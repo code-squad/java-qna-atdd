@@ -13,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import codesquad.domain.Question;
 import support.test.BasicAuthAcceptanceTest;
 
-public class ApiQuestionControllerTest extends BasicAuthAcceptanceTest {
-    private static final Logger log = LoggerFactory.getLogger(ApiQuestionControllerTest.class);
+public class ApiQuestionAcceptanceTest extends BasicAuthAcceptanceTest {
+    private static final Logger log = LoggerFactory.getLogger(ApiQuestionAcceptanceTest.class);
 
     @Test
     public void create_entity() throws Exception {

@@ -11,7 +11,7 @@ import codesquad.domain.User;
 import codesquad.dto.UserDto;
 import support.test.AcceptanceTest;
 
-public class ApiUserControllerTest extends AcceptanceTest {
+public class ApiUserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create_user() throws Exception {

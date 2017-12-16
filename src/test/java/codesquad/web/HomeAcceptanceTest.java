@@ -12,7 +12,7 @@ import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import support.test.BasicAuthAcceptanceTest;
 
-public class HomeControllerTest extends BasicAuthAcceptanceTest {
+public class HomeAcceptanceTest extends BasicAuthAcceptanceTest {
     @Autowired
     private QuestionRepository questionRepository;
 

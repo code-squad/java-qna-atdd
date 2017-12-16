@@ -12,7 +12,7 @@ import org.springframework.util.MultiValueMap;
 import support.test.BasicAuthAcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
-public class LoginControllerTest extends BasicAuthAcceptanceTest {
+public class LoginAcceptanceTest extends BasicAuthAcceptanceTest {
     @Test
     public void login_success() throws Exception {
         ResponseEntity<String> response = login(loginUser.getUserId(), loginUser.getPassword());

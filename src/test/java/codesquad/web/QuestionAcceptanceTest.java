@@ -17,7 +17,7 @@ import codesquad.domain.QuestionRepository;
 import support.test.BasicAuthAcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
-public class QuestionControllerTest extends BasicAuthAcceptanceTest {
+public class QuestionAcceptanceTest extends BasicAuthAcceptanceTest {
     @Autowired
     private QuestionRepository questionRepository;
 

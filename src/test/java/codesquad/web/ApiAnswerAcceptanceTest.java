@@ -16,8 +16,8 @@ import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import support.test.BasicAuthAcceptanceTest;
 
-public class ApiAnswerControllerTest extends BasicAuthAcceptanceTest {
-    private static final Logger log = LoggerFactory.getLogger(ApiAnswerControllerTest.class);
+public class ApiAnswerAcceptanceTest extends BasicAuthAcceptanceTest {
+    private static final Logger log = LoggerFactory.getLogger(ApiAnswerAcceptanceTest.class);
 
     @Autowired
     private QuestionRepository questionRepository;

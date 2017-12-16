@@ -17,8 +17,8 @@ import codesquad.domain.UserRepository;
 import support.test.BasicAuthAcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
-public class UserControllerTest extends BasicAuthAcceptanceTest {
-    private static final Logger log = LoggerFactory.getLogger(UserControllerTest.class);
+public class UserAcceptanceTest extends BasicAuthAcceptanceTest {
+    private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -34,7 +34,9 @@ public class UserControllerTest extends BasicAuthAcceptanceTest {
     public void create() throws Exception {
         String userId = "testuser";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("userId", userId).addParameter("password", "password").addParameter("name", "자바지기")
+                .addParameter("userId", userId)
+                .addParameter("password", "password")
+                .addParameter("name", "자바지기")
                 .addParameter("email", "javajigi@slipp.net").build();
 
         ResponseEntity<String> response = template.postForEntity("/users", request, String.class);
@@ -75,7 +77,9 @@ public class UserControllerTest extends BasicAuthAcceptanceTest {
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("_method", "put").addParameter("password", "pass2").addParameter("name", "재성2")
+                .addParameter("_method", "put")
+                .addParameter("password", "pass2")
+                .addParameter("name", "재성2")
                 .addParameter("email", "javajigi@slipp.net").build();
 
         return template.postForEntity(String.format("/users/%d", loginUser.getId()), request, String.class);
