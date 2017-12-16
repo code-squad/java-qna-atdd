@@ -3,6 +3,8 @@ package codesquad.domain;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import static codesquad.domain.UserTest.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,10 +54,6 @@ public class QuestionTest {
         Answer answer = newAnswer(1L, newUser(2L), question);
         question.addAnswer(answer);
         question.delete(newUser(1L));
-    }
-
-    private User newUser(Long id) {
-        return new User(id, "userId", "pass", "name", "javajigi@slipp.net");
     }
 
     private Answer newAnswer(Long id, User writer, Question question) {

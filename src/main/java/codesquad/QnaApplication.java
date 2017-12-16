@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @ComponentScan({"codesquad", "support"})
 @EnableJpaAuditing
 @EnableAspectJAutoProxy(proxyTargetClass=true)
-public class JwpSpringBootApplication {
+public class QnaApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(JwpSpringBootApplication.class, args);
+		SpringApplication.run(QnaApplication.class, args);
 	}
 }

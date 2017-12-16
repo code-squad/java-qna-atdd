@@ -33,7 +33,7 @@ public class AbstractEntity {
 	public AbstractEntity(long id) {
 		this.id = id;
 	}
-
+	
 	public long getId() {
 		return id;
 	}
