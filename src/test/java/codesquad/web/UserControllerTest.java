@@ -56,7 +56,7 @@ public class UserControllerTest extends BasicAuthAcceptanceTest {
     public void updateForm_no_login() throws Exception {
         ResponseEntity<String> response = template.getForEntity(String.format("/users/%d/form", loginUser.getId()),
                 String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class UserControllerTest extends BasicAuthAcceptanceTest {
     @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template);
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {

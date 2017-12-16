@@ -24,7 +24,7 @@ public class QuestionControllerTest extends BasicAuthAcceptanceTest {
     @Test
     public void createForm_logout() throws Exception {
         ResponseEntity<String> response = template.getForEntity("/questions/form", String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class QuestionControllerTest extends BasicAuthAcceptanceTest {
 
         ResponseEntity<String> response = basicAuthTemplate.getForEntity(savedQuestion.generateUrl() + "/form",
                 String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test
@@ -99,6 +99,6 @@ public class QuestionControllerTest extends BasicAuthAcceptanceTest {
                 .addParameter("contents", "맞아. TDD는 의심을 가지고 지켜봐야해.").build();
         ResponseEntity<String> response = basicAuthTemplate.postForEntity(savedQuestion.generateUrl(), request,
                 String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 }

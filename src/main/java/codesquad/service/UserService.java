@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;
@@ -41,8 +42,12 @@ public class UserService {
         return userRepository.save(original);
     }
 
-    public User findById(long id) {
-        return userRepository.findOne(id);
+    public User findById(User loginUser, long id) {
+        User user = userRepository.findOne(id);
+        if (!user.equals(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        return user;
     }
 
     public List<User> findAll() {

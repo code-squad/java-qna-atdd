@@ -69,7 +69,7 @@ public class AnswerControllerTest extends BasicAuthAcceptanceTest {
         ResponseEntity<String> response = basicAuthTemplate.postForEntity(savedAnswer.generateUrl(), request,
                 String.class);
 
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
         assertNotNull(answerRepository.findOne(savedAnswer.getId()));
     }
 }

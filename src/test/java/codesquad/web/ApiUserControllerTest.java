@@ -1,9 +1,11 @@
 package codesquad.web;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import codesquad.domain.User;
 import codesquad.dto.UserDto;
@@ -18,6 +20,15 @@ public class ApiUserControllerTest extends AcceptanceTest {
         
         UserDto dbUser = getResource(location, UserDto.class, findByUserId(newUser.getUserId()));
         assertThat(dbUser, is(newUser));
+    }
+    
+    @Test
+    public void show_다른_사람() throws Exception {
+        UserDto newUser = createUserDto("testuser3");
+        String location = createResource("/api/users", newUser);
+        
+        ResponseEntity<String> response = getResource(location, findDefaultUser());
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     private UserDto createUserDto(String userId) {
