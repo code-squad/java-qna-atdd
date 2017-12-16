@@ -6,6 +6,8 @@
 			<Pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] [%logger{36}] - %m%n</Pattern>
 		</layout>
 	</appender>
+
+	<logger name="support.jackson" level="DEBUG" />
 	
 	<logger name="codesquad" level="DEBUG" />
 	

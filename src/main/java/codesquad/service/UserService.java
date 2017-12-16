@@ -1,14 +1,15 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import codesquad.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
-import codesquad.security.UnAuthenticationException;
 
 @Service("userService")
 public class UserService {
@@ -16,7 +17,17 @@ public class UserService {
 	private UserRepository userRepository;
 
 	public User login(String userId, String password) throws UnAuthenticationException {
-		return null;
+		Optional<User> maybeUser = userRepository.findByUserId(userId);
+		if (!maybeUser.isPresent()) {
+			throw new UnAuthenticationException();
+		}
+
+		User user = maybeUser.get();
+		if (!user.matchPassword(password)) {
+			throw new UnAuthenticationException();
+		}
+
+		return user;
 	}
 
 	public User add(User user) {
@@ -24,7 +35,9 @@ public class UserService {
 	}
 
 	public User update(User loginUser, long id, User updatedUser) {
-		return null;
+		User original = userRepository.findOne(id);
+		original.update(loginUser, updatedUser);
+		return userRepository.save(original);
 	}
 
 	public User findById(long id) {
