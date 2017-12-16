@@ -3,45 +3,45 @@ package codesquad.dto;
 import javax.validation.constraints.Size;
 
 public class QuestionDto {
-	private long id;
-	
-	@Size(min = 3, max = 100)
-	private String title;
-	
-	@Size(min = 3)
-	private String contents;
-	
-	public QuestionDto(String title, String contents) {
-		this(0, title, contents);
-	}
+    private long id;
 
-	public QuestionDto(long id, String title, String contents) {
-		this.id = id;
-		this.title = title;
-		this.contents = contents;
-	}
+    @Size(min = 3, max = 100)
+    private String title;
 
-	public long getId() {
-		return id;
-	}
+    @Size(min = 3)
+    private String contents;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public QuestionDto(String title, String contents) {
+        this(0, title, contents);
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public QuestionDto(long id, String title, String contents) {
+        this.id = id;
+        this.title = title;
+        this.contents = contents;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public String getContents() {
-		return contents;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setContents(String contents) {
-		this.contents = contents;
-	}
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
 }

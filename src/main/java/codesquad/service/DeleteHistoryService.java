@@ -15,7 +15,7 @@ import codesquad.domain.DeleteHistoryRepository;
 public class DeleteHistoryService {
     @Resource(name = "deleteHistoryRepository")
     private DeleteHistoryRepository deleteHistoryRepository;
-    
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveAll(List<DeleteHistory> deleteHistories) {
         for (DeleteHistory deleteHistory : deleteHistories) {

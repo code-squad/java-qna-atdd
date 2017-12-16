@@ -17,37 +17,37 @@ import codesquad.domain.User;
 import codesquad.domain.UserTest;
 
 public class JacksonMappingTest {
-	private static final Logger log = LoggerFactory.getLogger(JacksonMappingTest.class);
-	
-	private ObjectMapper mapper;
-	
-	@Before
-	public void setup() {
-		mapper = new ObjectMapper();
-	}
-	
-	@Test
-	public void simple() throws Exception {
-		Map<String, String> data = new HashMap<>();
-		data.put("name", "jaesung");
-		String result = mapper.writeValueAsString(data);
-		log.debug("result : {}", result);
-	}
+    private static final Logger log = LoggerFactory.getLogger(JacksonMappingTest.class);
 
-	@Test
-	public void question() throws Exception {
-		User loginUser = UserTest.JAVAJIGI;
-		Question question = QuestionTest.createByLoginUser(loginUser);
-		String result = mapper.writeValueAsString(question);
-		log.debug("result : {}", result);
-	}
-	
-	@Test
-	public void answer() throws Exception {
-		User loginUser = UserTest.JAVAJIGI;
-		Question question = QuestionTest.createByLoginUser(loginUser);
-		Answer answer = new Answer(loginUser, "하지만 TDD는 너무 하기 힘들 활동임다.");
-		String result = mapper.writeValueAsString(question.addAnswer(answer));
-		log.debug("result : {}", result);
-	}
+    private ObjectMapper mapper;
+
+    @Before
+    public void setup() {
+        mapper = new ObjectMapper();
+    }
+
+    @Test
+    public void simple() throws Exception {
+        Map<String, String> data = new HashMap<>();
+        data.put("name", "jaesung");
+        String result = mapper.writeValueAsString(data);
+        log.debug("result : {}", result);
+    }
+
+    @Test
+    public void question() throws Exception {
+        User loginUser = UserTest.JAVAJIGI;
+        Question question = QuestionTest.createByLoginUser(loginUser);
+        String result = mapper.writeValueAsString(question);
+        log.debug("result : {}", result);
+    }
+
+    @Test
+    public void answer() throws Exception {
+        User loginUser = UserTest.JAVAJIGI;
+        Question question = QuestionTest.createByLoginUser(loginUser);
+        Answer answer = new Answer(loginUser, "하지만 TDD는 너무 하기 힘들 활동임다.");
+        String result = mapper.writeValueAsString(question.addAnswer(answer));
+        log.debug("result : {}", result);
+    }
 }

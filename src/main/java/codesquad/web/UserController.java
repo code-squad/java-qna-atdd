@@ -15,46 +15,47 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import codesquad.domain.User;
+import codesquad.dto.UserDto;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
-	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-	@Resource(name = "userService")
-	private UserService userService;
-	
-	@GetMapping("/form")
-	public String form() {
-		return "/user/form";
-	}
-	
-	@PostMapping("")
-	public String create(User user) {
-		userService.add(user);
-		return "redirect:/users";
-	}
-	
-	@GetMapping("")
-	public String list(Model model) {
-		List<User> users = userService.findAll();
-		log.debug("user size : {}", users.size());
-		model.addAttribute("users", users);
-		return "/user/list";
-	}
-	
-	@GetMapping("/{id}/form")
-	public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
-		model.addAttribute("user", userService.findById(id));
-		return "/user/updateForm";
-	}
-	
-	@PutMapping("/{id}")
-	public String update(@LoginUser User loginUser, @PathVariable long id, User target) {
-		userService.update(loginUser, id, target);
-		return "redirect:/users";
-	}
-	
+    @Resource(name = "userService")
+    private UserService userService;
+
+    @GetMapping("/form")
+    public String form() {
+        return "/user/form";
+    }
+
+    @PostMapping("")
+    public String create(UserDto userDto) {
+        userService.add(userDto);
+        return "redirect:/users";
+    }
+
+    @GetMapping("")
+    public String list(Model model) {
+        List<User> users = userService.findAll();
+        log.debug("user size : {}", users.size());
+        model.addAttribute("users", users);
+        return "/user/list";
+    }
+
+    @GetMapping("/{id}/form")
+    public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
+        model.addAttribute("user", userService.findById(id));
+        return "/user/updateForm";
+    }
+
+    @PutMapping("/{id}")
+    public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
+        userService.update(loginUser, id, target);
+        return "redirect:/users";
+    }
+
 }

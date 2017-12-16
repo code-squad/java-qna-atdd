@@ -15,7 +15,7 @@ public class UserTest {
     public static User newUser(Long id) {
         return new User(id, "userId", "pass", "name", "javajigi@slipp.net");
     }
-    
+
     public static User newUser(String userId) {
         return newUser(userId, "password");
     }

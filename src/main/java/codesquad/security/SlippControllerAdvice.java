@@ -20,7 +20,7 @@ public class SlippControllerAdvice {
     public void emptyResultData() {
         log.debug("EntityNotFoundException is happened!");
     }
-    
+
     @ExceptionHandler(UnAuthorizedException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public void unAuthorized() {

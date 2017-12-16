@@ -9,11 +9,11 @@ public class ValidationError {
         this.fieldName = fieldName;
         this.errorMessage = errorMessage;
     }
-    
+
     public String getFieldName() {
         return fieldName;
     }
-    
+
     public String getErrorMessage() {
         return errorMessage;
     }

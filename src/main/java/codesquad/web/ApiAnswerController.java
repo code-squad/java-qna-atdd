@@ -22,16 +22,15 @@ import codesquad.service.QnaService;
 @RestController
 @RequestMapping("/api/questions/{questionId}/answers")
 public class ApiAnswerController {
-	@Resource(name = "qnaService")
-	private QnaService qnaService;
+    @Resource(name = "qnaService")
+    private QnaService qnaService;
 
-	@PostMapping("")
-	public ResponseEntity<Void> addAnswer(@LoginUser User loginUser,
-									@PathVariable long questionId,
-									@Valid @RequestBody Answer answer) {
-		Answer savedAnswer = qnaService.addAnswer(loginUser, questionId, answer.getContents());
-		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(URI.create("/api" + savedAnswer.generateUrl()));
-		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
-	}
+    @PostMapping("")
+    public ResponseEntity<Void> addAnswer(@LoginUser User loginUser, @PathVariable long questionId,
+            @Valid @RequestBody Answer answer) {
+        Answer savedAnswer = qnaService.addAnswer(loginUser, questionId, answer.getContents());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/api" + savedAnswer.generateUrl()));
+        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+    }
 }

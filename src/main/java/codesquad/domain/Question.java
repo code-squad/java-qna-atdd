@@ -20,78 +20,78 @@ import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
-	@Size(min = 3, max = 100)
-	@Column(length = 100, nullable = false)
-	private String title;
+    @Size(min = 3, max = 100)
+    @Column(length = 100, nullable = false)
+    private String title;
 
-	@Size(min = 3)
-	@Lob
-	private String contents;
+    @Size(min = 3)
+    @Lob
+    private String contents;
 
-	@ManyToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
-	private User writer;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
+    private User writer;
 
-	@Embedded
+    @Embedded
     private Answers answers = new Answers();
 
-	private boolean deleted = false;
-	
-	public Question() {
-	}
+    private boolean deleted = false;
 
-	public Question(String title, String contents) {
-		this.title = title;
-		this.contents = contents;
-	}
+    public Question() {
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Question(String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getContents() {
-		return contents;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setContents(String contents) {
-		this.contents = contents;
-	}
+    public String getContents() {
+        return contents;
+    }
 
-	public User getWriter() {
-		return writer;
-	}
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
 
-	public void writeBy(User loginUser) {
-		this.writer = loginUser;
-	}
+    public User getWriter() {
+        return writer;
+    }
 
-	public Answer addAnswer(Answer answer) {
-	    answer.toQuestion(this);
-		answers.add(answer);
-		return answer;
-	}
+    public void writeBy(User loginUser) {
+        this.writer = loginUser;
+    }
 
-	public boolean isOwner(User loginUser) {
-		return writer.equals(loginUser);
-	}
-	
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public Answer addAnswer(Answer answer) {
+        answer.toQuestion(this);
+        answers.add(answer);
+        return answer;
+    }
 
-	public void update(User loginUser, Question updatedQuestion) {
-		if (!isOwner(loginUser)) {
-			throw new UnAuthorizedException();
-		}
+    public boolean isOwner(User loginUser) {
+        return writer.equals(loginUser);
+    }
 
-		this.title = updatedQuestion.title;
-		this.contents = updatedQuestion.contents;
-	}
-	
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void update(User loginUser, Question updatedQuestion) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+
+        this.title = updatedQuestion.title;
+        this.contents = updatedQuestion.contents;
+    }
+
     public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if (!isOwner(loginUser)) {
             throw new CannotDeleteException("다른 사람의 글은 삭제할 수 없다.");
@@ -105,17 +105,17 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return histories;
     }
 
-	@Override
-	public String generateUrl() {
-		return String.format("/questions/%d", getId());
-	}
+    @Override
+    public String generateUrl() {
+        return String.format("/questions/%d", getId());
+    }
 
-	public QuestionDto _toConvertQuestionDto() {
-		return new QuestionDto(getId(), this.title, this.contents);
-	}
+    public QuestionDto _toConvertQuestionDto() {
+        return new QuestionDto(getId(), this.title, this.contents);
+    }
 
-	@Override
-	public String toString() {
-		return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
-	}
+    @Override
+    public String toString() {
+        return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
 }

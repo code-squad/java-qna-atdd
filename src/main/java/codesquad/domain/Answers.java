@@ -14,22 +14,22 @@ import codesquad.CannotDeleteException;
 
 @Embeddable
 public class Answers {
-    @OneToMany(mappedBy="question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
     private List<Answer> answers = new ArrayList<>();
 
     public void add(Answer answer) {
-        answers.add(answer);      
+        answers.add(answer);
     }
-    
+
     public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         List<DeleteHistory> histories = new ArrayList<>();
-        
+
         for (Answer answer : answers) {
             histories.add(answer.delete(loginUser));
         }
-        
+
         return histories;
     }
 }

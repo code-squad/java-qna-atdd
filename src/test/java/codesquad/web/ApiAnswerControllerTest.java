@@ -17,32 +17,30 @@ import codesquad.domain.QuestionRepository;
 import support.test.BasicAuthAcceptanceTest;
 
 public class ApiAnswerControllerTest extends BasicAuthAcceptanceTest {
-	private static final Logger log = LoggerFactory.getLogger(ApiAnswerControllerTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiAnswerControllerTest.class);
 
-	@Autowired
-	private QuestionRepository questionRepository;
-	
-	@Test
-	public void create_entity() throws Exception {
-		Question savedQuestion = questionRepository.save(createByLoginUser(loginUser));
-		Answer answer = new Answer(loginUser, "하지만 TDD는 너무 하기 힘들 활동임다.");
-		
-		ResponseEntity<String> response = basicAuthTemplate.postForEntity(
-				String.format("/api/%s/answers", savedQuestion.generateUrl()), 
-				answer, String.class);
-		assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-		log.debug("body : {}", response.getBody());
-	}
-	
-	@Test
-	public void create_invalid() throws Exception {
-		Question savedQuestion = questionRepository.save(createByLoginUser(loginUser));
-		Answer answer = new Answer(loginUser, "T");
-		
-		ResponseEntity<String> response = basicAuthTemplate.postForEntity(
-				String.format("/api/%s/answers", savedQuestion.generateUrl()), 
-				answer, String.class);
-		assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
-		log.debug("body : {}", response.getBody());
-	}
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @Test
+    public void create_entity() throws Exception {
+        Question savedQuestion = questionRepository.save(createByLoginUser(loginUser));
+        Answer answer = new Answer(loginUser, "하지만 TDD는 너무 하기 힘들 활동임다.");
+
+        ResponseEntity<String> response = basicAuthTemplate
+                .postForEntity(String.format("/api/%s/answers", savedQuestion.generateUrl()), answer, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        log.debug("body : {}", response.getBody());
+    }
+
+    @Test
+    public void create_invalid() throws Exception {
+        Question savedQuestion = questionRepository.save(createByLoginUser(loginUser));
+        Answer answer = new Answer(loginUser, "T");
+
+        ResponseEntity<String> response = basicAuthTemplate
+                .postForEntity(String.format("/api/%s/answers", savedQuestion.generateUrl()), answer, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
+        log.debug("body : {}", response.getBody());
+    }
 }
