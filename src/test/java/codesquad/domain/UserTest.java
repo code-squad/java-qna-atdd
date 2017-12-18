@@ -59,16 +59,4 @@ public class UserTest {
         assertThat(origin.getName(), is(not(target.getName())));
         assertThat(origin.getEmail(), is(not(target.getEmail())));
     }
-    
-    @Test
-    public void match_password() throws Exception {
-        User user = newUser("sanjigi");
-        assertTrue(user.matchPassword(user.getPassword()));
-    }
-    
-    @Test
-    public void mismatch_password() throws Exception {
-        User user = newUser("sanjigi");
-        assertFalse(user.matchPassword(user.getPassword() + "2"));
-    }
 }

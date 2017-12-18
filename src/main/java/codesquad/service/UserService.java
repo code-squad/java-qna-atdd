@@ -18,20 +18,6 @@ public class UserService {
     @Resource(name = "userRepository")
     private UserRepository userRepository;
 
-    public User login(String userId, String password) throws UnAuthenticationException {
-        Optional<User> maybeUser = userRepository.findByUserId(userId);
-        if (!maybeUser.isPresent()) {
-            throw new UnAuthenticationException();
-        }
-
-        User user = maybeUser.get();
-        if (!user.matchPassword(password)) {
-            throw new UnAuthenticationException();
-        }
-
-        return user;
-    }
-
     public User add(UserDto userDto) {
         return userRepository.save(userDto._toUser());
     }
@@ -52,5 +38,24 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+    
+//    public User login(String userId, String password) throws UnAuthenticationException {
+//        // TODO 로그인 기능 구현
+//        return null;
+//    }
+    
+    public User login(String userId, String password) throws UnAuthenticationException {
+        Optional<User> maybeUser = userRepository.findByUserId(userId);
+        if (!maybeUser.isPresent()) {
+            throw new UnAuthenticationException();
+        }
+
+        User user = maybeUser.get();
+        if (!user.matchPassword(password)) {
+            throw new UnAuthenticationException();
+        }
+
+        return user;
     }
 }
