@@ -16,7 +16,6 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Where;
 
-import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -85,15 +84,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
-    }
-
-    public void update(User loginUser, Question updatedQuestion) {
-        if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
-
-        this.title = updatedQuestion.title;
-        this.contents = updatedQuestion.contents;
     }
 
     @Override

@@ -7,7 +7,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
-import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -70,12 +69,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
-    }
-
-    public void deletedBy(User loginUser) {
-        if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
     }
 
     @Override
