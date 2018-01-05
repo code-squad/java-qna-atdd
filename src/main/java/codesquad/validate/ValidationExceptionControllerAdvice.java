@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ValidationExceptionControllerAdvice {
     private static final Logger log = LoggerFactory.getLogger(ValidationExceptionControllerAdvice.class);
 
-    @Resource (name = "messageSourceAccessor")
+    @Resource(name = "messageSourceAccessor")
     private MessageSourceAccessor msa;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

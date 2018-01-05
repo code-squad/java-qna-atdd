@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
-import codesquad.domain.DeleteHistory;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -42,16 +41,13 @@ public class QnaService {
     }
 
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        Question question = questionRepository.findOne(id);
-        question.update(loginUser, updatedQuestion);
-        return questionRepository.save(question);
+        // TODO 수정 기능 구현
+        return null;
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        Question question = questionRepository.getOne(questionId);
-        List<DeleteHistory> histories = question.delete(loginUser);
-        deleteHistoryService.saveAll(histories);
+        // TODO 삭제 기능 구현
     }
 
     public Iterable<Question> findAll() {
@@ -63,17 +59,11 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        Question question = questionRepository.findOne(questionId);
-        Answer answer = new Answer(loginUser, contents);
-        question.addAnswer(answer);
-        questionRepository.save(question);
-        return answer;
+        return null;
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        Answer answer = answerRepository.findOne(id);
-        answer.deletedBy(loginUser);
-        answerRepository.delete(answer);
-        return answer;
+        // TODO 답변 삭제 기능 구현 
+        return null;
     }
 }

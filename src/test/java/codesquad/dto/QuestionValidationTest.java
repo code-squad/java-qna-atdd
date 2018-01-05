@@ -17,13 +17,13 @@ import codesquad.dto.QuestionDto;
 
 public class QuestionValidationTest {
     private static Validator validator;
-    
+
     @BeforeClass
     public static void setup() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
-    
+
     @Test
     public void titleWhenIsEmpty() throws Exception {
         QuestionDto question = new QuestionDto("", "당근 엄청 의미있는 활동이고 말고..");
@@ -31,4 +31,3 @@ public class QuestionValidationTest {
         assertThat(constraintViolcations.size(), is(1));
     }
 }
-

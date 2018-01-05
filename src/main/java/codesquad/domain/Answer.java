@@ -1,7 +1,5 @@
 package codesquad.domain;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
@@ -9,8 +7,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
-import codesquad.CannotDeleteException;
-import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -37,7 +33,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.writer = writer;
         this.contents = contents;
     }
-    
+
     public Answer(Long id, User writer, Question question, String contents) {
         super(id);
         this.writer = writer;
@@ -70,25 +66,9 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
-        if (!isOwner(loginUser)) {
-            throw new CannotDeleteException("다른 사용자가 작성한 답변을 삭제할 수 없습니다.");
-        }
-
-        this.deleted = true;
-
-        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
-    }
-
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
-    }
-
-    public void deletedBy(User loginUser) {
-        if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
     }
 
     @Override
