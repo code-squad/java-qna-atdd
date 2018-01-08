@@ -1,7 +1,6 @@
 package codesquad.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -40,22 +39,8 @@ public class UserService {
         return userRepository.findAll();
     }
     
-//    public User login(String userId, String password) throws UnAuthenticationException {
-//        // TODO 로그인 기능 구현
-//        return null;
-//    }
-    
     public User login(String userId, String password) throws UnAuthenticationException {
-        Optional<User> maybeUser = userRepository.findByUserId(userId);
-        if (!maybeUser.isPresent()) {
-            throw new UnAuthenticationException();
-        }
-
-        User user = maybeUser.get();
-        if (!user.matchPassword(password)) {
-            throw new UnAuthenticationException();
-        }
-
-        return user;
+        // TODO 로그인 기능 구현
+        return null;
     }
 }
