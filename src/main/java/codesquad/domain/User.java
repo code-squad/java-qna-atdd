@@ -48,57 +48,37 @@ public class User extends AbstractEntity {
         this.email = email;
     }
 
-    public String getUserId() {
-        return userId;
+    private boolean matchUserId(String userId) {
+        return this.userId.equals(userId);
     }
 
-    public User setUserId(String userId) {
-        this.userId = userId;
-        return this;
+    public void update(User loginUser, User target) {
+        if (!matchUserId(loginUser.userId)) {
+            throw new UnAuthorizedException();
+        }
+
+        if (!matchPassword(target.password)) {
+            return;
+        }
+
+        this.name = target.name;
+        this.email = target.email;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public User setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
     public String getName() {
         return name;
     }
 
-    public User setName(String name) {
-        this.name = name;
-        return this;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public User setEmail(String email) {
-        this.email = email;
-        return this;
-    }
-
-    private boolean matchUserId(String userId) {
-        return this.userId.equals(userId);
-    }
-
-    public void update(User loginUser, User target) {
-        if (!matchUserId(loginUser.getUserId())) {
-            throw new UnAuthorizedException();
-        }
-
-        if (!matchPassword(target.getPassword())) {
-            return;
-        }
-
-        this.name = target.name;
-        this.email = target.email;
     }
 
     public boolean matchPassword(String password) {

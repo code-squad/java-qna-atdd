@@ -2,6 +2,7 @@ package codesquad.web;
 
 import javax.annotation.Resource;
 
+import codesquad.dto.QuestionDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +31,7 @@ public class QuestionController {
     }
 
     @PostMapping("")
-    public String create(@LoginUser User loginUser, Question question) {
+    public String create(@LoginUser User loginUser, QuestionDto question) {
         qnaService.create(loginUser, question);
         return "redirect:/";
     }
@@ -53,7 +54,7 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-    public String update(@LoginUser User loginUser, @PathVariable long id, Question question) {
+    public String update(@LoginUser User loginUser, @PathVariable long id, QuestionDto question) {
         Question updatedQuestion = qnaService.update(loginUser, id, question);
         return "redirect:" + updatedQuestion.generateUrl();
     }

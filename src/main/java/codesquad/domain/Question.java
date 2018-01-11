@@ -45,26 +45,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-
-    public User getWriter() {
-        return writer;
-    }
-
     public void writeBy(User loginUser) {
         this.writer = loginUser;
     }
@@ -73,6 +53,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answer.toQuestion(this);
         answers.add(answer);
         return answer;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContents() {
+        return contents;
     }
 
     public boolean isOwner(User loginUser) {

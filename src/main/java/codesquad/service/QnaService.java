@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,8 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
+    public Question create(User loginUser, QuestionDto questionDto) {
+        Question question = questionDto.toQuestion();
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
@@ -41,9 +43,9 @@ public class QnaService {
         return questionRepository.findOne(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
+    public Question update(User loginUser, long id, QuestionDto updatedQuestion) {
         Question question = questionRepository.findOne(id);
-        question.update(loginUser, updatedQuestion);
+        question.update(loginUser, updatedQuestion.toQuestion());
         return questionRepository.save(question);
     }
 

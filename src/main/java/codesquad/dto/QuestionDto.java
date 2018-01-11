@@ -1,5 +1,7 @@
 package codesquad.dto;
 
+import codesquad.domain.Question;
+
 import javax.validation.constraints.Size;
 
 public class QuestionDto {
@@ -10,6 +12,8 @@ public class QuestionDto {
 
     @Size(min = 3)
     private String contents;
+
+    public QuestionDto() {}
 
     public QuestionDto(String title, String contents) {
         this(0, title, contents);
@@ -43,5 +47,9 @@ public class QuestionDto {
 
     public void setContents(String contents) {
         this.contents = contents;
+    }
+
+    public Question toQuestion() {
+        return new Question(this.title, this.contents);
     }
 }
