@@ -85,7 +85,7 @@ public class User extends AbstractEntity {
         return this.password.equals(password);
     }
 
-    public UserDto _toUserDto() {
+    public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
     

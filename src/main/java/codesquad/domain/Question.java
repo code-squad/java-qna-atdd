@@ -53,16 +53,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getContents() {
         return contents;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
     }
 
     public User getWriter() {
@@ -91,7 +83,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return String.format("/questions/%d", getId());
     }
 
-    public QuestionDto _toConvertQuestionDto() {
+    public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);
     }
 

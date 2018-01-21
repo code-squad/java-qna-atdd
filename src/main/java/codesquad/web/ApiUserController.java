@@ -39,7 +39,7 @@ public class ApiUserController {
     @GetMapping("{id}")
     public UserDto show(@LoginUser User loginUser, @PathVariable long id) {
         User user = userService.findById(loginUser, id);
-        return user._toUserDto();
+        return user.toUserDto();
     }
     
     @PutMapping("{id}")

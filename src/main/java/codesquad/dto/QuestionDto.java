@@ -25,23 +25,26 @@ public class QuestionDto {
         return id;
     }
 
-    public void setId(long id) {
+    public QuestionDto setId(long id) {
         this.id = id;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public QuestionDto setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public String getContents() {
         return contents;
     }
 
-    public void setContents(String contents) {
+    public QuestionDto setContents(String contents) {
         this.contents = contents;
+        return this;
     }
 }

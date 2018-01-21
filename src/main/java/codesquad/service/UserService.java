@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -18,12 +19,12 @@ public class UserService {
     private UserRepository userRepository;
 
     public User add(UserDto userDto) {
-        return userRepository.save(userDto._toUser());
+        return userRepository.save(userDto.toUser());
     }
 
     public User update(User loginUser, long id, UserDto updatedUser) {
         User original = userRepository.findOne(id);
-        original.update(loginUser, updatedUser._toUser());
+        original.update(loginUser, updatedUser.toUser());
         return userRepository.save(original);
     }
 
@@ -38,7 +39,7 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
-    
+
     public User login(String userId, String password) throws UnAuthenticationException {
         // TODO 로그인 기능 구현
         return null;
