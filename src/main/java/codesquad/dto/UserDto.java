@@ -1,5 +1,6 @@
 package codesquad.dto;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;

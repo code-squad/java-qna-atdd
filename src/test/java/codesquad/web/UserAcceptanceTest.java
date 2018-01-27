@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +24,19 @@ import org.springframework.util.MultiValueMap;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
+import support.utils.HtmlFormDataBuilder;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
     @Autowired
     private UserRepository userRepository;
+    private HtmlFormDataBuilder htmlFormDataBuilder;
+
+    @Before
+    public void setUp() throws Exception {
+        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
+    }
 
     @Test
     public void createForm() throws Exception {
@@ -39,19 +47,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        
-        ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
+
+        htmlFormDataBuilder.addParameter("userId", userId)
+                .addParameter("password", "password")
+                .addParameter("name", "자바지기")
+                .addParameter("email", "javajigi@slipp.net");
+
+        ResponseEntity<String> response = template().postForEntity("/users", htmlFormDataBuilder.build(), String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertNotNull(userRepository.findByUserId(userId));
@@ -89,18 +92,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        htmlFormDataBuilder
+                .addParameter("_method", "put")
+                .addParameter("password", "password2")
+                .addParameter("name", "자바지기2")
+                .addParameter("email", "javajigi@slipp.net");
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("_method", "put");
-        params.add("password", "password2");
-        params.add("name", "자바지기2");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-
-        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
+        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), htmlFormDataBuilder.build(), String.class);
     }
 
     @Test
