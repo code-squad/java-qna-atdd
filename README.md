@@ -8,3 +8,16 @@
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://github.com/code-squad/codesquad-docs/blob/master/codereview/README.md)
 * [동영상으로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://youtu.be/a5c9ku-_fok)
+
+
+#요구사항
+## 기능 요구사항
+* 로그인에 성공하면 HttpStatus.FOUND을 status code로 응답해야 한다. 응답 후에 이동할 경로는 "/users"이다.
+로그인에 실패하면 templates/user 디렉토리의 login_failed.html을 응답으로 보낸다.
+## 프로그래밍 요구사항
+* 로그인 기능을 ATDD 기반으로 구현해야 한다.
+* User에 대한 단위 테스트를 구현해야 한다.
+* UserService 클래스의 login() 메소드를 구현해 src/test/java의 모든 테스트 메소드가 성공해야 한다.
+힌트
+* codesquad.web.UserAcceptanceTest 소스 코드를 참고해 LoginAcceptanceTest를 구현하면서 시작한다.
+* codesquad.web.UserAcceptanceTest 소스 코드의 create() 테스트 메소드를 참고해 서버에 데이터를 전송한다.
