@@ -1,28 +1,23 @@
 package codesquad.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-
+import codesquad.UnAuthenticationException;
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
+import codesquad.dto.UserDto;
+import codesquad.utils.HtmlFormDataBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -39,18 +34,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
 
         String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        
+        htmlFormDataBuilder.addParameter("userId", userId);
+        htmlFormDataBuilder.addParameter("password", "password");
+        htmlFormDataBuilder.addParameter("name", "자바지기");
+        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
@@ -89,16 +80,12 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("_method", "put");
-        params.add("password", "password2");
-        params.add("name", "자바지기2");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
+        htmlFormDataBuilder.addParameter("_method", "put");
+        htmlFormDataBuilder.addParameter("password", "password2");
+        htmlFormDataBuilder.addParameter("name", "자바지기2");
+        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
 
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }
@@ -108,5 +95,30 @@ public class UserAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = update(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
+    }
+
+    @Test
+    public void 로그인_성공() throws Exception {
+        create();
+        User user = userRepository.findByUserId("testuser").orElseThrow(() -> new UnAuthenticationException());
+        assertEquals("testuser", user.getUserId());
+    }
+
+    @Test(expected = UnAuthenticationException.class)
+    public void 로그인_실패시_에러를_발생시키는가() throws Exception {
+        create();
+        userRepository.findByUserId("notuser").orElseThrow(() -> new UnAuthenticationException());
+    }
+
+    @Test
+    public void login() throws Exception {
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
+        htmlFormDataBuilder.addParameter("userId", "test");
+        htmlFormDataBuilder.addParameter("password", "password2");
+        ResponseEntity<String> response = template().postForEntity("/users", htmlFormDataBuilder.build(), String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        log.debug("body : {}", response.getBody());
+        assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다. 다시 로그인 해주세요."), is(true));
     }
 }

@@ -1,11 +1,7 @@
 package codesquad.security;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Base64;
-
+import codesquad.domain.User;
+import codesquad.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,10 +9,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import codesquad.domain.User;
-import codesquad.security.BasicAuthInterceptor;
-import codesquad.security.HttpSessionUtils;
-import codesquad.service.UserService;
+import java.util.Base64;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BasicAuthInterceptorTest {

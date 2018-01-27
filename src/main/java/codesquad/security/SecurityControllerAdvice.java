@@ -23,14 +23,15 @@ public class SecurityControllerAdvice {
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN) //금지
     public void unAuthorized() {
         log.debug("UnAuthorizedException is happened!");
     }
     
     @ExceptionHandler(UnAuthenticationException.class)
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-    public void unAuthentication() {
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED) //권한없음
+    public String unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
+        return "/user/login_failed";
     }
 }
