@@ -93,7 +93,11 @@ public class User extends AbstractEntity {
     public boolean isGuestUser() {
         return false;
     }
-    
+
+    public boolean isCorrectPassword(String password) {
+        return this.password.equals(password);
+    }
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {
