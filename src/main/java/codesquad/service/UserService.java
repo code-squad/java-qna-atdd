@@ -41,7 +41,16 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        Optional<User> userOptional = userRepository.findByUserId(userId);
+        if(!userOptional.isPresent()){
+            throw new UnAuthenticationException();
+        }
+
+        User user = userOptional.get();
+        if(!user.matchPassword(password)){
+            throw new UnAuthenticationException();
+        }
+
+        return user;
     }
 }
