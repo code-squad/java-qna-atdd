@@ -27,7 +27,7 @@ public class SecurityControllerAdvice {
     public void unAuthorized() {
         log.debug("UnAuthorizedException is happened!");
     }
-    
+
     @ExceptionHandler(UnAuthenticationException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public void unAuthentication() {

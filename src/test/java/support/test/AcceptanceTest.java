@@ -1,14 +1,17 @@
 package support.test;
 
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.MultiValueMap;
 
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
+import static support.test.HtmlFormDataBuilder.urlEncodedForm;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -39,5 +42,13 @@ public abstract class AcceptanceTest {
     
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
+    }
+
+    protected HttpEntity<MultiValueMap<String, Object>> htmlRequest(User user) {
+        return urlEncodedForm().addParameter("userId", user.getUserId())
+                               .addParameter("password", user.getPassword())
+                               .addParameter("name", user.getName())
+                               .addParameter("email", user.getEmail())
+                               .build();
     }
 }

@@ -1,28 +1,23 @@
 package codesquad.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static support.test.HtmlFormDataBuilder.urlEncodedForm;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -39,22 +34,11 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        User user = new User("testuser", "password", "자바지기", "javajigi@slipp.net");
 
-        String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        
-        ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
-
+        ResponseEntity<String> response = template().postForEntity("/users", htmlRequest(user), String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertNotNull(userRepository.findByUserId(user.getUserId()));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
     }
 
@@ -69,7 +53,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void updateForm_no_login() throws Exception {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
-                String.class);
+                                                                  String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
@@ -77,7 +61,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void updateForm_login() throws Exception {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
-                .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
+            .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
     }
@@ -89,17 +73,11 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("_method", "put");
-        params.add("password", "password2");
-        params.add("name", "자바지기2");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-
+        HttpEntity<MultiValueMap<String, Object>> request = urlEncodedForm().addParameter("_method", "put")
+                                                                            .addParameter("password", "password2")
+                                                                            .addParameter("name", "자바지기2")
+                                                                            .addParameter("email", "javajigi@slipp.net")
+                                                                            .build();
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }
 
