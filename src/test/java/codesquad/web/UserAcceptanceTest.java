@@ -109,4 +109,35 @@ public class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
     }
+
+    @Test
+    public void loginTest() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("userId", "sanjini");
+        params.add("password", "password");
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    }
+
+    @Test
+    public void loginFailTest() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("userId", "sanjini");
+        params.add("password", "test2");
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertTrue(response.getBody().contains("아이디 또는 비밀번호가 틀립니다. 다시 로그인 해주세요."));
+    }
 }
