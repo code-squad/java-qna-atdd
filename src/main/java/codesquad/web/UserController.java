@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import codesquad.UnAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -58,4 +59,14 @@ public class UserController {
         return "redirect:/users";
     }
 
+    @PostMapping("/login")
+    public String login(UserDto userDto) {
+        try {
+            userService.login(userDto.getUserId(), userDto.getPassword());
+        } catch(UnAuthenticationException ue) {
+            return "/user/login_failed";
+        }
+
+        return "redirect:/users";
+    }
 }

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,19 @@ import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
 
+import javax.swing.text.html.HTML;
+
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
+    private HtmlFormDataBuilder htmlFormDataBuilder;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Before
+    public void setup() {
+        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
+    }
 
     @Test
     public void createForm() throws Exception {
@@ -39,18 +48,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
         
+        htmlFormDataBuilder.addParameter("userId", "testuser");
+        htmlFormDataBuilder.addParameter("password", "password");
+        htmlFormDataBuilder.addParameter("name", "자바지기");
+        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
+
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
