@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,10 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        User user = userRepository.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
+        if(!user.matchPassword(password))
+            throw new UnAuthenticationException();
+
+        return user;
     }
 }

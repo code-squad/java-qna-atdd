@@ -1,23 +1,20 @@
 package codesquad.web;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.UnAuthenticationException;
+import codesquad.domain.User;
+import codesquad.dto.UserDto;
+import codesquad.security.HttpSessionUtils;
+import codesquad.security.LoginUser;
+import codesquad.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import codesquad.domain.User;
-import codesquad.dto.UserDto;
-import codesquad.security.LoginUser;
-import codesquad.service.UserService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 @RequestMapping("/users")
@@ -36,6 +33,22 @@ public class UserController {
     public String create(UserDto userDto) {
         userService.add(userDto);
         return "redirect:/users";
+    }
+
+    @GetMapping("/login_form")
+    public String login_form(){
+        return "/user/login";
+    }
+
+    @PostMapping("/login")
+    public String login(HttpServletRequest request, UserDto userDto){
+        try {
+            User user = userService.login(userDto.getUserId(), userDto.getPassword());
+            request.getSession().setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
+        }catch (UnAuthenticationException e){
+            return "user/login_failed";
+        }
+        return "redirect:/";
     }
 
     @GetMapping("")
