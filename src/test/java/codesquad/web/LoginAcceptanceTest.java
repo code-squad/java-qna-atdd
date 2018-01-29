@@ -17,7 +17,7 @@ public class LoginAcceptanceTest extends BasicAuthAcceptanceTest {
     public void login_success() throws Exception {
         ResponseEntity<String> response = login(loginUser.getUserId(), loginUser.getPassword());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertTrue(response.getHeaders().getLocation().getPath().startsWith("/;jsessionid="));
+        assertTrue(response.getHeaders().getLocation().getPath().equals("/"));
     }
 
     @Test
