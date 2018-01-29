@@ -1,37 +1,25 @@
 package codesquad.web;
 
-import codesquad.UnAuthenticationException;
-import codesquad.dto.UserDto;
-import codesquad.service.UserService;
+import codesquad.service.QnaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.HttpSession;
-
-import static codesquad.security.HttpSessionUtils.USER_SESSION_KEY;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Controller
 public class HomeController {
 
     @Autowired
-    private UserService userService;
+    private QnaService qnaService;
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(@PageableDefault(sort = "id", direction = DESC) Pageable pageable,
+                       Model model) {
+        model.addAttribute("questions", qnaService.findAll(pageable));
         return "home";
-    }
-
-    @GetMapping("/login")
-    public String login() {
-        return "/user/login";
-    }
-
-    @PostMapping("/login")
-    public String login(HttpSession session, UserDto user) throws UnAuthenticationException {
-        session.setAttribute(USER_SESSION_KEY, userService.login(user.getUserId(), user.getPassword()));
-        return "redirect:/";
     }
 }

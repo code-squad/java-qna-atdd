@@ -42,7 +42,7 @@ public class UserService {
 
     public User login(String userId, String password) throws UnAuthenticationException {
         User user = userRepository.findByUserId(userId).orElseThrow(() -> new UnAuthenticationException("회원 정보가 없습니다."));
-        if(!password.equals(user.getPassword())) throw new UnAuthenticationException("패스워드가 일치하지 않습니다.");
+        if(!user.matchPassword(password)) throw new UnAuthenticationException("패스워드가 일치하지 않습니다.");
 
         return user;
     }
