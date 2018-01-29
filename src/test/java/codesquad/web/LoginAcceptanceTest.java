@@ -4,11 +4,8 @@ import codesquad.util.HtmlFormDataBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
-
-import java.util.Arrays;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -24,7 +21,7 @@ public class LoginAcceptanceTest extends AcceptanceTest{
 
     @Test
     public void loginForm() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/login/form",String.class);
+        ResponseEntity<String> response = template().getForEntity("/login",String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 
