@@ -44,4 +44,8 @@ public class HttpSessionUtils {
 
         session.setAttribute(USER_SESSION_KEY, user);
     }
+
+    public static void logout(HttpSession session) {
+        session.removeAttribute(USER_SESSION_KEY);
+    }
 }

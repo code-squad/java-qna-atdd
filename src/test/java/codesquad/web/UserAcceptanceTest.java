@@ -38,7 +38,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         String userId = "testuser";
 
         HttpEntity<MultiValueMap<String, Object>> request;
-        request = HtmlFormDataBuilder.urlEncodedFrom()
+        request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
                 .addParameter("password", "password")
                 .addParameter("name", "자바지기")
@@ -84,7 +84,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request;
-        request = HtmlFormDataBuilder.urlEncodedFrom()
+        request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("_method", "put")
                 .addParameter("password", "password2")
                 .addParameter("name", "자바지기2")
@@ -104,25 +104,34 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void loginTest() throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request;
-        request = HtmlFormDataBuilder.urlEncodedFrom()
-                .addParameter("userId", "sanjini")
-                .addParameter("password", "password")
+        request = HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("userId", "sanjigi")
+                .addParameter("password", "test")
                 .build();
 
         ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
     }
 
     @Test
     public void loginFailTest() throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request;
-        request = HtmlFormDataBuilder.urlEncodedFrom()
-                .addParameter("userId", "sanjini")
+        request = HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("userId", "sanjigi")
                 .addParameter("password", "test2")
                 .build();
 
         ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertTrue(response.getBody().contains("아이디 또는 비밀번호가 틀립니다. 다시 로그인 해주세요."));
+    }
+
+    @Test
+    public void logoutTest() {
+        ResponseEntity<String> response = basicAuthTemplate().withBasicAuth("sanjigi", "test")
+                .getForEntity("/users/logout", String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertTrue(response.getBody().contains("로그인"));
     }
 }

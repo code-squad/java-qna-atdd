@@ -17,6 +17,10 @@ import codesquad.converter.LocalDateTimeConverter;
 import codesquad.security.BasicAuthInterceptor;
 import codesquad.security.LoginUserHandlerMethodArgumentResolver;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Override
@@ -52,6 +56,12 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public LoginUserHandlerMethodArgumentResolver loginUserArgumentResolver() {
         return new LoginUserHandlerMethodArgumentResolver();
+    }
+
+    @Bean
+    public Validator validator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        return factory.getValidator();
     }
 
     @Override

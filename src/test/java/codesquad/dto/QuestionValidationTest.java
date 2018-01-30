@@ -13,7 +13,6 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import codesquad.dto.QuestionDto;
 
 public class QuestionValidationTest {
     private static Validator validator;
@@ -27,7 +26,7 @@ public class QuestionValidationTest {
     @Test
     public void titleWhenIsEmpty() throws Exception {
         QuestionDto question = new QuestionDto("", "당근 엄청 의미있는 활동이고 말고..");
-        Set<ConstraintViolation<QuestionDto>> constraintViolcations = validator.validate(question);
-        assertThat(constraintViolcations.size(), is(1));
+        Set<ConstraintViolation<QuestionDto>> constraintViolations = validator.validate(question);
+        assertThat(constraintViolations.size(), is(1));
     }
 }
