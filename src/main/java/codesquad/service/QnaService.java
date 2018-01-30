@@ -4,12 +4,12 @@ import codesquad.CannotManageException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
@@ -33,13 +33,12 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return questionRepository.findOne(id);
+    public Question findById(long id) throws CannotManageException {
+        return findOneOrElseThrow(id);
     }
 
     public Question update(User loginUser, long id, Question updatedQuestion) throws CannotManageException {
-        Question question = ofNullable(questionRepository.findOne(id)).orElseThrow(() -> new CannotManageException("원본 글이 없습니다."));
-        return question.update(loginUser, updatedQuestion);
+        return findOneOrElseThrow(id).update(loginUser, updatedQuestion);
     }
 
     public void deleteQuestion(User loginUser, long questionId) throws CannotManageException {
@@ -47,20 +46,34 @@ public class QnaService {
         question.deleted(loginUser);
     }
 
-    public Iterable<Question> findAll() {
-        return questionRepository.findByDeleted(false);
+    public Iterable<Question> findAll() { return questionRepository.findAll(); }
+
+    public Page<Question> findAll(Pageable pageable) {
+        return questionRepository.findByDeleted(false, pageable);
     }
 
-    public List<Question> findAll(Pageable pageable) {
-        return questionRepository.findAll(pageable).getContent();
+    public Answer findOneAnswer(long id) throws CannotManageException {
+        return ofNullable(answerRepository.findOne(id)).orElseThrow(() -> new CannotManageException("원본 댓글이 없습니다."));
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    public Answer addAnswer(User loginUser, long questionId, String contents) throws CannotManageException {
+        Question question = findById(questionId);
+        Answer answer = Answer.convert(loginUser, contents);
+        question.addAnswer(answer);
+
+        return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public Answer updateAnswer(User loginUser, long id, Answer updatedAnswer) throws CannotManageException {
+        return findOneAnswer(id).update(loginUser, updatedAnswer);
+    }
+
+    public void deleteAnswer(User loginUser, long id) throws CannotManageException {
+        Answer answer = findOneAnswer(id);
+        answer.deleted(loginUser);
+    }
+
+    private Question findOneOrElseThrow(long id) throws CannotManageException {
+        return ofNullable(questionRepository.findOne(id)).orElseThrow(() -> new CannotManageException("원본 글이 없습니다."));
     }
 }

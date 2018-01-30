@@ -1,4 +1,4 @@
-package codesquad.web;
+package codesquad.web.api;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

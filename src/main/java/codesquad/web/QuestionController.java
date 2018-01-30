@@ -23,13 +23,13 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public String questionShow(@PathVariable Long id, Model model) {
+    public String questionShow(@PathVariable Long id, Model model) throws CannotManageException {
         model.addAttribute("question", qnaService.findById(id));
         return "/qna/show";
     }
 
     @GetMapping("/{id}/form")
-    public String updateQuestionForm(@PathVariable Long id, Model model) {
+    public String updateQuestionForm(@PathVariable Long id, Model model) throws CannotManageException {
         model.addAttribute("question", qnaService.findById(id));
         return "qna/updateForm";
     }

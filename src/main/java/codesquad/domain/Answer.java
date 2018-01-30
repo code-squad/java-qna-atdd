@@ -1,14 +1,11 @@
 package codesquad.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
+import codesquad.CannotManageException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -24,6 +21,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Lob
     private String contents;
 
+    @Column
     private boolean deleted = false;
 
     public Answer() {
@@ -66,6 +64,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public static Answer convert(User loginUser, String contents) {
+        return new Answer(loginUser, contents);
+    }
+
+    public Answer update(User loginUser, Answer updatedAnswer) throws CannotManageException {
+        if(!this.isOwner(loginUser)) { throw new CannotManageException("수정은 글쓴이만 가능합니다."); }
+        else if(isDeleted()) { throw new CannotManageException("삭제된 글입니다."); }
+
+        this.contents = updatedAnswer.getContents();
+        return this;
+    }
+
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
@@ -74,5 +84,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    public void deleted(User loginUser) throws CannotManageException {
+        if(!this.isOwner(loginUser)) { throw new CannotManageException("삭제는 글쓴이만 가능합니다."); }
+        this.deleted = true;
     }
 }

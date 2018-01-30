@@ -56,7 +56,7 @@ public class QnaServiceTest extends AcceptanceTest {
                 .collect(Collectors.toList());
 
         questionRepository.save(questions);
-        List<Question> savedQuestions = qnaService.findAll(new PageRequest(0, 10));
+        List<Question> savedQuestions = qnaService.findAll(new PageRequest(0, 10)).getContent();
         assertEquals(3, savedQuestions.size());
     }
 

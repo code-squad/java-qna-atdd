@@ -120,4 +120,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         if(!this.isOwner(loginUser)) { throw new CannotManageException("수정은 글쓴이만 가능합니다."); }
         this.deleted = true; //TODO:4단계에서 삭제히스토리 테이블에 저장
     }
+
+    public static Question convert(QuestionDto questionDto) {
+        return new Question(questionDto.getTitle(), questionDto.getContents());
+    }
 }

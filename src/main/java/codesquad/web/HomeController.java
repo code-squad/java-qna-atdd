@@ -19,7 +19,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(@PageableDefault(sort = "id", direction = DESC) Pageable pageable,
                        Model model) {
-        model.addAttribute("questions", qnaService.findAll(pageable));
+        model.addAttribute("questions", qnaService.findAll(pageable).getContent());
         return "home";
     }
 }

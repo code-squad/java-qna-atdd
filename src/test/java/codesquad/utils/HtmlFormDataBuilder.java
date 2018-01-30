@@ -29,10 +29,20 @@ public class HtmlFormDataBuilder {
         return new HttpEntity<>(params, headers);
     }
 
+    public HttpEntity<Object> build(Object object) {
+        return new HttpEntity<>(object);
+    }
+
     public static HtmlFormDataBuilder urlEncodedForm() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return new HtmlFormDataBuilder(headers);
+    }
+
+    public static HtmlFormDataBuilder jsonEncodedForm() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         return new HtmlFormDataBuilder(headers);
     }
 }
