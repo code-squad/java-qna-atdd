@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -90,5 +91,22 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public Question update(User loginUser, Question updatedQuestion) throws IllegalAccessException {
+        if (loginUser.isWriterOf(this)){
+            this.title = updatedQuestion.title;
+            this.contents = updatedQuestion.contents;
+            return this;
+        }
+        throw new IllegalAccessException("작성자만 수정할 수 있습니다.");
+    }
+
+    public boolean delete(User loginUser, Question question) {
+        if (loginUser.isWriterOf(question)) {
+            deleted = true;
+        }
+
+        return deleted;
     }
 }

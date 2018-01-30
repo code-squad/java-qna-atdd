@@ -22,7 +22,7 @@ public class HtmlFormDataBuilder {
         return this;
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> request() {
+    public HttpEntity<MultiValueMap<String, Object>> build() {
         return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
     }
 

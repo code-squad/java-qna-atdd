@@ -98,6 +98,10 @@ public class User extends AbstractEntity {
         return this.password.equals(password);
     }
 
+    public boolean isWriterOf(Question question) {
+        return question.isOwner(this);
+    }
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {

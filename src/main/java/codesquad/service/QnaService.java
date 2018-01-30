@@ -40,14 +40,16 @@ public class QnaService {
         return questionRepository.findOne(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    @Transactional
+    public Question update(User loginUser, long id, Question updatedQuestion) throws IllegalAccessException {
+        Question question = findById(id);
+        return question.update(loginUser, updatedQuestion);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+    public boolean deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
+        Question question = questionRepository.findOne(questionId);
+        return question.delete(loginUser, question);
     }
 
     public Iterable<Question> findAll() {

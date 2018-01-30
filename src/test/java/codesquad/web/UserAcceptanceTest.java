@@ -43,7 +43,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
                                                                                .addParameter("password", "password")
                                                                                .addParameter("name", "자바지기")
                                                                                .addParameter("email", "javajigi@slipp.net")
-                                                                               .request();
+                                                                               .build();
 
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
@@ -88,7 +88,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
                                                                                .addParameter("password", "password2")
                                                                                .addParameter("name", "자바지기2")
                                                                                .addParameter("email", "javajigi@slipp.net")
-                                                                               .request();
+                                                                               .build();
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }
 
@@ -104,7 +104,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.urlEncodedForm()
                                                                                .addParameter("userId", "javajigi")
                                                                                .addParameter("password", "test")
-                                                                               .request();
+                                                                               .build();
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
@@ -115,7 +115,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.urlEncodedForm()
                                                                                .addParameter("userId", "javajigi")
                                                                                .addParameter("password", "password")
-                                                                               .request();
+                                                                               .build();
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
