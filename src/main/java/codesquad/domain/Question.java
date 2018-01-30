@@ -1,24 +1,16 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.Where;
-
+import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
+import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -49,6 +41,12 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public Question(long id, String title, String contents) {
+        super(id);
+        this.title = title;
+        this.contents = contents;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -70,12 +68,37 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answers.add(answer);
     }
 
+    private boolean misMatchId(long id) {
+        return this.getId() != id;
+    }
+
+    public void update(Question question) {
+        if (!isOwner(question.writer)) {
+            throw new UnAuthorizedException();
+        }
+
+        if (this.misMatchId(question.getId())) {
+            return;
+        }
+
+        this.title = question.title;
+        this.contents = question.contents;
+    }
+
+    public void delete() {
+        deleted = true;
+    }
+
     public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public boolean notEmptyAnswer() {
+        return answers.size() != 0;
     }
 
     @Override
@@ -90,5 +113,24 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Question question = (Question) o;
+        return deleted == question.deleted &&
+                Objects.equals(title, question.title) &&
+                Objects.equals(contents, question.contents) &&
+                Objects.equals(writer, question.writer) &&
+                Objects.equals(answers, question.answers);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), title, contents, writer, answers, deleted);
     }
 }

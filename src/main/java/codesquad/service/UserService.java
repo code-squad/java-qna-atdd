@@ -43,7 +43,7 @@ public class UserService {
     public User login(String userId, String password) throws UnAuthenticationException {
         Optional<User> userOptional = userRepository.findByUserId(userId);
         User user = userOptional.orElseThrow(() -> new UnAuthenticationException());
-        if (user.getPassword().equals(password)) {
+        if (user.matchPassword(password)) {
             return user;
         }
         throw new UnAuthenticationException();
