@@ -3,6 +3,7 @@ package codesquad.web;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import codesquad.UnAuthenticationException;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ import codesquad.domain.User;
 import codesquad.dto.UserDto;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
+
+import static codesquad.security.HttpSessionUtils.USER_SESSION_KEY;
 
 @Controller
 @RequestMapping("/users")
@@ -60,13 +63,18 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(UserDto userDto) {
+    public String login(HttpSession httpSession, UserDto userDto) {
         try {
-            userService.login(userDto.getUserId(), userDto.getPassword());
+            httpSession.setAttribute(USER_SESSION_KEY, userService.login(userDto.getUserId(), userDto.getPassword()));
         } catch(UnAuthenticationException ue) {
             return "/user/login_failed";
         }
+        return "redirect:/users";
+    }
 
+    @GetMapping("/logout")
+    public String logOut(HttpSession httpSession) {
+        httpSession.removeAttribute(USER_SESSION_KEY);
         return "redirect:/users";
     }
 }

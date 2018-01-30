@@ -49,7 +49,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void create() throws Exception {
         String userId = "testuser";
-        
+
         htmlFormDataBuilder.addParameter("userId", "testuser");
         htmlFormDataBuilder.addParameter("password", "password");
         htmlFormDataBuilder.addParameter("name", "자바지기");
@@ -73,8 +73,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void updateForm_no_login() throws Exception {
-        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
-                String.class);
+        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()), String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
