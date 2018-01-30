@@ -20,6 +20,11 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/login")
+    public String login() {
+        return "/user/login";
+    }
+
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession session) {
         log.debug("userId : {}, password : {}", userId, password);
@@ -30,5 +35,11 @@ public class LoginController {
             return "/user/login_failed";
         }
         return "redirect:/users";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
     }
 }

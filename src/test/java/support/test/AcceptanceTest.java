@@ -32,7 +32,7 @@ public abstract class AcceptanceTest {
     public TestRestTemplate basicAuthTemplate(User loginUser) {
         return template.withBasicAuth(loginUser.getUserId(), loginUser.getPassword());
     }
-    
+
     protected User defaultUser() {
         return findByUserId(DEFAULT_LOGIN_USER);
     }
