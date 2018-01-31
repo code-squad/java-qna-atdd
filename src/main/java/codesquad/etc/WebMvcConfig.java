@@ -1,4 +1,4 @@
-package codesquad;
+package codesquad.etc;
 
 import java.util.List;
 

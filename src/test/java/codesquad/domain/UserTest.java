@@ -5,8 +5,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import codesquad.UnAuthorizedException;
-import codesquad.domain.User;
+import codesquad.etc.UnAuthorizedException;
 
 public class UserTest {
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");

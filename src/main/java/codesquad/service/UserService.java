@@ -1,14 +1,13 @@
 package codesquad.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.etc.UnAuthenticationException;
+import codesquad.etc.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;
@@ -41,7 +40,8 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        return userRepository.findByUserId(userId)
+                .filter(user -> password.equals(user.getPassword()))
+                .orElseThrow(UnAuthenticationException::new);
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import codesquad.UnAuthorizedException;
+import codesquad.etc.UnAuthorizedException;
 import codesquad.domain.User;
 
 public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {

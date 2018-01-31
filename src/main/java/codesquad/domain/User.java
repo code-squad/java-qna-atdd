@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import codesquad.UnAuthorizedException;
+import codesquad.etc.UnAuthorizedException;
 import codesquad.dto.UserDto;
 import support.domain.AbstractEntity;
 
