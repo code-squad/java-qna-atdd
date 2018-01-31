@@ -14,6 +14,10 @@ public class AnswerDto {
     public AnswerDto() {
     }
 
+    public AnswerDto(String contents) {
+        this.contents = contents;
+    }
+
     public AnswerDto(Long questionId, String contents) {
         this.questionId = questionId;
         this.contents = contents;

@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.domain.AnswerRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -20,10 +21,14 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     private Question question;
 
     @Autowired
+    private AnswerRepository answerRepository;
+
+    @Autowired
     private QuestionRepository questionRepository;
 
     @Before
     public void init() {
+        answerRepository.deleteAll();
         questionRepository.deleteAll();
         makeQuestion("TestTitle", "테스트당");
     }
@@ -56,7 +61,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void 자신의_질문에_삭제가능한가_통합_테스트() {
+    public void 자신의_질문에_답변이_없는_경우_삭제가능한가_통합_테스트() {
         Question saveQuestion = questionRepository.save(question);
         ResponseEntity<String> response = template().exchange("/questions/"+saveQuestion.getId(), HttpMethod.DELETE, urlEncodedForm().build(),  String.class);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());

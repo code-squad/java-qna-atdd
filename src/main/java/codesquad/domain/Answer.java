@@ -1,11 +1,18 @@
 package codesquad.domain;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
+
 import codesquad.CannotManageException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import static codesquad.domain.ContentType.ANSWER;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -86,8 +93,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
 
-    public void deleted(User loginUser) throws CannotManageException {
+    public DeleteHistory deleted(User loginUser) throws CannotManageException {
         if(!this.isOwner(loginUser)) { throw new CannotManageException("삭제는 글쓴이만 가능합니다."); }
         this.deleted = true;
+
+        DeletedId deletedId = DeletedId.builder().contentId(getId()).contentType(ANSWER).build();
+        return DeleteHistory.builder().id(deletedId).deletedBy(loginUser).build();
     }
 }

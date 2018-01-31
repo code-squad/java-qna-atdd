@@ -1,6 +1,7 @@
 package support.test;
 
-import codesquad.dto.QuestionDto;
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,9 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 
 import static codesquad.utils.HtmlFormDataBuilder.jsonEncodedForm;
 import static org.hamcrest.Matchers.is;

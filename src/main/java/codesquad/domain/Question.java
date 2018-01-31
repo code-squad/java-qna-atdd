@@ -1,26 +1,19 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
 import codesquad.CannotManageException;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Where;
-
 import codesquad.dto.QuestionDto;
+import org.apache.commons.lang3.StringUtils;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static codesquad.domain.ContentType.QUESTION;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -36,10 +29,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     @Column
     private boolean deleted = false;
@@ -108,20 +99,38 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public Question update(User loginUser, Question updatedQuestion) throws CannotManageException {
-        if(!this.isOwner(loginUser)) { throw new CannotManageException("수정은 글쓴이만 가능합니다."); }
-        else if(isDeleted()) { throw new CannotManageException("삭제된 글입니다."); }
+        checkCommon(loginUser, "수정은 글쓴이만 가능합니다.", "삭제된 글입니다.");
 
         updateTitle(updatedQuestion.getTitle());
         updateContents(updatedQuestion.getContents());
         return this;
     }
 
-    public void deleted(User loginUser) throws CannotManageException {
-        if(!this.isOwner(loginUser)) { throw new CannotManageException("수정은 글쓴이만 가능합니다."); }
-        this.deleted = true; //TODO:4단계에서 삭제히스토리 테이블에 저장
+    public List<DeleteHistory> deleted(User loginUser) throws CannotManageException {
+        checkCommon(loginUser, "삭제는 글쓴이만 가능합니다.", "이미 삭제된 글입니다.");
+        hasOtherAnswerWriter();
+        this.deleted = true;
+
+        return createDeleteHistorys(loginUser);
+    }
+
+    private List<DeleteHistory> createDeleteHistorys(User loginUser) {
+        List<DeletedId> deletedIds = new ArrayList<>(Arrays.asList(new DeletedId(getId(), QUESTION)));
+        deletedIds.addAll(answers.convertDeletedId());
+        return deletedIds.stream().map(deletedId -> new DeleteHistory(deletedId, loginUser)).collect(Collectors.toList());
+    }
+
+    private void hasOtherAnswerWriter() throws CannotManageException {
+        if(answers.isHasOtherWriter(writer)) { throw new CannotManageException("다른 사용자가 답변을 달아 삭제할 수 없습니다."); }
+    }
+
+    private void checkCommon(User loginUser, String ownerMessage, String deleteMessage) throws CannotManageException {
+        if (!this.isOwner(loginUser)) { throw new CannotManageException(ownerMessage); }
+        else if (isDeleted()) { throw new CannotManageException(deleteMessage); }
     }
 
     public static Question convert(QuestionDto questionDto) {
         return new Question(questionDto.getTitle(), questionDto.getContents());
     }
+
 }

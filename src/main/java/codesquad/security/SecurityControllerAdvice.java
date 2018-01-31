@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import codesquad.CannotManageException;
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 
@@ -22,7 +23,7 @@ public class SecurityControllerAdvice {
         log.debug("EntityNotFoundException is happened!");
     }
 
-    @ExceptionHandler(UnAuthorizedException.class)
+    @ExceptionHandler({UnAuthorizedException.class, CannotManageException.class})
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     public void unAuthorized() { log.debug("UnAuthorizedException is happened!"); }
     

@@ -1,46 +1,39 @@
 package codesquad.domain;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+@EqualsAndHashCode
 @Entity
 public class DeleteHistory {
-    @Id
-    @GeneratedValue
-    private Long id;
+    @EmbeddedId
+    private DeletedId id;
 
-    @Enumerated(EnumType.STRING)
-    private ContentType contentType;
-
-    private Long contentId;
+    @CreatedDate
+    private LocalDateTime createDate;
 
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_deletehistory_to_user"))
     private User deletedBy;
 
-    private LocalDateTime createDate = LocalDateTime.now();
-
-    public DeleteHistory() {
-    }
-
-    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
-        this.contentType = contentType;
-        this.contentId = contentId;
+    @Builder
+    public DeleteHistory(DeletedId id, User deletedBy) {
+        this.id = id;
         this.deletedBy = deletedBy;
-        this.createDate = createDate;
-    }
-
-    @Override
-    public String toString() {
-        return "DeleteHistory [id=" + id + ", contentType=" + contentType + ", contentId=" + contentId + ", deletedBy="
-                + deletedBy + ", createDate=" + createDate + "]";
+        this.createDate = LocalDateTime.now();
     }
 }

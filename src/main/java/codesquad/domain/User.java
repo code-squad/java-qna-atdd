@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
 
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,6 +14,7 @@ import codesquad.dto.UserDto;
 import support.domain.AbstractEntity;
 
 @Entity
+@EqualsAndHashCode
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
 
