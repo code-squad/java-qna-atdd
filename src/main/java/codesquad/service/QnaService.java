@@ -40,14 +40,22 @@ public class QnaService {
         return questionRepository.findOne(id);
     }
 
+    @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+        Question question = findById(id);
+        question.updateBy(updatedQuestion, loginUser);
+        return question;
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        Question question = findById(questionId);
+
+        if (question == null) {
+            throw new CannotDeleteException("questions is not exist");
+        }
+
+        question.deleteBy(loginUser);
     }
 
     public Iterable<Question> findAll() {
