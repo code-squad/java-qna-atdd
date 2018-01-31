@@ -18,6 +18,7 @@ import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 
 @Service("qnaService")
+@Transactional
 public class QnaService {
     private static final Logger log = LoggerFactory.getLogger(QnaService.class);
 
@@ -40,13 +41,15 @@ public class QnaService {
         return questionRepository.findOne(id);
     }
 
-    @Transactional
+    public Answer findAnswerById(long id) {
+        return answerRepository.findOne(id);
+    }
+
     public Question update(User loginUser, long id, Question updatedQuestion) throws IllegalAccessException {
         Question question = findById(id);
         return question.update(loginUser, updatedQuestion);
     }
 
-    @Transactional
     public boolean deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = questionRepository.findOne(questionId);
         return question.delete(loginUser, question);
@@ -61,11 +64,19 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        Question question = findById(questionId);
+        question.addAnswer(answer);
+        return answerRepository.save(answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public boolean deleteAnswer(User loginUser, long id) throws IllegalAccessException {
+        Answer answer = findAnswerById(id);
+        return answer.delete(loginUser);
+    }
+
+    public Answer updateAnswer(User loginUser, Long answerId, String contents) throws IllegalAccessException {
+        Answer answer = findAnswerById(answerId);
+        return answer.update(contents, loginUser);
     }
 }

@@ -28,7 +28,7 @@ public class QuestionController {
         return "/qna/form";
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public String create(@LoginUser User loginUser, QuestionDto questionDto, Model model) {
         Question question = new Question(questionDto.getTitle(), questionDto.getContents());
         model.addAttribute("question", questionService.create(loginUser, question));

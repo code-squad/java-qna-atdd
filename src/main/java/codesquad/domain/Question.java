@@ -94,19 +94,18 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public Question update(User loginUser, Question updatedQuestion) throws IllegalAccessException {
-        if (loginUser.isWriterOf(this)){
-            this.title = updatedQuestion.title;
-            this.contents = updatedQuestion.contents;
-            return this;
+        if (!loginUser.isWriterOf(this)){
+            throw new IllegalAccessException("작성자만 수정할 수 있습니다.");
         }
-        throw new IllegalAccessException("작성자만 수정할 수 있습니다.");
+        this.title = updatedQuestion.title;
+        this.contents = updatedQuestion.contents;
+        return this;
     }
 
     public boolean delete(User loginUser, Question question) {
         if (loginUser.isWriterOf(question)) {
             deleted = true;
         }
-
         return deleted;
     }
 }

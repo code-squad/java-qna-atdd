@@ -54,7 +54,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
                                                                                .addParameter("contents", ":) :)")
                                                                                .build();
 
-        ResponseEntity<String> response = basicAuthTemplate(writer).postForEntity("/questions/create", request, String.class);
+        ResponseEntity<String> response = basicAuthTemplate(writer).postForEntity("/questions", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertNotNull(questionRepository.findByWriter(writer));
