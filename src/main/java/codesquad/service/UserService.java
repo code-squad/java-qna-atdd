@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -12,6 +13,7 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Service("userService")
 public class UserService {
@@ -41,7 +43,9 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        User user = userRepository.findByUserId(userId).orElseThrow(UnAuthenticationException::new);
+        if (!user.getPassword().equals(password))
+            throw new UnAuthenticationException();
+        return user;
     }
 }
