@@ -49,4 +49,10 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 
+    @Test
+    public void logout() throws Exception {
+        ResponseEntity<String> response = template().getForEntity("/logout", String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    }
+
 }

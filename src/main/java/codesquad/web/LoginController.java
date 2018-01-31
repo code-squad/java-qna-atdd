@@ -30,7 +30,14 @@ public class LoginController {
         }
     }
 
-    @GetMapping("login")
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute(HttpSessionUtils.USER_SESSION_KEY);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/login")
     public String login() {
         return "/user/login";
     }

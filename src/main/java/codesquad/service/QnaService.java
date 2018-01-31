@@ -1,21 +1,20 @@
 package codesquad.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.QuestionNotFoundException;
+import codesquad.domain.Answer;
+import codesquad.domain.AnswerRepository;
+import codesquad.domain.Question;
+import codesquad.domain.QuestionRepository;
+import codesquad.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
@@ -36,18 +35,32 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return questionRepository.findOne(id);
+    public Optional<Question> findById(long id) {
+        return Optional.ofNullable(questionRepository.findOne(id));
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    public Optional<Question> findByIdAndNotDeleted(long id) {
+        Question question = questionRepository.findOne(id);
+        if (question == null || question.isDeleted()) {
+            return Optional.empty();
+        }
+        return Optional.of(question);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+    public Question update(User loginUser, long id, Question updatedQuestion) {
+        Optional<Question> question = findByIdAndNotDeleted(id);
+
+        return question.orElseThrow(QuestionNotFoundException::new)
+                       .update(loginUser, updatedQuestion);
+    }
+
+    @Transactional
+    public void deleteQuestion(User loginUser, long id) {
+        Optional<Question> question = findByIdAndNotDeleted(id);
+
+        question.orElseThrow(QuestionNotFoundException::new)
+                .delete(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -65,5 +78,13 @@ public class QnaService {
     public Answer deleteAnswer(User loginUser, long id) {
         // TODO 답변 삭제 기능 구현 
         return null;
+    }
+
+    public boolean isOwnerOfQuestion(User loginUser, long id) {
+        Question question = questionRepository.findOne(id);
+        if (question == null) {
+            throw new QuestionNotFoundException();
+        }
+        return question.isOwner(loginUser);
     }
 }

@@ -2,6 +2,7 @@ package support.test;
 
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
+import codesquad.dto.QuestionDto;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,6 +50,12 @@ public abstract class AcceptanceTest {
                                .addParameter("password", user.getPassword())
                                .addParameter("name", user.getName())
                                .addParameter("email", user.getEmail())
+                               .build();
+    }
+
+    protected HttpEntity<MultiValueMap<String, Object>> htmlRequest(QuestionDto question) {
+        return urlEncodedForm().addParameter("title", question.getTitle())
+                               .addParameter("contents", question.getContents())
                                .build();
     }
 }
