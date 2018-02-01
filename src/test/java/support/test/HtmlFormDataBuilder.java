@@ -22,6 +22,12 @@ public class HtmlFormDataBuilder {
         return this;
     }
 
+    public HtmlFormDataBuilder setRequestMethod(String method) {
+        this.params.add("_method", method);
+
+        return this;
+    }
+
     public HttpEntity<MultiValueMap<String, Object>> build() {
         return new HttpEntity<>(params, headers);
     }

@@ -1,29 +1,21 @@
 package codesquad.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
 import support.test.HtmlFormDataBuilder;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -53,6 +45,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertNotNull(userRepository.findByUserId(userId));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
+    }
+
+    @Test
+    public void show() {
+        long id = 1;
+
+        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d" + id), String.class);
     }
 
     @Test
@@ -87,7 +86,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("_method", "put")
+                .setRequestMethod("put")
                 .addParameter("password", "password2")
                 .addParameter("name", "자바지기2")
                 .addParameter("email", "javajigi@slipp.net")
