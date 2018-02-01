@@ -5,19 +5,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import codesquad.domain.User;
@@ -42,7 +37,10 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void create() throws Exception {
         String userId = "javajigi2";
         HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-        htmlFormDataBuilder.addParameter("userId", userId).addParameter("password", "test22").addParameter("name", "자바지기2").addParameter("email", "javajigi2r@slipp.net");
+        htmlFormDataBuilder.addParameter("userId", userId)
+                .addParameter("password", "test22")
+                .addParameter("name", "자바지기2")
+                .addParameter("email", "javajigi2r@slipp.net");
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
 
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
@@ -85,7 +83,10 @@ public class UserAcceptanceTest extends AcceptanceTest {
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
 
         HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-        htmlFormDataBuilder.addParameter("_method", "put").addParameter("password", "password2").addParameter("name", "자바지기2").addParameter("email", "javajigi@slipp.net");
+        htmlFormDataBuilder.addParameter("_method", "put")
+                .addParameter("password", "password2")
+                .addParameter("name", "자바지기2")
+                .addParameter("email", "javajigi@slipp.net");
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }

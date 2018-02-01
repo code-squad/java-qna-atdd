@@ -1,5 +1,7 @@
 package support.test;
 
+import codesquad.domain.Question;
+import codesquad.domain.QuestionRepository;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +34,7 @@ public abstract class AcceptanceTest {
     public TestRestTemplate basicAuthTemplate(User loginUser) {
         return template.withBasicAuth(loginUser.getUserId(), loginUser.getPassword());
     }
-    
+
     protected User defaultUser() {
         return findByUserId(DEFAULT_LOGIN_USER);
     }
@@ -40,4 +42,5 @@ public abstract class AcceptanceTest {
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
     }
+
 }

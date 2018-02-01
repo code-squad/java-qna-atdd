@@ -67,7 +67,5 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
         registry.addViewController("/login").setViewName("user/login");
 
-
-
     }
 }

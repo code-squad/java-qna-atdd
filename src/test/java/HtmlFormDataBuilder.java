@@ -32,4 +32,18 @@ public class HtmlFormDataBuilder {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return new HtmlFormDataBuilder(headers);
     }
+
+    public static HtmlFormDataBuilder put() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return new HtmlFormDataBuilder(headers).addParameter("_method", "put");
+    }
+
+    public static HtmlFormDataBuilder delete() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return new HtmlFormDataBuilder(headers).addParameter("_method", "delete");
+    }
 }
