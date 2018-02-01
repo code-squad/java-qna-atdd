@@ -88,24 +88,28 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatedQuestion.contents;
     }
 
-    @Override
-    public String generateUrl() {
-        return String.format("/questions/%d", getId());
+    public void delete(User loginUser) throws CannotDeleteException {
+        if(!this.isOwner(loginUser))
+            throw new CannotDeleteException("Not owner");
+
+        this.deleted = true;
     }
 
     public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);
     }
 
+    public String generateApiUrl() {
+        return "/api" + generateUrl();
+    }
+
+    @Override
+    public String generateUrl() {
+        return String.format("/questions/%d", getId());
+    }
+
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
-    }
-
-    public void delete(User loginUser) throws CannotDeleteException {
-        if(!this.isOwner(loginUser))
-            throw new CannotDeleteException("Not owner");
-
-        this.deleted = true;
     }
 }

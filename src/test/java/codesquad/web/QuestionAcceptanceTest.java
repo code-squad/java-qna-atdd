@@ -77,7 +77,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = basicAuthTemplate()
                 .getForEntity("/questions/100", String.class);
 
-        assertTrue(response.getBody().contains("질문하기"));
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
     @Test

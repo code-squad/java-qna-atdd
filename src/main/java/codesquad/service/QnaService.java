@@ -1,10 +1,12 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 
-import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -38,11 +40,14 @@ public class QnaService {
     }
 
     public Question findById(long id) {
-        return questionRepository.findOne(id);
+        Optional<Question> question = questionRepository.findOne(id);
+
+        return question.filter(q -> !q.isDeleted())
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        Question originalQuestion = questionRepository.findOne(id);
+        Question originalQuestion = findById(id);
 
         originalQuestion.update(loginUser, updatedQuestion);
 
@@ -51,7 +56,7 @@ public class QnaService {
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        Question question = questionRepository.findOne(questionId);
+        Question question = findById(questionId);
 
         question.delete(loginUser);
 
@@ -66,12 +71,38 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+        Answer answer = new Answer(loginUser, contents);
+
+        question.addAnswer(answer);
+
+        return answer;
     }
 
+    @Transactional
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        Answer answer = findAnswerById(id);
+
+        answer.delete(loginUser);
+
+        return answer;
+    }
+
+    public Answer findAnswerById(long answerNo) {
+        Answer answer = answerRepository.findByIdAndDeletedFalse(answerNo);
+
+        if(answer == null)
+            throw new EntityNotFoundException("Answer not exists");
+
+        return answer;
+    }
+
+    public Answer updateAnswer(User loginUser, long answerNo, AnswerDto answerDto) {
+        Answer answer = findAnswerById(answerNo);
+        answer.update(loginUser, answerDto);
+
+        return answerRepository.save(answer);
     }
 }

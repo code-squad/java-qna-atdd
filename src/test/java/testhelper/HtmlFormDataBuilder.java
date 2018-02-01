@@ -32,4 +32,11 @@ public class HtmlFormDataBuilder {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return new HtmlFormDataBuilder(headers);
     }
+
+    public static HttpEntity toJson(Object object) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity(object, headers);
+    }
 }

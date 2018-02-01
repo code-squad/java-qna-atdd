@@ -7,6 +7,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -64,6 +66,31 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), contents);
+    }
+
+    public void update(User loginUser, AnswerDto answerDto) {
+        checkOwner(loginUser);
+
+        this.contents = answerDto.getContents();
+    }
+
+    public void delete(User loginUser) {
+        checkOwner(loginUser);
+
+        this.deleted = true;
+    }
+
+    private void checkOwner(User loginUser) {
+        if(!isOwner(loginUser))
+            throw new UnAuthorizedException("Not answer owner");
+    }
+
+    public String generateApiUrl() {
+        return "/api" + generateUrl();
     }
 
     @Override
