@@ -16,19 +16,19 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping
 public class LoginController {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Resource(name = "userService")
     private UserService userService;
 
-    @GetMapping("")
+    @GetMapping("/login")
     public String loginForm(){
         return "/user/login";
     }
 
-    @PostMapping("")
+    @PostMapping("/login")
     public String login(UserDto userDto, HttpSession session) {
         try {
             User user = userService.login(userDto.getUserId(), userDto.getPassword());
@@ -38,5 +38,12 @@ public class LoginController {
         }
 
         return "redirect:/users";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session){
+        session.removeAttribute(HttpSessionUtils.USER_SESSION_KEY);
+
+        return "redirect:/";
     }
 }

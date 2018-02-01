@@ -63,4 +63,14 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다. 다시 로그인 해주세요."), is(true));
 
     }
+
+    @Test
+    public void logout(){
+        PostRequestBuilder postBuilder = PostRequestBuilder.urlEncodedHeader();
+        ResponseEntity<String> response = template().postForEntity("/logout", postBuilder.build(), String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
+        log.debug("header: {}", response.getHeaders());
+        log.debug("body: {}", response.getBody());
+    }
 }
