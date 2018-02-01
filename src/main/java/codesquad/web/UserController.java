@@ -43,9 +43,7 @@ public class UserController {
 
 	@GetMapping("")
 	public String list(Model model) {
-		List<User> users = userService.findAll();
-		log.debug("user size : {}", users.size());
-		model.addAttribute("users", users);
+		model.addAttribute("users", userService.findAll());
 		return "/user/list";
 	}
 

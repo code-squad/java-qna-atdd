@@ -24,7 +24,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 		builder.addParameter("userId", "javajigi");
 		builder.addParameter("password", "test");
 
-		ResponseEntity<String> response = template().postForEntity("/users/login", builder.build(), String.class);
+		ResponseEntity<String> response = template().postForEntity("/users/login", builder.getOrPost(), String.class);
 
 		assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 		assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
@@ -36,7 +36,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 		builder.addParameter("userId", "javajigi");
 		builder.addParameter("password", "test1");
 
-		ResponseEntity<String> response = template().postForEntity("/users/login", builder.build(), String.class);
+		ResponseEntity<String> response = template().postForEntity("/users/login", builder.getOrPost(), String.class);
 
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 	}
@@ -47,7 +47,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 		builder.addParameter("userId", "hacker");
 		builder.addParameter("password", "test");
 
-		ResponseEntity<String> response = template().postForEntity("/users/login", builder.build(), String.class);
+		ResponseEntity<String> response = template().postForEntity("/users/login", builder.getOrPost(), String.class);
 
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 	}

@@ -14,14 +14,19 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+	private static final Logger log = LoggerFactory.getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -90,5 +95,23 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public void update(User loginUser, Question updatedQuestion) {
+	    log.debug("loginUser: {}, id: {}, target: {}", loginUser, updatedQuestion);
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+
+        this.title = updatedQuestion.title;
+        this.contents = updatedQuestion.contents;
+    }
+
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+
+        this.deleted = true;
     }
 }
