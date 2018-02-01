@@ -12,6 +12,8 @@ import codesquad.etc.UnAuthorizedException;
 import codesquad.dto.UserDto;
 import support.domain.AbstractEntity;
 
+import java.util.Objects;
+
 @Entity
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
@@ -103,6 +105,6 @@ public class User extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+        return "User [id=" + getId() + ", userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
 }

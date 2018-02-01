@@ -20,7 +20,11 @@ public class UserTest {
     }
 
     public static User newUser(String userId, String password) {
-        return new User(1L, userId, password, "name", "javajigi@slipp.net");
+        return newUser(1L, userId, password);
+    }
+
+    public static User newUser(long id, String userId, String password) {
+        return new User(id, userId, password, "name", "javajigi@slipp.net");
     }
 
     @Test

@@ -2,6 +2,7 @@ package codesquad.etc;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,13 @@ import codesquad.security.LoginUserHandlerMethodArgumentResolver;
 
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Autowired
+    BasicAuthInterceptor basicAuthInterceptor;
+
+    @Autowired
+    LoginUserHandlerMethodArgumentResolver loginUserHandlerMethodArgumentResolver;
+
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new LocalDateConverter("yyyy-MM-dd"));
@@ -39,14 +47,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return new MessageSourceAccessor(messageSource);
     }
 
-    @Bean
-    public BasicAuthInterceptor basicAuthInterceptor() {
-        return new BasicAuthInterceptor();
-    }
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(basicAuthInterceptor());
+        registry.addInterceptor(basicAuthInterceptor);
     }
 
     @Bean
@@ -56,6 +59,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(loginUserArgumentResolver());
+        argumentResolvers.add(loginUserHandlerMethodArgumentResolver);
     }
 }

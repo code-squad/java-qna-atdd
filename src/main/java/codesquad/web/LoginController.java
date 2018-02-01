@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/login")
 public class LoginController {
 
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
@@ -23,12 +22,12 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("")
+    @GetMapping("/login")
     public String loginPage() {
         return "user/login";
     }
 
-    @PostMapping("")
+    @PostMapping("/login")
     public String tryLogin(final String userId, final String password, HttpSession session) {
         try {
             User user = userService.login(userId, password);
@@ -38,5 +37,11 @@ public class LoginController {
             log.debug("{}: login failed. ", userId);
             return "user/login_failed";
         }
+    }
+
+    @GetMapping("/logout")
+    public String tryLogout(HttpSession session) {
+        session.removeAttribute(HttpSessionUtils.USER_SESSION_KEY);
+        return "redirect:/";
     }
 }

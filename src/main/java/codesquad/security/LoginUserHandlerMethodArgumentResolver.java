@@ -1,6 +1,7 @@
 package codesquad.security;
 
 import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -9,6 +10,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import codesquad.etc.UnAuthorizedException;
 import codesquad.domain.User;
 
+@Component
 public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

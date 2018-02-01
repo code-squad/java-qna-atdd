@@ -14,14 +14,20 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.etc.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+
+    private static final Logger log = LoggerFactory.getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -49,6 +55,31 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public Question setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Question setContents(String contents) {
+        this.contents = contents;
+        return this;
+    }
+
+    public Question setWriter(User writer) {
+        this.writer = writer;
+        return this;
+    }
+
+    public Question setAnswers(List<Answer> answers) {
+        this.answers = answers;
+        return this;
+    }
+
+    public Question setDeleted(boolean deleted) {
+        this.deleted = deleted;
+        return this;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -68,6 +99,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
         answers.add(answer);
+    }
+
+    public List<Answer> getAnswers() {
+        return this.answers;
+    }
+
+    public void update(User loginUser, Question newQuestion) {
+        if (this.writer.equals(loginUser)) {
+            this.contents = newQuestion.getContents();
+            this.title = newQuestion.getTitle();
+
+            return;
+        }
+        log.debug("{} {}", loginUser, writer);
+        throw new UnAuthorizedException("Cannot update question.");
     }
 
     public boolean isOwner(User loginUser) {
