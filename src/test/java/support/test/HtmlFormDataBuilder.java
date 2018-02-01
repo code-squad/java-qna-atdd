@@ -32,4 +32,24 @@ public class HtmlFormDataBuilder {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return new HtmlFormDataBuilder(headers);
     }
+
+    public static HttpEntity<MultiValueMap<String, Object>> updateRequest() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("_method", "put")
+                .addParameter("title", "title test1")
+                .addParameter("contents", "contents test1")
+                .build();
+    }
+
+    public static HttpEntity<MultiValueMap<String, Object>> deleteRequest() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("_method", "delete")
+                .build();
+    }
+
+    public static HttpEntity<MultiValueMap<String, Object>> createRequest() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("title", "title test")
+                .addParameter("contents", "contents test").build();
+    }
 }

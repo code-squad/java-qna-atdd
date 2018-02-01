@@ -62,6 +62,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
         String location = response.getHeaders().getLocation().getPath(); 
         
         UserDto updateUser = new UserDto(newUser.getUserId(), "password", "name2", "javajigi@slipp.net2");
+
         basicAuthTemplate(defaultUser()).put(location, updateUser);
         
         UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
