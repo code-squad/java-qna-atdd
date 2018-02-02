@@ -1,19 +1,19 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Email;
+import support.domain.AbstractEntity;
+import support.domain.ApiUrlGeneratable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import codesquad.UnAuthorizedException;
-import codesquad.dto.UserDto;
-import support.domain.AbstractEntity;
+import java.net.URI;
 
 @Entity
-public class User extends AbstractEntity {
+public class User extends AbstractEntity implements ApiUrlGeneratable {
     public static final GuestUser GUEST_USER = new GuestUser();
 
     @Size(min = 3, max = 20)
@@ -88,7 +88,12 @@ public class User extends AbstractEntity {
     public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
-    
+
+    @Override
+    public URI generateApiUri() {
+        return URI.create("/api/users/" + getId());
+    }
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;

@@ -1,5 +1,6 @@
 package codesquad.service;
 
+import codesquad.AnswerNotFoundException;
 import codesquad.QuestionNotFoundException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
@@ -23,11 +24,11 @@ public class QnaService {
     @Resource(name = "questionRepository")
     private QuestionRepository questionRepository;
 
-    @Resource(name = "answerRepository")
-    private AnswerRepository answerRepository;
-
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
+
+    @Resource(name = "answerRepository")
+    private AnswerRepository answerRepository;
 
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
@@ -35,32 +36,57 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
+    public Optional<Question> findQuestionById(long id) {
         return Optional.ofNullable(questionRepository.findOne(id));
     }
 
-    public Optional<Question> findByIdAndNotDeleted(long id) {
+    public Question findQuestionByIdAndNotDeleted(long id) {
         Question question = questionRepository.findOne(id);
         if (question == null || question.isDeleted()) {
-            return Optional.empty();
+            throw new QuestionNotFoundException(id);
         }
-        return Optional.of(question);
+        return question;
     }
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        Optional<Question> question = findByIdAndNotDeleted(id);
+        Question question = findQuestionByIdAndNotDeleted(id);
 
-        return question.orElseThrow(QuestionNotFoundException::new)
-                       .update(loginUser, updatedQuestion);
+        return question.update(loginUser, updatedQuestion);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long id) {
-        Optional<Question> question = findByIdAndNotDeleted(id);
+        Question question = findQuestionByIdAndNotDeleted(id);
 
-        question.orElseThrow(QuestionNotFoundException::new)
-                .delete(loginUser);
+        question.delete(loginUser);
+    }
+
+    @Transactional
+    public Answer addAnswer(Answer answer, long questonId) {
+        Question question = findQuestionByIdAndNotDeleted(questonId);
+        question.addAnswer(answer);
+        return answer;
+    }
+
+    @Transactional
+    public Answer updateAnswer(long id, Answer updateAnswer) {
+        Answer answer = findAnswerByIdAndNotDeleted(id);
+        return answer.update(updateAnswer);
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) {
+        Answer answer = findAnswerByIdAndNotDeleted(id);
+        answer.delete(loginUser);
+    }
+
+    public Answer findAnswerByIdAndNotDeleted(long id) {
+        Answer answer = answerRepository.findOne(id);
+        if (answer == null || answer.isDeleted()) {
+            throw new AnswerNotFoundException(id);
+        }
+        return answer;
     }
 
     public Iterable<Question> findAll() {
@@ -69,22 +95,5 @@ public class QnaService {
 
     public List<Question> findAll(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
-    }
-
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
-    }
-
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
-    }
-
-    public boolean isOwnerOfQuestion(User loginUser, long id) {
-        Question question = questionRepository.findOne(id);
-        if (question == null) {
-            throw new QuestionNotFoundException();
-        }
-        return question.isOwner(loginUser);
     }
 }

@@ -1,15 +1,14 @@
-package codesquad.web;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+package codesquad.web.api;
 
 import codesquad.domain.User;
 import codesquad.dto.UserDto;
+import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
 

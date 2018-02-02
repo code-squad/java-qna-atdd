@@ -1,17 +1,21 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
+import support.domain.AbstractEntity;
+import support.domain.ApiUrlGeneratable;
+import support.domain.UrlGeneratable;
+
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
-
-import support.domain.AbstractEntity;
-import support.domain.UrlGeneratable;
+import java.net.URI;
 
 @Entity
-public class Answer extends AbstractEntity implements UrlGeneratable {
+public class Answer extends AbstractEntity implements UrlGeneratable, ApiUrlGeneratable {
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -64,6 +68,37 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), contents);
+    }
+
+    public URI generateApiUri() {
+        String apiUri = "/api" + generateUrl();
+        return URI.create(apiUri);
+    }
+
+    public Answer update(Answer updateAnswer) {
+        if (!isOwner(updateAnswer.writer)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = updateAnswer.contents;
+        return this;
+    }
+
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
+        this.question.deleteAnswer(this);
+    }
+
+    public void checkAuthority(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
     }
 
     @Override

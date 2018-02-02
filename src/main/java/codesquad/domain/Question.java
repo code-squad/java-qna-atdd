@@ -4,6 +4,7 @@ import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
+import support.domain.ApiUrlGeneratable;
 import support.domain.UrlGeneratable;
 
 import javax.persistence.CascadeType;
@@ -16,11 +17,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
-public class Question extends AbstractEntity implements UrlGeneratable {
+public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGeneratable {
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -60,6 +63,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer;
     }
 
+    public List<Answer> getAnswers() {
+        return Collections.unmodifiableList(answers);
+    }
+
+    public int getCountOfAnswers() {
+        return answers.size();
+    }
+
     public void writeBy(User loginUser) {
         this.writer = loginUser;
     }
@@ -96,13 +107,31 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
+    public QuestionDto toQuestionDto() {
+        return new QuestionDto(getId(), this.title, this.contents);
+    }
+
+    void deleteAnswer(Answer answer) {
+        if (!answers.remove(answer)) {
+            throw new IllegalStateException();
+        }
+    }
+
+    public void checkAuthority(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+    }
+
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
     }
 
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
+    @Override
+    public URI generateApiUri() {
+        String apiUri = "/api" + generateUrl();
+        return URI.create(apiUri);
     }
 
     @Override

@@ -9,20 +9,32 @@ public abstract class CustomException extends RuntimeException {
 
     private String message;
 
-    CustomException() {
-
-    }
+    private Object[] arguments;
 
     CustomException(String message) {
         super(message);
         this.message = message;
     }
 
-    abstract HttpStatus status();
+    CustomException(String message, Object... arguments) {
+        super(message);
+        this.message = message;
+        this.arguments = arguments;
+    }
+
+    public abstract HttpStatus status();
 
     @Override
     public String getMessage() {
         return String.format("%s %s", getErrorMessage(), status());
+    }
+
+    public Object[] getArguments() {
+        return arguments;
+    }
+
+    public String getMessageCode() {
+        return this.getClass().getSimpleName();
     }
 
     private String getErrorMessage() {
@@ -31,5 +43,4 @@ public abstract class CustomException extends RuntimeException {
         }
         return message;
     }
-
 }

@@ -1,8 +1,9 @@
 package codesquad.web;
 
+import codesquad.CustomException;
 import codesquad.NotFoundException;
 import codesquad.UnAuthorizedException;
-import org.springframework.core.Ordered;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -13,13 +14,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice(basePackages = "codesquad.web",
                   annotations = Controller.class)
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(1)
 public class WebControllerAdvice {
+
+    private final MessageSourceAccessor accessor;
+
+    public WebControllerAdvice(MessageSourceAccessor accessor) {
+        this.accessor = accessor;
+    }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ModelAndView handleNotFoundException(NotFoundException ex) {
-        return createView(ex.getMessage());
+        return createView(getCustomErrorMessage(ex));
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
@@ -39,5 +46,9 @@ public class WebControllerAdvice {
         mv.addObject("message", errorMessage);
 
         return mv;
+    }
+
+    private String getCustomErrorMessage(CustomException e) {
+        return accessor.getMessage(e.getMessageCode(), e.getArguments(), e.getMessage());
     }
 }
