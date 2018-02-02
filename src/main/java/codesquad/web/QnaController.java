@@ -1,6 +1,5 @@
 package codesquad.web;
 
-import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.Question;
 import codesquad.domain.User;
@@ -28,14 +27,14 @@ public class QnaController {
 
     @PostMapping("")
     public String create(@LoginUser User user, String title, String contents) {
-        qnaService.create(user, new Question(title, contents));
+        qnaService.createQuestion(user, new Question(title, contents));
         logger.debug("Question created.");
         return "redirect:/";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable long id, Model model) {
-        Question question = qnaService.findById(id);
+        Question question = qnaService.findQuestionById(id);
         model.addAttribute("question", question);
         return "/qna/show";
     }
@@ -57,7 +56,7 @@ public class QnaController {
 
     @GetMapping("/{id}/form")
     public String updateForm(@PathVariable long id, @LoginUser User user, Model model) {
-        Question question = qnaService.findById(id);
+        Question question = qnaService.findQuestionById(id);
         if (!question.isOwner(user)) {
             throw new UnAuthorizedException("자신의 글만 수정할 수 있습니다.");
         }

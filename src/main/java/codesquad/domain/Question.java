@@ -19,10 +19,11 @@ import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
 import support.domain.AbstractEntity;
+import support.domain.ApiUrlGeneratable;
 import support.domain.UrlGeneratable;
 
 @Entity
-public class Question extends AbstractEntity implements UrlGeneratable {
+public class Question extends AbstractEntity {
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -100,6 +101,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public QuestionDto toQuestionDto() {
+        if (isDeleted()) {
+            return null;
+        }
         return new QuestionDto(getId(), this.title, this.contents);
     }
 

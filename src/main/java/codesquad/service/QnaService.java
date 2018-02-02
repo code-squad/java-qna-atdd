@@ -23,14 +23,26 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
+    public Question createQuestion(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
+    @Transactional
+    public Answer createAnswer(User loginUser, long targetId, Answer answer) {
+        answer.writeBy(loginUser);
+        Question target = questionRepository.findOne(targetId);
+        target.addAnswer(answer);
+        return answer;
+    }
+
+    public Question findQuestionById(long id) {
         return questionRepository.findOne(id);
+    }
+
+    public Answer findAnswerById(long id) {
+        return answerRepository.findOne(id);
     }
 
     @Transactional
@@ -47,6 +59,12 @@ public class QnaService {
         question.delete(loginUser);
     }
 
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) {
+        Answer answer = answerRepository.findOne(id);
+        answer.delete(loginUser);
+    }
+
     public Iterable<Question> findAll() {
         return questionRepository.findByDeleted(false);
     }
@@ -56,11 +74,6 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
-    }
-
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
         return null;
     }
 }

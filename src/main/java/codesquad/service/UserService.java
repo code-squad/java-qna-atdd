@@ -46,7 +46,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByUserId(userId);
 
         return optionalUser.filter(user -> user.matchPassword(password))
-                .orElseThrow(UnAuthorizedException::new);
+                .orElseThrow(UnAuthenticationException::new);
     }
 
     public User findOne(long userId) {

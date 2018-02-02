@@ -51,7 +51,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void show() {
         long id = 1;
 
-        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d" + id), String.class);
+        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d", id), String.class);
     }
 
     @Test

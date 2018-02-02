@@ -71,7 +71,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
     @Test
     public void show_one() {
         long id = 1;
-        Question question = qnaService.findById(id);
+        Question question = qnaService.findQuestionById(id);
 
         ResponseEntity<String> response = getForEntity(template(), String.format("/questions/%d", id));
 
@@ -81,7 +81,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void show_list() {
-        Question question = qnaService.findById(2);
+        Question question = qnaService.findQuestionById(2);
         ResponseEntity<String> response = getForEntity(template(), "/");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
@@ -100,7 +100,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
     @Test
     public void update_form_owner_login() {
         long questionId = 1;
-        Question question = qnaService.findById(questionId);
+        Question question = qnaService.findQuestionById(questionId);
 
         ResponseEntity<String> response = getForEntity(basicAuthTemplate(), String.format("/questions/%d/form", questionId));
 
@@ -137,7 +137,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
 
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
                 .postForEntity(String.format("/questions/%d", questionId), request, String.class);
-        Question updatedQuestion = qnaService.findById(questionId);
+        Question updatedQuestion = qnaService.findQuestionById(questionId);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertThat(updatedQuestion.getTitle(), is(title));
@@ -195,7 +195,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
                 .postForEntity(String.format("/questions/%d", id), request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertTrue(qnaService.findById(id).isDeleted());
+        assertTrue(qnaService.findQuestionById(id).isDeleted());
         assertThat(response.getHeaders().getLocation().getPath(), is("/"));
     }
 

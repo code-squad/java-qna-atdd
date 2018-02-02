@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class AbstractEntity {
+public abstract class AbstractEntity implements ApiUrlGeneratable, UrlGeneratable {
     @Id
     @GeneratedValue
     private long id;
@@ -81,4 +81,14 @@ public class AbstractEntity {
     public String toString() {
         return "AbstractEntity [id=" + id + ", createDate=" + createDate + ", modifiedDate=" + modifiedDate + "]";
     }
+
+    @Override
+    public String generateApiUrl() {
+        return new StringBuilder("/api")
+                .append(generateUrl())
+                .toString();
+    }
+
+    @Override
+    public abstract String generateUrl();
 }
