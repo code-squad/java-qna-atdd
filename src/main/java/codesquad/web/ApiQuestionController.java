@@ -64,11 +64,13 @@ public class ApiQuestionController {
 	}
 
 	@DeleteMapping("/{id}")
-	public void delete(@LoginUser User loginUser, @PathVariable long id) {
+	public ResponseEntity<Void> delete(@LoginUser User loginUser, @PathVariable long id) {
 		try {
 			qnaService.deleteQuestion(loginUser, id);
+			return new ResponseEntity<Void>(new HttpHeaders(), HttpStatus.OK);
 		} catch (CannotDeleteException e) {
 			log.info(e.getMessage());
+			return new ResponseEntity<Void>(new HttpHeaders(), HttpStatus.PRECONDITION_REQUIRED);
 		}
 	}
 }

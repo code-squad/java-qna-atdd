@@ -1,28 +1,16 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
-import org.hibernate.annotations.Where;
-
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
-import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Question extends AbstractEntity {
@@ -40,10 +28,8 @@ public class Question extends AbstractEntity {
 	@JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
 	private User writer;
 
-	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-	@Where(clause = "deleted = false")
-	@OrderBy("id ASC")
-	private List<Answer> answers = new ArrayList<>();
+	@Embedded
+	private Answers answers = new Answers();
 
 	private boolean deleted = false;
 
@@ -107,33 +93,21 @@ public class Question extends AbstractEntity {
 		this.contents = updatedQuestion.getContents();
 	}
 
-	public void delete(User loginUser) throws CannotDeleteException {
+	public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
 		if (!canDelete(loginUser)) {
 			throw new CannotDeleteException("삭제할 수 없습니다.");
 		}
 
 		this.deleted = true;
-		deleteAllAnswer(loginUser);
+
+		List<DeleteHistory> deleteHistories = answers.delete(loginUser);
+		deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser, LocalDateTime.now()));
+		return deleteHistories;
 	}
 
-	public void deleteAllAnswer(User loginUser) throws CannotDeleteException {
-		for (Answer answer : answers) {
-			answer.delete(loginUser);
-		}
-	}
 
 	public boolean canDelete(User loginUser) {
-		if (!isOwner(loginUser)) {
-			return false;
-		}
-
-		for (Answer answer : answers) {
-			if (!answer.canDelete(loginUser)) {
-				return false;
-			}
-		}
-
-		return true;
+		return isOwner(loginUser) && answers.canDelete(loginUser);
 	}
 
 	@Override
