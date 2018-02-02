@@ -18,11 +18,16 @@ import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = LoggerFactory.getLogger(Question.class);
+    
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -56,15 +61,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
             throw new UnAuthorizedException();
         }
 
-        this.title = target.title;
-        this.contents = target.contents;
+        this.title = target.getTitle();
+        this.contents = target.getContents();
     }
 
     public void delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
-
         this.deleted = true;
     }
 
@@ -82,6 +86,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
     }
 
     public void setDeleted(boolean deleted) {
@@ -104,9 +112,15 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.writer = loginUser;
     }
 
+    @Transactional
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
         answers.add(answer);
+    }
+
+    @Transactional
+    public void removeAnswer(Answer answer) {
+        answers.remove(answer);
     }
 
     public boolean isOwner(User loginUser) {
@@ -119,7 +133,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String generateUrl() {
-        return String.format("/questions/%d", getId());
+        return String.format("/api/questions/%d", getId());
     }
 
     public QuestionDto toQuestionDto() {
@@ -128,6 +142,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+        return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + ", deleted=" + deleted + "]";
     }
+
 }

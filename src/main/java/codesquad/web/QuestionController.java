@@ -44,7 +44,7 @@ public class QuestionController {
 
     @PutMapping("/{id}/update")
     public String update(@PathVariable long id, @LoginUser User user, Question question) throws Exception {
-        qnaService.update(user, id, question);
+        qnaService.updateQuestion(user, id, question);
         return "redirect:/";
     }
 }

@@ -12,6 +12,8 @@ import codesquad.UnAuthorizedException;
 import codesquad.dto.UserDto;
 import support.domain.AbstractEntity;
 
+import java.util.Objects;
+
 @Entity
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
@@ -88,7 +90,7 @@ public class User extends AbstractEntity {
     public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
-    
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;
@@ -105,4 +107,23 @@ public class User extends AbstractEntity {
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
+
+    @Override
+    public boolean equals(Object target) {
+        if (this == target) return true;
+        if (target == null || getClass() != target.getClass()) return false;
+        if (!super.equals(target)) return false;
+        User user = (User) target;
+        return Objects.equals(getId(), user.getId()) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(name, user.name) &&
+                Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), userId, password, name, email);
+    }
+
 }

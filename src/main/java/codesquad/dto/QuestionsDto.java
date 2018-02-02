@@ -1,5 +1,7 @@
 package codesquad.dto;
 
+import codesquad.domain.Question;
+
 import java.util.List;
 
 public class QuestionsDto {
@@ -12,4 +14,5 @@ public class QuestionsDto {
     public int getSize() {
         return contents.size();
     }
+
 }
