@@ -4,7 +4,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,10 @@ public class QnaService {
 	@Resource(name = "deleteHistoryService")
 	private DeleteHistoryService deleteHistoryService;
 
+	public Question create(User loginUser, QuestionDto questionDto) {
+		return create(loginUser, questionDto.toQuestion());
+	}
+
 	public Question create(User loginUser, Question question) {
 		question.writeBy(loginUser);
 		log.debug("question : {}", question);
@@ -42,10 +47,10 @@ public class QnaService {
 	}
 
 	@Transactional
-	public Question update(User loginUser, long id, Question updatedQuestion) {
+	public Question update(User loginUser, long id, QuestionDto updatedQuestionDto) {
 		log.debug("before: {}", questionRepository.findAll());
 		Question question = questionRepository.findOne(id);
-		question.update(loginUser, updatedQuestion);
+		question.update(loginUser, updatedQuestionDto);
 		log.debug("after: {}", questionRepository.findAll());
 		return question;
 	}
@@ -64,12 +69,24 @@ public class QnaService {
 		return questionRepository.findAll(pageable).getContent();
 	}
 
-	public Answer addAnswer(User loginUser, long questionId, String contents) {
-		return null;
+	@Transactional
+	public Answer addAnswer(User loginUser, long questionId, Answer answer) {
+		answer.writeBy(loginUser);
+
+		Question question = findById(questionId);
+		question.addAnswer(answer);
+
+		return answer;
 	}
 
-	public Answer deleteAnswer(User loginUser, long id) {
-		// TODO 답변 삭제 기능 구현
-		return null;
+	public Answer findAnswerById(long id) {
+		return answerRepository.findOne(id);
 	}
+
+	@Transactional
+	public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+		Answer answer = answerRepository.findOne(id);
+		answer.delete(loginUser);
+	}
+
 }

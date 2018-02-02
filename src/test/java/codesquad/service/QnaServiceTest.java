@@ -4,6 +4,7 @@ import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
+import codesquad.dto.QuestionDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -59,14 +60,13 @@ public class QnaServiceTest {
 		qnaService.create(loginUser, question1);
 		logger.debug("data: {}", questionRepository.findAll());
 
-		Question question2 = new Question("질문제목2", "질문본문2");
-		when(questionRepository.save(question2)).thenReturn(question2);
-		logger.debug("question2: {}", question2);
+		QuestionDto questionDto = new QuestionDto("질문제목2", "질문본문2");
+		logger.debug("question2: {}", questionDto);
 
-		Question updatedQuestion = qnaService.update(loginUser, 1, question2);
+		Question updatedQuestion = qnaService.update(loginUser, 1, questionDto);
 		logger.debug("updatedQuestion: {}", updatedQuestion);
 
-		assertThat(updatedQuestion, is(question2));
+		assertThat(updatedQuestion, is(questionDto));
 	}
 
 }

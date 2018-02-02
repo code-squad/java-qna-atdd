@@ -32,16 +32,16 @@ public class ApiUserController {
         User savedUser = userService.add(user);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/api/users/" + savedUser.getId()));
+        headers.setLocation(URI.create(savedUser.generateApiUrl()));
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
-    
+
     @GetMapping("{id}")
     public UserDto show(@LoginUser User loginUser, @PathVariable long id) {
         User user = userService.findById(loginUser, id);
         return user.toUserDto();
     }
-    
+
     @PutMapping("{id}")
     public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody UserDto updatedUser) {
         userService.update(loginUser, id, updatedUser);

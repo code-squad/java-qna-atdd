@@ -1,6 +1,9 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
+import codesquad.dto.QuestionDto;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -9,25 +12,22 @@ import static org.junit.Assert.assertThat;
 public class QuestionTest {
 	public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
 	public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
-	public static final Question QUESTION_1 = new Question("질문1", "질문내용1");
-	public static final Question QUESTION_2 = new Question("질문2", "질문내용2");
+	public Question origin;
+	public QuestionDto target;
+	public Answer answer;
 
-	public static Question newQuestion(String title) {
-		return newQuestion(title, "contents");
-	}
-
-	public static Question newQuestion(String title, String contents) {
-		return new Question(title, contents);
+	@Before
+	public void setup() {
+		origin = new Question("질문1", "질문내용1");
+		target = new QuestionDto("질문2", "질문내용2");
+		answer = new Answer("질문에 대한 답변");
 	}
 
 	@Test
 	public void update_owner() throws Exception {
 		User writer = JAVAJIGI;
-
-		Question origin = newQuestion(QUESTION_1.getTitle(), QUESTION_1.getContents());
 		origin.writeBy(writer);
 
-		Question target = newQuestion(QUESTION_2.getTitle(), QUESTION_2.getContents());
 		origin.update(writer, target);
 
 		assertThat(origin.getTitle(), is(target.getTitle()));
@@ -39,10 +39,8 @@ public class QuestionTest {
 		User writer = JAVAJIGI;
 		User not_writer = SANJIGI;
 
-		Question origin = newQuestion(QUESTION_1.getTitle(), QUESTION_1.getContents());
 		origin.writeBy(writer);
 
-		Question target = newQuestion(QUESTION_2.getTitle(), QUESTION_2.getContents());
 		origin.update(not_writer, target);
 	}
 
@@ -50,20 +48,48 @@ public class QuestionTest {
 	public void delete_owner() throws Exception {
 		User writer = JAVAJIGI;
 
-		Question origin = newQuestion(QUESTION_1.getTitle(), QUESTION_1.getContents());
 		origin.writeBy(writer);
 		origin.delete(writer);
 
 		assertThat(origin.isDeleted(), is(true));
 	}
 
-	@Test(expected = UnAuthorizedException.class)
-	public void delete_not_owner() {
+	@Test(expected = CannotDeleteException.class)
+	public void delete_not_owner() throws Exception {
 		User writer = JAVAJIGI;
 		User not_writer = SANJIGI;
 
-		Question origin = newQuestion(QUESTION_1.getTitle(), QUESTION_1.getContents());
 		origin.writeBy(writer);
 		origin.delete(not_writer);
 	}
+
+	@Test
+	public void delete_내_답글이_있을_때() throws Exception {
+		User writer = JAVAJIGI;
+
+		origin.writeBy(writer);
+
+		answer.writeBy(writer);
+		answer.setQuestion(origin);
+		origin.addAnswer(answer);
+
+		origin.delete(writer);
+
+		assertThat(origin.isDeleted(), is(true));
+	}
+
+	@Test(expected = CannotDeleteException.class)
+	public void delete_남의_답글이_있을_때() throws Exception {
+		User writer = JAVAJIGI;
+		User not_writer = SANJIGI;
+
+		origin.writeBy(writer);
+
+		answer.writeBy(not_writer);
+		answer.setQuestion(origin);
+		origin.addAnswer(answer);
+
+		origin.delete(writer);
+	}
+
 }

@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
@@ -24,94 +25,119 @@ import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
-public class Question extends AbstractEntity implements UrlGeneratable {
+public class Question extends AbstractEntity {
 	private static final Logger log = LoggerFactory.getLogger(Question.class);
 
-    @Size(min = 3, max = 100)
-    @Column(length = 100, nullable = false)
-    private String title;
+	@Size(min = 3, max = 100)
+	@Column(length = 100, nullable = false)
+	private String title;
 
-    @Size(min = 3)
-    @Lob
-    private String contents;
+	@Size(min = 3)
+	@Lob
+	private String contents;
 
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
-    private User writer;
+	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
+	private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+	@Where(clause = "deleted = false")
+	@OrderBy("id ASC")
+	private List<Answer> answers = new ArrayList<>();
 
-    private boolean deleted = false;
+	private boolean deleted = false;
 
-    public Question() {
-    }
+	public Question() {
+	}
 
-    public Question(String title, String contents) {
-        this.title = title;
-        this.contents = contents;
-    }
+	public Question(String title, String contents) {
+		this.title = title;
+		this.contents = contents;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public String getContents() {
-        return contents;
-    }
+	public String getContents() {
+		return contents;
+	}
 
-    public User getWriter() {
-        return writer;
-    }
+	public User getWriter() {
+		return writer;
+	}
 
-    public void writeBy(User loginUser) {
-        this.writer = loginUser;
-    }
+	public void writeBy(User loginUser) {
+		this.writer = loginUser;
+	}
 
-    public void addAnswer(Answer answer) {
-        answer.toQuestion(this);
-        answers.add(answer);
-    }
+	public void addAnswer(Answer answer) {
+		answer.setQuestion(this);
+		answers.add(answer);
+	}
 
-    public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
-    }
+	public boolean isOwner(User loginUser) {
+		return writer.equals(loginUser);
+	}
 
-    public boolean isDeleted() {
-        return deleted;
-    }
+	public boolean isDeleted() {
+		return deleted;
+	}
 
-    @Override
-    public String generateUrl() {
-        return String.format("/questions/%d", getId());
-    }
+	@Override
+	public String generateUrl() {
+		return String.format("/questions/%d", getId());
+	}
 
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
-    }
+	public QuestionDto toQuestionDto() {
+		if (isDeleted()) {
+			return null;
+		}
 
-    @Override
-    public String toString() {
-        return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
-    }
+		return new QuestionDto(getId(), this.title, this.contents);
+	}
 
-    public void update(User loginUser, Question updatedQuestion) {
-	    log.debug("loginUser: {}, id: {}, target: {}", loginUser, updatedQuestion);
-        if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
+	public void update(User loginUser, QuestionDto updatedQuestion) {
+		log.debug("loginUser: {}, id: {}, target: {}", loginUser, updatedQuestion);
+		if (!isOwner(loginUser)) {
+			throw new UnAuthorizedException();
+		}
 
-        this.title = updatedQuestion.title;
-        this.contents = updatedQuestion.contents;
-    }
+		this.title = updatedQuestion.getTitle();
+		this.contents = updatedQuestion.getContents();
+	}
 
-    public void delete(User loginUser) {
-        if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
+	public void delete(User loginUser) throws CannotDeleteException {
+		if (!canDelete(loginUser)) {
+			throw new CannotDeleteException("삭제할 수 없습니다.");
+		}
 
-        this.deleted = true;
-    }
+		this.deleted = true;
+		deleteAllAnswer(loginUser);
+	}
+
+	public void deleteAllAnswer(User loginUser) throws CannotDeleteException {
+		for (Answer answer : answers) {
+			answer.delete(loginUser);
+		}
+	}
+
+	public boolean canDelete(User loginUser) {
+		if (!isOwner(loginUser)) {
+			return false;
+		}
+
+		for (Answer answer : answers) {
+			if (!answer.canDelete(loginUser)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+	}
 }
