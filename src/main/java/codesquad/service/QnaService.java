@@ -37,7 +37,7 @@ public class QnaService {
     }
 
     public Question findById(long id) {
-        return questionRepository.findOne(id);
+        return questionRepository.findOneByIdAndDeleted(id, false);
     }
 
     @Transactional
@@ -66,12 +66,35 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    // [NEED TO STUDY] @Transactional's specific role
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+
+        if (question == null) {
+            throw new IllegalStateException("question is not exist. questionId=" + questionId);
+        }
+
+        Answer answer = new Answer(loginUser, contents);
+        question.addAnswer(answer);
+
+        return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void updateAnswer(User loginUser, long questionId, long answerId, String contents) {
+        Answer answer = answerRepository.findOne(answerId);
+        answer.updatedBy(loginUser, questionId, contents);
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long questionId, long answerId) throws CannotDeleteException {
+        Answer answer = answerRepository.findOne(answerId);
+
+        if (answer == null) {
+            throw new CannotDeleteException("answer is not exist. answerId=" + answerId);
+        }
+
+        answer.deleteBy(loginUser, questionId);
     }
 }

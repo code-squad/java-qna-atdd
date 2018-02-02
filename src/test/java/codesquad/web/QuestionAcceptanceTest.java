@@ -1,9 +1,6 @@
 package codesquad.web;
 
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
-import codesquad.security.LoginUser;
+import codesquad.domain.*;
 import codesquad.util.HtmlFormDataBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -98,14 +95,10 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void update() {
         HttpEntity<MultiValueMap<String, Object>> request = makeQuestionRequest("title test", "contents test");
-        basicAuthTemplate(getSANJIGI()).put("/questions/4", request, String.class);
+        basicAuthTemplate(defaultUserAsSANJIGI()).put("/questions/4", request, String.class);
 
         Question question = questionRepository.findOne(4L);
         assertEquals("title test", question.getTitle());
-    }
-
-    private User getSANJIGI() {
-        return findByUserId("sanjigi");
     }
 
     @Test
@@ -119,10 +112,15 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void delete() {
-        basicAuthTemplate(getSANJIGI()).delete("/questions/3");
+        basicAuthTemplate(defaultUserAsSANJIGI()).delete("/questions/3");
 
         Question question = questionRepository.findOne(3L);
         assertTrue(question.isDeleted());
+
+        ResponseEntity<String> response = template().getForEntity("/questions/3", String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        log.debug("body : {}", response.getBody());
+        assertThat(response.getBody().contains("expected delete"), is(false));
     }
 
     @Test

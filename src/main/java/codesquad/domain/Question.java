@@ -49,6 +49,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public Question(QuestionDto questionDto) {
+        this.title = questionDto.getTitle();
+        this.contents = questionDto.getContents();
+    }
+
     public String getTitle() {
         return title;
     }
@@ -107,5 +112,24 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         }
 
         this.deleted = true;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public Answer findAnswer(long answerId) {
+        List<Answer> answers = getAnswers();
+        for (Answer answer : answers) {
+            if (answer.getId() == answerId) {
+                return answer;
+            }
+        }
+
+        return null;
+    }
+
+    public int getAnswersCount() {
+        return answers.size();
     }
 }

@@ -7,6 +7,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -42,6 +43,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
+    public Answer(AnswerDto answerDto) {
+        contents = answerDto.getContents();
+    }
+
     public User getWriter() {
         return writer;
     }
@@ -58,7 +63,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
-    public boolean isOwner(User loginUser) {
+    private boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
@@ -74,5 +79,31 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), this.contents);
+    }
+
+    public void updatedBy(User loginUser, long questionId, String contents) {
+        validate(loginUser, questionId);
+
+        this.contents = contents;
+    }
+
+    private void validate(User loginUser, long questionId) {
+        if ( !this.isOwner(loginUser)) {
+            throw new IllegalStateException("loginUser is not owner, loginUser=" + loginUser + ", answer=" + this);
+        }
+
+        if (question.getId() != questionId) {
+            throw new IllegalStateException("questionId is invalid, loginUser=" + loginUser + ", questionId=" + questionId);
+        }
+    }
+
+    public void deleteBy(User loginUser, long questionId) {
+        validate(loginUser, questionId);
+
+        this.deleted = true;
     }
 }

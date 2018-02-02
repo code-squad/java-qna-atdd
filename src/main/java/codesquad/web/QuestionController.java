@@ -46,7 +46,9 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String getOne(Model model, @PathVariable long id) {
-        model.addAttribute("questions", Collections.singletonList(questionService.findById(id)));
+        Question question = questionService.findById(id);
+        model.addAttribute("questions", Collections.singletonList(question));
+        model.addAttribute("answersCount", question == null ? 0 : question.getAnswersCount());
         return "/qna/show";
     }
 
