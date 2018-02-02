@@ -81,4 +81,8 @@ public class AbstractEntity {
     public String toString() {
         return "AbstractEntity [id=" + id + ", createDate=" + createDate + ", modifiedDate=" + modifiedDate + "]";
     }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
 }

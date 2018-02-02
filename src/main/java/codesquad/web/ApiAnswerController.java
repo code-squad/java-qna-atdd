@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.User;
 import codesquad.security.LoginUser;
 import codesquad.service.QnaService;
@@ -45,7 +46,7 @@ public class ApiAnswerController {
     }
 
     @DeleteMapping("/{id}")
-    public Boolean delete(@LoginUser User loginUser, @PathVariable Long id) throws IllegalAccessException {
-        return qnaService.deleteAnswer(loginUser, id);
+    public void delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException {
+        qnaService.deleteAnswer(loginUser, id);
     }
 }

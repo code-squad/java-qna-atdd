@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 public class AnswerAcceptanceTest extends AcceptanceTest {
     private HtmlFormDataBuilder htmlFormDataBuilder;
     private Question question;
+    private Question question2;
 
     @Autowired
     private QnaService qnaService;
@@ -29,6 +30,7 @@ public class AnswerAcceptanceTest extends AcceptanceTest {
     @Before
     public void setUp() {
         question = qnaService.create(defaultUser(), new Question("this is title", "this is contents"));
+        question2 = qnaService.create(defaultUser(), new Question("this is title", "this is contents"));
     }
 
     @Test
@@ -55,5 +57,11 @@ public class AnswerAcceptanceTest extends AcceptanceTest {
     public void delete() {
         basicAuthTemplate().delete("/questions/"+ question.getId() + "/answers/1");
         assertThat(answerRepository.findOne(1L).isDeleted(), is(true));
+    }
+
+    @Test
+    public void delete_NotMyAnswer() {
+        basicAuthTemplate(secondDefaultUser()).delete("/questions/"+ question2.getId() + "/answers/1");
+        assertThat(answerRepository.findOne(2L).isDeleted(), is(false));
     }
 }

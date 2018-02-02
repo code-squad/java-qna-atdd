@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import codesquad.domain.DeleteHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -50,9 +51,9 @@ public class QnaService {
         return question.update(loginUser, updatedQuestion);
     }
 
-    public boolean deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
+    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = questionRepository.findOne(questionId);
-        return question.delete(loginUser, question);
+        deleteHistoryService.saveAll(question.delete(loginUser, question));
     }
 
     public Iterable<Question> findAll() {
@@ -70,9 +71,9 @@ public class QnaService {
         return answerRepository.save(answer);
     }
 
-    public boolean deleteAnswer(User loginUser, long id) throws IllegalAccessException {
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
         Answer answer = findAnswerById(id);
-        return answer.delete(loginUser);
+        answer.delete(loginUser);
     }
 
     public Answer updateAnswer(User loginUser, Long answerId, String contents) throws IllegalAccessException {

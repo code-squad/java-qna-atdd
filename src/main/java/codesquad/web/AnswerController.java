@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.User;
 import codesquad.security.LoginUser;
@@ -35,7 +36,7 @@ public class AnswerController {
     }
 
     @DeleteMapping("/{answerId}")
-    public String delete(@LoginUser User loginUser, @PathVariable Long answerId) throws IllegalAccessException {
+    public String delete(@LoginUser User loginUser, @PathVariable Long answerId) throws CannotDeleteException {
         answerService.deleteAnswer(loginUser, answerId);
         return "redirect:/";
     }

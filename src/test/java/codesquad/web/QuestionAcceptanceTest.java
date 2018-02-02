@@ -81,7 +81,29 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void delete() {
-        basicAuthTemplate().delete("/questions/" + QUESTION_ID);
-        assertThat(questionRepository.findOne(QUESTION_ID).isDeleted()).isTrue();
+        basicAuthTemplate().delete("/questions/" + 2);
+        assertThat(questionRepository.findOne(2L).isDeleted()).isTrue();
+    }
+
+    @Test
+    public void delete_NotMyQuestion() {
+        basicAuthTemplate(secondDefaultUser()).delete("/questions/" + QUESTION_ID);
+        assertThat(questionRepository.findOne(QUESTION_ID).isDeleted()).isFalse();
+    }
+
+    @Test
+    public void delete_NotMyAnswer() {
+        basicAuthTemplate(secondDefaultUser()).delete("/questions/" + QUESTION_ID);
+        addAnswer();
+        assertThat(questionRepository.findOne(QUESTION_ID).isDeleted()).isFalse();
+    }
+
+    private void addAnswer() {
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.urlEncodedForm()
+                                                                               .addParameter("contents", "hello~")
+                                                                               .build();
+
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/" + QUESTION_ID + "/answers", request, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 }

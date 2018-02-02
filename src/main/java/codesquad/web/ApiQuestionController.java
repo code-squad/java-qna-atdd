@@ -51,7 +51,7 @@ public class ApiQuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public Boolean delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException {
-        return qnaService.deleteQuestion(loginUser, id);
+    public void delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException, IllegalAccessException {
+        qnaService.deleteQuestion(loginUser, id);
     }
 }

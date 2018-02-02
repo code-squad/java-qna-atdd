@@ -7,6 +7,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -74,12 +75,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public boolean delete(User loginUser) throws IllegalAccessException {
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
         if (!isOwner(loginUser)) {
-            throw new IllegalAccessException("작성자만 삭제가 가능합니다.");
+            throw new CannotDeleteException("작성자만 삭제가 가능합니다.");
         }
-        this.deleted = true;
-        return this.deleted;
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, getCreateDate());
     }
 
     @Override

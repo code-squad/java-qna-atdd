@@ -48,7 +48,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{questionId}")
-    public String update(@LoginUser User loginUser, @PathVariable Long questionId) throws CannotDeleteException {
+    public String update(@LoginUser User loginUser, @PathVariable Long questionId) throws CannotDeleteException, IllegalAccessException {
         questionService.deleteQuestion(loginUser, questionId);
         return "redirect:/";
     }
