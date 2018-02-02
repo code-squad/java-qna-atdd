@@ -2,16 +2,9 @@ package codesquad.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import codesquad.CannotDeleteException;
@@ -19,8 +12,11 @@ import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.hibernate.hql.spi.id.persistent.DeleteHandlerImpl;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import static codesquad.domain.ContentType.QUESTION;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -36,10 +32,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -88,12 +82,22 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatedQuestion.contents;
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if(!this.isOwner(loginUser))
             throw new CannotDeleteException("Not owner");
 
         this.deleted = true;
+
+        List<DeleteHistory> histories = answers.deleteAnswers(writer);
+        histories.add(this.deleteHistory());
+
+        return histories;
     }
+
+    private DeleteHistory deleteHistory() {
+        return new DeleteHistory(QUESTION, getId(), writer);
+    }
+
 
     public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);

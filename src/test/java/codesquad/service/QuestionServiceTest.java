@@ -8,9 +8,7 @@ import static org.junit.Assert.*;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import codesquad.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionServiceTest {
@@ -41,6 +42,9 @@ public class QuestionServiceTest {
 
     @InjectMocks
     private QnaService qnaService;
+
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
 
     @Before
     public void init() {
@@ -91,5 +95,26 @@ public class QuestionServiceTest {
     @Test(expected = CannotDeleteException.class)
     public void deleteTest_by_other() throws Exception {
         qnaService.deleteQuestion(JAVAJIGI, QUESTION.getId());
+    }
+
+    @Test
+    public void deleteTest_with_answer() throws Exception {
+        QUESTION.addAnswer(new Answer(SANJIGI, "1"));
+        assertFalse(QUESTION.isDeleted());
+
+        qnaService.deleteQuestion(SANJIGI, QUESTION.getId());
+        assertTrue(QUESTION.isDeleted());
+
+        verify(deleteHistoryService, times(1)).saveAll(QUESTION.delete(SANJIGI));
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void deleteTest_with_answer_written_by_other() throws Exception {
+        QUESTION.addAnswer(new Answer(JAVAJIGI, "1"));
+        assertFalse(QUESTION.isDeleted());
+
+        qnaService.deleteQuestion(SANJIGI, QUESTION.getId());
+
+        assertFalse(QUESTION.isDeleted());
     }
 }

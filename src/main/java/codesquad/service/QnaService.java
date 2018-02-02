@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
 
+import codesquad.domain.*;
 import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -58,9 +54,9 @@ public class QnaService {
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = findById(questionId);
 
-        question.delete(loginUser);
+        List<DeleteHistory> histories = question.delete(loginUser);
 
-        questionRepository.save(question);
+        deleteHistoryService.saveAll(histories);
     }
 
     public Iterable<Question> findAll() {

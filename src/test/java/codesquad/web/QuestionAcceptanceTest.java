@@ -124,7 +124,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void deleteQuestionTest_with_owner() throws Exception {
-        ResponseEntity<String> response = delete("/questions/1");
+        ResponseEntity<String> response = delete("sanjigi", "/questions/2");
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 
@@ -132,7 +132,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
                 .getForEntity("/", String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertFalse(response.getBody().contains("국내에서 Ruby on Rails와 Play가 활성화되기 힘든 이유는 뭘까?"));
+        assertFalse(response.getBody().contains("언더스코어"));
     }
 
     @Test

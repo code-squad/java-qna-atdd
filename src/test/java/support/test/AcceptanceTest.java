@@ -46,6 +46,11 @@ public abstract class AcceptanceTest {
                 .exchange(url, HttpMethod.DELETE, urlEncodedForm().build(), String.class);
     }
 
+    public ResponseEntity<String> delete(String userId, String url) {
+        return basicAuthTemplate(findByUserId(userId))
+                .exchange(url, HttpMethod.DELETE, urlEncodedForm().build(), String.class);
+    }
+
     public ResponseEntity<String> put(String url, HttpEntity<?> request) {
         return basicAuthTemplate()
                 .exchange(url, HttpMethod.PUT, request, String.class);

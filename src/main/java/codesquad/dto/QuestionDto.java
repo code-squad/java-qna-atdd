@@ -58,6 +58,10 @@ public class QuestionDto {
         return new Question(this.title, this.contents);
     }
 
+    public static String apiUrl(long id) {
+        return "/api/questions/" + id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

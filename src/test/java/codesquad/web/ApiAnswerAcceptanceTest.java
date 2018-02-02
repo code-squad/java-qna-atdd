@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 
 public class ApiAnswerAcceptanceTest extends AcceptanceTest {
     private static final String URL_BASE = "/api/questions/1/answers";
-    private static final AnswerDto NEW_ANSWER = new AnswerDto(3,"Test Answer");
+    private static final AnswerDto NEW_ANSWER = new AnswerDto(4,"Test Answer");
     private static final AnswerDto UPDATED_ANSWER = new AnswerDto(1,"Updated Answer");
 
     @Test
