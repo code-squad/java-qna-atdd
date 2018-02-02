@@ -4,7 +4,6 @@ import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.etc.CannotDeleteException;
 import codesquad.etc.UnAuthorizedException;
-import codesquad.security.HttpSessionUtils;
 import codesquad.security.LoginUser;
 import codesquad.service.QnaService;
 import org.slf4j.Logger;
@@ -13,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/questions")
@@ -45,8 +46,8 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String showQuestionDetail(@PathVariable long id, Model model) {
-        Question question = qnaService.findById(id);
-        model.addAttribute("question", question);
+        Optional<Question> optQuestion = qnaService.findById(id);
+        model.addAttribute("question", optQuestion.orElse(null));
 
         return "qna/show";
     }
@@ -65,8 +66,8 @@ public class QuestionController {
 
     @GetMapping("/{id}/form")
     public String getQuestionForm(@PathVariable long id, Model model) {
-        Question question = qnaService.findById(id);
-        model.addAttribute("question", question);
+        Optional<Question> optQuestion = qnaService.findById(id);
+        model.addAttribute("question", optQuestion.orElse(null));
         return "qna/update_form";
     }
 

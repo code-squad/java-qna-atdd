@@ -3,8 +3,11 @@ package codesquad.domain;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import codesquad.dto.AnswerDto;
 import codesquad.etc.CannotDeleteException;
 import codesquad.etc.UnAuthorizedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import support.domain.AbstractEntity;
@@ -14,6 +17,9 @@ import java.util.Date;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
+
+    private static final Logger log = LoggerFactory.getLogger(Answer.class);
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -95,13 +101,37 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer{" +
+                "id=" + getId() +
+                ", writer=" + writer +
+                ", question=" + question +
+                ", contents='" + contents + '\'' +
+                ", deleted=" + deleted +
+                '}';
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
-        if (this.writer.equals(loginUser))
+    public void  delete(User loginUser) throws CannotDeleteException {
+        if (this.writer.equals(loginUser)){
             this.deleted = true;
+            return;
+        }
 
         throw new CannotDeleteException("The user has no authorization.");
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto()
+                .setId(getId())
+                .setWriter(this.writer)
+                .setContents(this.contents)
+                .setQuestion(this.question);
+    }
+
+    public void update(User loginUser, Answer newAnswer) {
+        if (writer.equals(loginUser)) {
+            this.contents = newAnswer.getContents();
+            return;
+        }
+        throw new UnAuthorizedException();
     }
 }

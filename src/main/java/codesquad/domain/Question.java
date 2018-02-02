@@ -15,6 +15,7 @@ import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
 import codesquad.etc.UnAuthorizedException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -40,6 +41,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
@@ -126,7 +128,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String generateUrl() {
-        return String.format("/questions/%d", getId());
+        return String.format("/api/questions/%d", getId());
     }
 
     public QuestionDto toQuestionDto() {

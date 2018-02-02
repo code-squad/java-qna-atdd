@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 
 import codesquad.domain.*;
+import codesquad.dto.QuestionDto;
 import codesquad.etc.UnAuthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,16 +38,21 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return Optional.of(questionRepository.findOne(id))
-                        .filter(i -> !i.isDeleted())
-                        .orElse(null);
+    public Optional<Question> findById(long id) {
+        return Optional.ofNullable(questionRepository.findOne(id))
+                        .filter(i -> !i.isDeleted());
     }
 
     @Transactional
-    public void update(User loginUser, long id, Question updatedQuestion) throws UnAuthorizedException {
-        Question question = findById(id);
-        question.update(loginUser, updatedQuestion);
+    public void update(User loginUser, long id, Question newQuestion) throws UnAuthorizedException {
+        Optional<Question> optQuestion = findById(id);
+        optQuestion.ifPresent(question -> question.update(loginUser, newQuestion));
+    }
+
+    @Transactional
+    public void updateAnswer(User loginUser, long id, Answer newAnswer) throws UnAuthorizedException {
+        Answer answer = findOneAnswer(id);
+        answer.update(loginUser, newAnswer);
     }
 
     @Transactional
@@ -81,8 +88,12 @@ public class QnaService {
                 LocalDateTime.now());
 
         deleteHistoryService.saveAll(Arrays.asList(answerDeleteHistory));
-        Answer answer = answerRepository.findOne(id);
+        Answer answer = findOneAnswer(id);
         answer.delete(loginUser);
+    }
+
+    public Answer findOneAnswer(long id) {
+        return answerRepository.findOne(id);
     }
 
     public Iterable<Question> findAll() {
@@ -93,7 +104,19 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public Answer addAnswer(User loginUser, long questionId, String contents) throws EntityNotFoundException {
+        Optional<Question> optQuestion = findById(questionId);
+        Question question = optQuestion.orElseThrow(EntityNotFoundException::new);
+
+        Answer answer = new Answer()
+                .setContents(contents)
+                .setWriter(loginUser)
+                .setQuestion(question);
+        question.addAnswer(answer);
+
+        return answer;
     }
+
+
 }

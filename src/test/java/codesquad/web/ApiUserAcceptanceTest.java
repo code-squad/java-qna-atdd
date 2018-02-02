@@ -42,7 +42,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     @Test
     public void update() throws Exception {
         UserDto newUser = createUserDto("testuser3");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/api/users", newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
         String location = response.getHeaders().getLocation().getPath();  
         
