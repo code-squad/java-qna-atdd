@@ -1,14 +1,12 @@
 package codesquad.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -29,8 +27,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public Answer() {
     }
 
-    public Answer(User writer, String contents) {
-        this.writer = writer;
+    public Answer(String contents) {
         this.contents = contents;
     }
 
@@ -66,9 +63,37 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public void writedBy(User writer) {
+        this.writer = writer;
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), this.contents);
+    }
+
+    public Answer update(User loginUser, AnswerDto answerDto) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("자신이 작성한 답변만 수정 가능합니다.");
+        }
+        this.contents = answerDto.getContents();
+        return this;
+    }
+
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("자신이 작성한 답변만 삭제 가능합니다.");
+        }
+        this.deleted = true;
+    }
+
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
+    }
+
+    @Override
+    public String generateRestUrl() {
+        return String.format("%s/answers/%d", question.generateRestUrl(), getId());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.domain.*;
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service("qnaService")
@@ -24,24 +26,29 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
+    @Transactional
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return questionRepository.findOne(id);
+    public Question findQuestionById(long id) {
+        Question question = questionRepository.findOne(id);
+        if (question == null) {
+            throw new EntityNotFoundException(id + " Question not found");
+        }
+        return question;
     }
 
     @Transactional
-    public void update(User loginUser, long questionId, QuestionDto questionDto) {
-        Question selectedQuestion = questionRepository.findOne(questionId);
-        selectedQuestion.update(loginUser, questionDto);
+    public Question update(User loginUser, long questionId, QuestionDto questionDto) {
+        Question selectedQuestion = findQuestionById(questionId);
+        return selectedQuestion.update(loginUser, questionDto);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) {
-        Question question = findById(questionId);
+        Question question = findQuestionById(questionId);
         question.delete(loginUser);
     }
 
@@ -53,12 +60,31 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public Answer addAnswer(User loginUser, long questionId, Answer answer) {
+        Question question = findQuestionById(questionId);
+        answer.writedBy(loginUser);
+        question.addAnswer(answer);
+        return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public Answer findAnswerById(long answerId) {
+        Answer answer = answerRepository.findOne(answerId);
+        if (answer == null) {
+            throw new EntityNotFoundException(answerId + " Answer not found");
+        }
+        return answer;
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long answerId) {
+        Answer answer = findAnswerById(answerId);
+        answer.delete(loginUser);
+    }
+
+    @Transactional
+    public Answer updateAnswer(User loginUser, long answerId, AnswerDto answerDto) {
+        Answer selectedAnswer = findAnswerById(answerId);
+        return selectedAnswer.update(loginUser, answerDto);
     }
 }

@@ -58,6 +58,24 @@ public class QuestionDto {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QuestionDto that = (QuestionDto) o;
+
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        return contents != null ? contents.equals(that.contents) : that.contents == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (contents != null ? contents.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "QuestionDto{" +
                 "id=" + id +

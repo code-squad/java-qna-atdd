@@ -68,12 +68,13 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.deleted = true;
     }
 
-    public void update(User loginUser, QuestionDto questionDto) {
+    public Question update(User loginUser, QuestionDto questionDto) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("자신이 작성한 질문만 수정 가능합니다.");
         }
         this.title = questionDto.getTitle();
         this.contents = questionDto.getContents();
+        return this;
     }
 
     public boolean isOwner(User loginUser) {
@@ -87,6 +88,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
+    }
+
+    @Override
+    public String generateRestUrl() {
+        return String.format("/api/questions/%d", getId());
     }
 
     public QuestionDto toQuestionDto() {

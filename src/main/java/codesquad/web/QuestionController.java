@@ -34,7 +34,7 @@ public class QuestionController {
 
     @GetMapping("{id}")
     public String questionDetailView(@PathVariable long id, Model model) {
-        model.addAttribute("question", qnaService.findById(id));
+        model.addAttribute("question", qnaService.findQuestionById(id));
         return "/qna/show";
     }
 
@@ -46,7 +46,7 @@ public class QuestionController {
 
     @GetMapping("{id}/form")
     public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
-        model.addAttribute("question", qnaService.findById(id));
+        model.addAttribute("question", qnaService.findQuestionById(id));
         return "/qna/updateForm";
     }
 
