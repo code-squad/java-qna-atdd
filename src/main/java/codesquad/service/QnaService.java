@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import codesquad.UnAuthorizedException;
+import codesquad.domain.*;
+import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -33,12 +30,15 @@ public class QnaService {
 
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
-        log.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
     public Question findById(long id) {
         return questionRepository.findOne(id);
+    }
+
+    public Answer findByIdAnswer(long id) {
+        return answerRepository.findOne(id);
     }
 
     @Transactional
@@ -63,12 +63,17 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public Answer addAnswer(User loginUser, long questionId, Answer answer) {
+        answer.writeBy(loginUser);
+        Question question = questionRepository.findOne(questionId);
+        question.addAnswer(answer);
+        return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        Answer answer = answerRepository.findOne(id);
+        answer.delete(loginUser);
     }
 }

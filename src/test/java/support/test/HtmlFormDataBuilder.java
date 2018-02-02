@@ -32,4 +32,14 @@ public class HtmlFormDataBuilder {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		return new HtmlFormDataBuilder(headers);
 	}
+
+	public HttpEntity<MultiValueMap<String, Object>> putBuild() {
+		addParameter("_method", "PUT");
+		return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+	}
+
+	public HttpEntity<MultiValueMap<String, Object>> deleteBuild() {
+		addParameter("_method", "DELETE");
+		return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+	}
 }

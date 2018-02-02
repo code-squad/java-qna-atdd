@@ -51,7 +51,7 @@ public class QuestionTest {
 		Question question = QUESTION1;
 		question.writeBy(USER1);
 
-		question.delete(USER1, true);
+		question.delete(USER1);
 
 		assertTrue(question.isDeleted());
 	}
@@ -61,6 +61,6 @@ public class QuestionTest {
 		Question question = QUESTION1;
 		question.writeBy(USER1);
 
-		question.delete(USER2, true);
+		question.delete(USER2);
 	}
 }

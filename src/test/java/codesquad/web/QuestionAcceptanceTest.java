@@ -84,9 +84,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 		builder.addParameter("title", "질문수정한다!");
 		builder.addParameter("contents", "질문수정이다아아아!");
-		builder.addParameter("_method", "PUT");
 
-		HttpEntity<MultiValueMap<String, Object>> request = builder.build();
+		HttpEntity<MultiValueMap<String, Object>> request = builder.putBuild();
 
 		ResponseEntity<String> response = template.postForEntity("/questions/1", request, String.class);
 
@@ -103,9 +102,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 		builder.addParameter("title", "질문수정한다!");
 		builder.addParameter("contents", "질문수정이다아아아!");
-		builder.addParameter("_method", "PUT");
 
-		HttpEntity<MultiValueMap<String, Object>> request = builder.build();
+		HttpEntity<MultiValueMap<String, Object>> request = builder.putBuild();
 
 		ResponseEntity<String> response = template.postForEntity("/questions/2", request, String.class);
 
@@ -118,9 +116,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 		TestRestTemplate template = basicAuthTemplate();
 
-		builder.addParameter("_method", "DELETE");
-
-		HttpEntity<MultiValueMap<String, Object>> request = builder.build();
+		HttpEntity<MultiValueMap<String, Object>> request = builder.deleteBuild();
 
 		ResponseEntity<String> response = template.postForEntity("/questions/1", request, String.class);
 
@@ -135,9 +131,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 		TestRestTemplate template = basicAuthTemplate();
 
-		builder.addParameter("_method", "DELETE");
-
-		HttpEntity<MultiValueMap<String, Object>> request = builder.build();
+		HttpEntity<MultiValueMap<String, Object>> request = builder.deleteBuild();
 
 		ResponseEntity<String> response = template.postForEntity("/questions/2", request, String.class);
 
