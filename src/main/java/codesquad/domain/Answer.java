@@ -1,12 +1,19 @@
 package codesquad.domain;
 
-import codesquad.CannotDeleteException;
-import codesquad.dto.AnswerDto;
-import support.domain.AbstractEntity;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
+import codesquad.dto.QuestionDto;
+import support.domain.AbstractEntity;
+import support.domain.UrlGeneratable;
+
 import java.util.Optional;
 
 @Entity
@@ -74,13 +81,12 @@ public class Answer extends AbstractEntity {
 		return String.format("%s/answers/%d", question.generateUrl(), getId());
 	}
 
-	public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+	public void delete(User loginUser) throws CannotDeleteException {
 		if (!canDelete(loginUser)) {
 			throw new CannotDeleteException("삭제할 수 없습니다.");
 		}
 
 		this.deleted = true;
-		return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
 	}
 
 	public boolean canDelete(User loginUser) {

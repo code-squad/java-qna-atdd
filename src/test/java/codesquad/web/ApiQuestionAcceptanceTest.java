@@ -3,14 +3,11 @@ package codesquad.web;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
 import codesquad.dto.QuestionsDto;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
-import support.test.HtmlFormDataBuilder;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.is;
@@ -76,7 +73,8 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 		basicAuthTemplate(SANJIGI).put(location, updateQuestion);
 
 		dbQuestion = getResource(location, QuestionDto.class);
-		assertThat(dbQuestion, is(newQuestion));
+		assertThat(dbQuestion.getTitle(), is(newQuestion.getTitle()));
+		assertThat(dbQuestion.getContents(), is(newQuestion.getContents()));
 	}
 
 	@Test
@@ -89,17 +87,6 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
 		dbQuestion = getResource(location, QuestionDto.class);
 		assertNull(dbQuestion);
-	}
-
-	@Test
-	public void delete_no_exist() throws Exception {
-		long question = 1;
-		String location = String.format("/api/questions/%d", question);
-
-		HtmlFormDataBuilder builder = HtmlFormDataBuilder.urlEncodedForm();
-		ResponseEntity<String> response = basicAuthTemplate().postForEntity(location, builder.delete(), String.class);
-
-		assertThat(response.getStatusCode(), Matchers.is(HttpStatus.PRECONDITION_REQUIRED));
 	}
 
 	@Test

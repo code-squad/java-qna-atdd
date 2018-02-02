@@ -1,13 +1,15 @@
 package codesquad.service;
 
-import codesquad.domain.DeleteHistory;
-import codesquad.domain.DeleteHistoryRepository;
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.List;
+import codesquad.domain.DeleteHistory;
+import codesquad.domain.DeleteHistoryRepository;
 
 @Service("deleteHistoryService")
 public class DeleteHistoryService {
@@ -19,10 +21,5 @@ public class DeleteHistoryService {
         for (DeleteHistory deleteHistory : deleteHistories) {
             deleteHistoryRepository.save(deleteHistory);
         }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void save(DeleteHistory deleteHistory) {
-        deleteHistoryRepository.save(deleteHistory);
     }
 }
