@@ -28,9 +28,15 @@ public class LoginController {
         try {
             User user = userService.login(userId, password);
             httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
-            return "redirect:/users";
+            return "redirect:/";
         } catch (UnAuthenticationException e) {
             return "/user/login_failed";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession httpSession) {
+        httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, null);
+        return "redirect:/";
     }
 }

@@ -73,6 +73,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    public void update() throws Exception {
+        ResponseEntity<String> response = update(basicAuthTemplate());
+        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
+        assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
+    }
+
+    @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template());
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
@@ -87,12 +94,5 @@ public class UserAcceptanceTest extends AcceptanceTest {
                 .build();
 
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
-    }
-
-    @Test
-    public void update() throws Exception {
-        ResponseEntity<String> response = update(basicAuthTemplate());
-        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
     }
 }

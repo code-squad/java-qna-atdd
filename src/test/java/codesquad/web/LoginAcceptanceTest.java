@@ -22,9 +22,6 @@ import static org.junit.Assert.assertThat;
 public class LoginAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(LoginAcceptanceTest.class);
 
-    @Autowired
-    private UserRepository userRepository;
-
     private User testUser;
 
     @Before
@@ -62,7 +59,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = loginUser(testUser.getUserId(), testUser.getPassword());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         String redirectPath = response.getHeaders().getLocation().getPath();
-        assertThat(redirectPath, is("/users"));
+        assertThat(redirectPath, is("/"));
     }
 
     @Test
@@ -80,4 +77,12 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다."), is(true));
         log.debug("body : {}", response.getBody());
     }
+
+//    @Test
+//    public void logout() throws Exception {
+//        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).getForEntity("/logout", String.class);
+//        log.debug("body : {}", response.getBody());
+//        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+//        assertThat(response.getBody().contains("로그인"), is(true));
+//    }
 }

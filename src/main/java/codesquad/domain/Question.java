@@ -1,68 +1,53 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.Where;
-
+import codesquad.CannotDeleteException;
 import codesquad.dto.QuestionDto;
-import support.domain.AbstractEntity;
+import org.hibernate.annotations.Where;
 import support.domain.UrlGeneratable;
 
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Entity
-public class Question extends AbstractEntity implements UrlGeneratable {
+public class Question extends Contents implements UrlGeneratable {
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
-
-    @Size(min = 3)
-    @Lob
-    private String contents;
-
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
-    private User writer;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
     private List<Answer> answers = new ArrayList<>();
 
-    private boolean deleted = false;
-
     public Question() {
     }
 
     public Question(String title, String contents) {
+        this(title, contents, null);
+    }
+
+    public Question(String title, String contents, User writer) {
+        super(writer, contents);
         this.title = title;
-        this.contents = contents;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getContents() {
-        return contents;
+    public void update(User loginUser, Question updatedQuestion) {
+        super.update(loginUser, updatedQuestion.getContents());
+        this.title = updatedQuestion.title;
     }
 
-    public User getWriter() {
-        return writer;
-    }
-
-    public void writeBy(User loginUser) {
-        this.writer = loginUser;
+    public List<DeleteHistory> deleteWithAnswers(User loginUser) throws CannotDeleteException{
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        deleteHistories.add(delete(loginUser));
+        deleteHistories.addAll(deleteAnswers(loginUser));
+        return deleteHistories;
     }
 
     public void addAnswer(Answer answer) {
@@ -70,12 +55,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answers.add(answer);
     }
 
-    public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
+    private List<DeleteHistory> deleteAnswers(User loginUser) throws CannotDeleteException {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        for (Answer answer : answers) {
+            if(!answer.isDeleted())
+                deleteHistories.add(answer.delete(loginUser));
+        }
+        return deleteHistories;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public int getAnswerCount() {
+        return (int)answers.stream().filter(answer -> !answer.isDeleted()).count();
+    }
+
+    public List<Answer> getAnswers() {
+        return answers.stream().filter(answer -> !answer.isDeleted()).collect(Collectors.toList());
     }
 
     @Override
@@ -84,11 +78,16 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
+        return new QuestionDto(getId(), this.title, getContents());
     }
 
     @Override
     public String toString() {
-        return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+        return "Question [id=" + getId() + ", title=" + title + ", contents=" + getContents() + ", writer=" + getWriter() + "]";
+    }
+
+    @Override
+    public DeleteHistory audit() {
+        return new DeleteHistory(ContentType.QUESTION, getId(), getWriter());
     }
 }
