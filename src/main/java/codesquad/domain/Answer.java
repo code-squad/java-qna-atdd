@@ -13,6 +13,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 import java.net.URI;
+import java.time.LocalDateTime;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable, ApiUrlGeneratable {
@@ -87,12 +88,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable, ApiUrlGene
         return this;
     }
 
-    public void delete(User loginUser) {
+    public DeleteHistory delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
         this.deleted = true;
-        this.question.deleteAnswer(this);
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
     }
 
     public void checkAuthority(User loginUser) {

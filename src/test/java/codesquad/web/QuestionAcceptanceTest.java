@@ -36,7 +36,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
                                                                                          htmlRequest(questionDto),
                                                                                          String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertThat(repository.findByWriter(defaultUser()).size(), is(2));
+        assertThat(repository.findByWriter(defaultUser()).size(), is(3));
     }
 
     @Test
@@ -112,12 +112,19 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     @DirtiesContext
     public void delete() throws Exception {
-        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).exchange("/questions/1", HttpMethod.DELETE,
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).exchange("/questions/4", HttpMethod.DELETE,
                                                                                     HttpEntity.EMPTY, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        Question question = repository.findOne(1L);
+        Question question = repository.findOne(4L);
         assertThat(question.isDeleted(), is(true));
+    }
+
+    @Test
+    public void delete_답변에다른답변자가존재하는경우() throws Exception {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).exchange("/questions/1", HttpMethod.DELETE,
+                                                                                    HttpEntity.EMPTY, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test

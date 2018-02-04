@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import support.test.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,11 +33,12 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void create() throws Exception {
         String location = createResource("/api/questions/1/answers", answerDto, defaultUser());
         AnswerDto dbAnswer = getResource(location, AnswerDto.class);
-        assertThat(compareAnswerDto(answerDto, dbAnswer)).isTrue();
+        assertThat(answerDto.equals(dbAnswer)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
@@ -51,32 +51,27 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void update() throws Exception {
         AnswerDto updateAnswer = new AnswerDto("업데이트된 내용");
         String location = createResource("/api/questions/1/answers", answerDto, defaultUser());
         basicAuthTemplate(defaultUser()).put(location, updateAnswer);
 
         AnswerDto dbAnswer = getResource(location, AnswerDto.class);
-        assertThat(compareAnswerDto(updateAnswer, dbAnswer)).isTrue();
+        assertThat(updateAnswer.equals(dbAnswer)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
-    @DirtiesContext
     public void update_잘못된형식() throws Exception {
         AnswerDto updateAnswer = new AnswerDto("t");
         String location = createResource("/api/questions/1/answers", answerDto, defaultUser());
         basicAuthTemplate(defaultUser()).put(location, updateAnswer);
 
         AnswerDto dbAnswer = getResource(location, AnswerDto.class);
-        assertThat(compareAnswerDto(answerDto, dbAnswer)).isTrue();
-    }
+        assertThat(answerDto.equals(dbAnswer)).isTrue();
 
-    private static boolean compareAnswerDto(AnswerDto answerDto, AnswerDto dbAnswer) {
-        if (answerDto == null || dbAnswer == null) {
-            return false;
-        }
-        return answerDto.getContents().equals(dbAnswer.getContents());
+        deleteResource(location, defaultUser());
     }
 
     @Test
@@ -90,23 +85,25 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void delete_권한이없는사용자() throws Exception {
         String location = createResource("/api/questions/1/answers", answerDto, defaultUser());
         deleteResource(location, findByUserId("sanjigi"));
 
         ResponseEntity<AnswerDto> response = template().getForEntity(location, AnswerDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
-    @DirtiesContext
     public void update_권한이없는사용자() throws Exception {
         AnswerDto updateAnswer = new AnswerDto("업데이트된 내용");
         String location = createResource("/api/questions/1/answers", answerDto, defaultUser());
         basicAuthTemplate(findByUserId("sanjigi")).put(location, updateAnswer);
 
         AnswerDto dbAnswer = getResource(location, AnswerDto.class);
-        assertThat(compareAnswerDto(answerDto, dbAnswer)).isTrue();
+        assertThat(dbAnswer.equals(answerDto)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 }

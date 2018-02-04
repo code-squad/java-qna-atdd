@@ -64,7 +64,6 @@ public class QuestionDto {
 
         QuestionDto that = (QuestionDto) o;
 
-        if (id != that.id) { return false; }
         if (title != null ? !title.equals(that.title) : that.title != null) { return false; }
         return contents != null ? contents.equals(that.contents) : that.contents == null;
     }

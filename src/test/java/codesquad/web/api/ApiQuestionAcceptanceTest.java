@@ -4,7 +4,6 @@ import codesquad.dto.QuestionDto;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import support.test.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,13 +26,14 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void create() {
         QuestionDto questionDto = new QuestionDto("title", "content");
 
         String location = createResource("/api/questions", questionDto, defaultUser());
         QuestionDto dbQuestion = getResource(location, QuestionDto.class);
-        assertThat(compareQuestionDto(questionDto, dbQuestion)).isTrue();
+        assertThat(questionDto.equals(dbQuestion)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
@@ -44,7 +44,6 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void update() {
         QuestionDto questionDto = new QuestionDto("title", "content");
         QuestionDto updateQuestion = new QuestionDto("update", "update content");
@@ -53,11 +52,12 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         basicAuthTemplate(defaultUser()).put(location, updateQuestion);
 
         QuestionDto dbQuestion = getResource(location, QuestionDto.class);
-        assertThat(compareQuestionDto(updateQuestion, dbQuestion)).isTrue();
+        assertThat(updateQuestion.equals(dbQuestion)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
-    @DirtiesContext
     public void update_권한이없는사용자() {
         QuestionDto questionDto = new QuestionDto("title", "content");
         QuestionDto updateQuestion = new QuestionDto("update", "update content");
@@ -66,7 +66,9 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         basicAuthTemplate(findByUserId("sanjigi")).put(location, updateQuestion);
 
         QuestionDto dbQuestion = getResource(location, QuestionDto.class);
-        assertThat(compareQuestionDto(questionDto, dbQuestion)).isTrue();
+        assertThat(questionDto.equals(dbQuestion)).isTrue();
+
+        deleteResource(location, defaultUser());
     }
 
     @Test
@@ -82,7 +84,6 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void delete_권한이없는사용자() {
         QuestionDto questionDto = new QuestionDto("title", "content");
 
@@ -91,12 +92,7 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
         ResponseEntity<QuestionDto> response = template().getForEntity(location, QuestionDto.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
 
-    private boolean compareQuestionDto(QuestionDto o1, QuestionDto o2) {
-        if (o1 == null || o2 == null) {
-            return false;
-        }
-        return o1.getTitle().equals(o2.getTitle()) && o1.getContents().equals(o2.getContents());
+        deleteResource(location, defaultUser());
     }
 }

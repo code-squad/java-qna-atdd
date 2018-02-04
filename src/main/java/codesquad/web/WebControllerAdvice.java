@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.CustomException;
 import codesquad.NotFoundException;
 import codesquad.UnAuthorizedException;
@@ -29,7 +30,8 @@ public class WebControllerAdvice {
         return createView(getCustomErrorMessage(ex));
     }
 
-    @ExceptionHandler(UnAuthorizedException.class)
+    @ExceptionHandler({UnAuthorizedException.class,
+                       CannotDeleteException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ModelAndView handleUnAuthorizedException() {
         return createView("해당 권한이 없습니다");

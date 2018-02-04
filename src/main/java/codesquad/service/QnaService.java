@@ -4,6 +4,7 @@ import codesquad.AnswerNotFoundException;
 import codesquad.QuestionNotFoundException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
+import codesquad.domain.DeleteHistory;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -59,7 +60,8 @@ public class QnaService {
     public void deleteQuestion(User loginUser, long id) {
         Question question = findQuestionByIdAndNotDeleted(id);
 
-        question.delete(loginUser);
+        List<DeleteHistory> histories = question.delete(loginUser);
+        deleteHistoryService.saveAll(histories);
     }
 
     @Transactional

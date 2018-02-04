@@ -8,8 +8,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnswerTest {
 
-    private Question question;
-
     private Answer answer;
 
     private User javajigi;
@@ -21,10 +19,7 @@ public class AnswerTest {
         javajigi = new User(1, "javajigi", "test", "자바지기", "javajigi@slipp.net");
         gunju = new User(2, "gunju", "test", "건주", "test@email.com");
 
-        question = new Question("test", "test contents");
         answer = new Answer(javajigi, "test contents");
-        question.writeBy(javajigi);
-        question.addAnswer(answer);
     }
 
     @Test
@@ -52,7 +47,6 @@ public class AnswerTest {
         answer.delete(javajigi);
 
         assertThat(answer.isDeleted()).isTrue();
-        assertThat(question.getAnswers().isEmpty()).isTrue();
     }
 
     @Test(expected = UnAuthorizedException.class)

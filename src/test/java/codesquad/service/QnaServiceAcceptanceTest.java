@@ -1,9 +1,11 @@
 package codesquad.service;
 
+import codesquad.CannotDeleteException;
 import codesquad.QuestionNotFoundException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
+import codesquad.domain.DeleteHistoryRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -12,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,9 @@ public class QnaServiceAcceptanceTest {
     @Autowired
     private AnswerRepository answerRepository;
 
+    @Autowired
+    private DeleteHistoryRepository deleteHistoryRepository;
+
     private User javajigi;
 
     private User gunju;
@@ -45,7 +49,6 @@ public class QnaServiceAcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void create() throws Exception {
         Question question = qnaService.create(javajigi, new Question("test", "test"));
 
@@ -72,7 +75,6 @@ public class QnaServiceAcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void update() throws Exception {
         Question question = qnaService.update(javajigi, 1, new Question("update", "update content"));
         assertThat(question).isNotNull();
@@ -107,8 +109,14 @@ public class QnaServiceAcceptanceTest {
     }
 
     @Test
-    @DirtiesContext
     public void deleteQuestion() throws Exception {
+        qnaService.deleteQuestion(javajigi, 4);
+        assertThat(questionRepository.findOne(4L).isDeleted()).isTrue();
+        assertThat(deleteHistoryRepository.count()).isEqualTo(1);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void deleteQuestion_질문자가아닌다른사람의답변이존재하는경우() throws Exception {
         qnaService.deleteQuestion(javajigi, 1);
         assertThat(questionRepository.findOne(1L).isDeleted()).isTrue();
     }
@@ -117,11 +125,6 @@ public class QnaServiceAcceptanceTest {
     public void deleteQuestion_권한이없는경우() throws Exception {
         User user = new User(2, "sanjigi", "test", "산지기", "sanjigi@slipp.net");
         qnaService.deleteQuestion(user, 1);
-    }
-
-    @Test(expected = UnAuthorizedException.class)
-    public void deleteQuestion_파라미터가NULL인경우() throws Exception {
-        qnaService.deleteQuestion(null, 1);
     }
 
     @Test(expected = QuestionNotFoundException.class)
@@ -135,7 +138,7 @@ public class QnaServiceAcceptanceTest {
         Answer answer = new Answer(javajigi, "test contents");
         qnaService.addAnswer(answer, 1L);
 
-        assertThat(question.getAnswers().size()).isEqualTo(3);
+        assertThat(question.getCountOfAnswers()).isEqualTo(3);
     }
 
     @Test
@@ -151,10 +154,7 @@ public class QnaServiceAcceptanceTest {
     public void deleteAnswer() throws Exception {
         qnaService.deleteAnswer(javajigi, 1);
         Answer answer = answerRepository.findOne(1L);
-
-        Question dbQuestion = questionRepository.findOne(1L);
         assertThat(answer.isDeleted()).isTrue();
-        assertThat(dbQuestion.getAnswers().size()).isEqualTo(1);
     }
 
     @Test(expected = UnAuthorizedException.class)

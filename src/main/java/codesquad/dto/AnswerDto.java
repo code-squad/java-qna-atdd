@@ -43,4 +43,21 @@ public class AnswerDto {
     public Answer toAnswer(User writer) {
         return new Answer(writer, this.contents);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (!(o instanceof AnswerDto)) { return false; }
+
+        AnswerDto answerDto = (AnswerDto) o;
+
+        return contents != null ? contents.equals(answerDto.contents) : answerDto.contents == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (contents != null ? contents.hashCode() : 0);
+        return result;
+    }
 }

@@ -2,24 +2,20 @@ package codesquad.domain;
 
 import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
-import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.ApiUrlGeneratable;
 import support.domain.UrlGeneratable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -36,10 +32,8 @@ public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGe
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -63,12 +57,8 @@ public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGe
         return writer;
     }
 
-    public List<Answer> getAnswers() {
-        return Collections.unmodifiableList(answers);
-    }
-
     public int getCountOfAnswers() {
-        return answers.size();
+        return answers.getCountOfAnswers();
     }
 
     public void writeBy(User loginUser) {
@@ -77,7 +67,7 @@ public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGe
 
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
-        answers.add(answer);
+        answers.addAnswer(answer);
     }
 
     public boolean isOwner(User loginUser) {
@@ -91,11 +81,15 @@ public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGe
         return deleted;
     }
 
-    public void delete(User loginUser) {
+    public List<DeleteHistory> delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("권한이없습니다");
         }
+        List<DeleteHistory> histories = answers.deleteAll(loginUser);
         this.deleted = true;
+        histories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser, LocalDateTime.now()));
+
+        return histories;
     }
 
     public Question update(User loginUser, Question updatedQuestion) {
@@ -109,12 +103,6 @@ public class Question extends AbstractEntity implements UrlGeneratable, ApiUrlGe
 
     public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);
-    }
-
-    void deleteAnswer(Answer answer) {
-        if (!answers.remove(answer)) {
-            throw new IllegalStateException();
-        }
     }
 
     public void checkAuthority(User loginUser) {
