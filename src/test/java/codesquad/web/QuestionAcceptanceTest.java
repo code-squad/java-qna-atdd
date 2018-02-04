@@ -48,7 +48,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void 질문_삭제() throws Exception {
         HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
-        ResponseEntity<String> response = basicAuthTemplate().exchange(String.format("/questions/%d/", 1), HttpMethod.DELETE, request, String.class);
+        ResponseEntity<String> response = basicAuthTemplate(findByUserId("sanjigi")).exchange(String.format("/questions/%d/", 2), HttpMethod.DELETE, request, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
     }
 

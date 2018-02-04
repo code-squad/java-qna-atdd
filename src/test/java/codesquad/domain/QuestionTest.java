@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import org.junit.Before;
@@ -58,9 +59,27 @@ public class QuestionTest {
         assertTrue(savedQuestion.isDeleted());
     }
 
-    @Test(expected = UnAuthorizedException.class)
+    @Test(expected = CannotDeleteException.class)
     public void 다른_사람_질문_삭제_익셉션() throws Exception {
         savedQuestion.delete(UserTest.SANJIGI);
         assertFalse(savedQuestion.isDeleted());
+    }
+
+    @Test
+    public void 질문자와_답변글의_모든_답변자_같은경우() throws Exception {
+        Answer answer1 = new Answer(1L, loginUser, null, "answer1");
+        Answer answer2 = new Answer(2L, loginUser, null, "answer2");
+        savedQuestion.addAnswer(answer1);
+        savedQuestion.addAnswer(answer2);
+        savedQuestion.delete(loginUser);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void 질문자와_답변글의_답변자_다른경우() throws Exception {
+        Answer answer1 = new Answer(1L, UserTest.SANJIGI, null, "answer1");
+        Answer answer2 = new Answer(2L, loginUser, null, "answer2");
+        savedQuestion.addAnswer(answer1);
+        savedQuestion.addAnswer(answer2);
+        savedQuestion.delete(loginUser);
     }
 }

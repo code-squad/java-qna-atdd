@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
@@ -7,6 +8,7 @@ import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -79,11 +81,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public void delete(User loginUser) {
+    public DeleteHistory delete(User loginUser) {
         if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException("자신이 작성한 답변만 삭제 가능합니다.");
+            throw new CannotDeleteException("자신이 작성한 답변만 삭제 가능합니다.");
         }
         this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), writer, LocalDateTime.now());
     }
 
     @Override

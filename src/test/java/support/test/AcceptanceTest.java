@@ -1,5 +1,6 @@
 package support.test;
 
+import codesquad.HtmlFormDataBuilder;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.junit.runner.RunWith;
@@ -7,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.MultiValueMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -51,6 +55,12 @@ public abstract class AcceptanceTest {
         return response.getHeaders().getLocation().getPath();
     }
 
+    protected String createResource(String path, Object bodyPayload, String userId) {
+        ResponseEntity<String> response = basicAuthTemplate(findByUserId(userId)).postForEntity(path, bodyPayload, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        return response.getHeaders().getLocation().getPath();
+    }
+
     protected <T> T getResource(String location, Class<T> responseType) {
         return basicAuthTemplate().getForObject(location, responseType);
     }
@@ -59,7 +69,9 @@ public abstract class AcceptanceTest {
         basicAuthTemplate().put(location, request);
     }
 
-    protected void delete(String location) {
-        basicAuthTemplate().delete(location);
+    protected ResponseEntity<String> delete(String location) {
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
+        return basicAuthTemplate().exchange(location, HttpMethod.DELETE, request, String.class);
     }
 }

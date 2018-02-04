@@ -1,6 +1,8 @@
 package codesquad.web;
 
 import codesquad.domain.Question;
+import codesquad.domain.UserTest;
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -49,10 +51,30 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void delete() throws Exception {
-        String location = createResource("/api/questions", new QuestionDto("new title", "new contents"));
+        String location = createResource("/api/questions", new QuestionDto("new title", "new contents"), "javajigi");
+
+        AnswerDto answerDto1 = new AnswerDto("answer1");
+        createResource(location+ "/answers", answerDto1, "javajigi");
+
+        AnswerDto answerDto2 = new AnswerDto("answer2");
+        createResource(location+ "/answers", answerDto2, "javajigi");
 
         delete(location);
         Question respQuestion = getResource(location, Question.class);
         assertTrue(respQuestion.isDeleted());
+    }
+
+    @Test
+    public void delete_cannot() throws Exception {
+        String location = createResource("/api/questions", new QuestionDto("new title", "new contents"), "javajigi");
+
+        AnswerDto answerDto1 = new AnswerDto("answer1");
+        createResource(location+ "/answers", answerDto1, "javajigi");
+
+        AnswerDto answerDto2 = new AnswerDto("answer2");
+        createResource(location+ "/answers", answerDto2, "sanjigi");
+
+        ResponseEntity<String> response = delete(location);
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 }
