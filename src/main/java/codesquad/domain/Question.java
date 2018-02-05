@@ -1,7 +1,12 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,7 +19,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
+import codesquad.security.LoginUser;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -27,7 +35,7 @@ import support.domain.UrlGeneratable;
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
     private static final Logger log = LoggerFactory.getLogger(Question.class);
-    
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -44,6 +52,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
     private List<Answer> answers = new ArrayList<>();
+
+    @CreationTimestamp
+    private Date createdTime;
 
     private boolean deleted;
 
@@ -65,11 +76,43 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = target.getContents();
     }
 
-    public void delete(User loginUser) {
+    public List<DeleteHistory> delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
+        if (!areAnswersAllMineOrEmpty()) {
+            throw new UnAuthorizedException("모든 답변이 자신의 것이어야 글을 삭제할 수 있습니다.");
+        }
+        List<DeleteHistory> histories = new ArrayList<>();
+        histories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser, LocalDateTime.now()));
         this.deleted = true;
+        histories.addAll(deleteAnswers(loginUser));
+        return histories;
+    }
+
+    private List<DeleteHistory> deleteAnswers(User loginUser) {
+        List<DeleteHistory> histories = new ArrayList<>();
+        answers.forEach(answer -> histories.add(answer.delete(loginUser)));
+        return histories;
+    }
+
+    public boolean areAnswersAllMineOrEmpty() {
+        if (answers.size() == 0) return true;
+        log.debug("it's answers!! : {}", answers.toArray()[0].getClass());
+        List <Answer> tempAnswers = answers;
+
+        boolean result = tempAnswers.stream()
+                .allMatch(answer -> answer.getWriter().equals(writer) || answer.isDeleted());
+        log.debug("Result of areAnswersAllMineOrEmpty : {}", result);
+        return result;
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
     }
 
     public void setTitle(String title) {

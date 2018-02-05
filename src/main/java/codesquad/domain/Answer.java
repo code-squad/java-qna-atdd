@@ -6,8 +6,11 @@ import javax.validation.constraints.Size;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.AnswerDto;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.transaction.annotation.Transactional;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -47,16 +50,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
-    public void delete(User loginUser) {
+    public DeleteHistory delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
         this.deleted = true;
-        removeFromQuestion();
-    }
-
-    private void removeFromQuestion() {
-        this.question.removeAnswer(this);
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
     }
 
     public User getWriter() {
@@ -88,7 +87,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     }
 
     public AnswerDto toAnswerDto() {
-        return new AnswerDto(this.getId(), this.contents);
+        return new AnswerDto(getId(), this.contents);
     }
 
     @Override
@@ -98,6 +97,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + ", deleted=" + deleted + "]";
     }
 }
