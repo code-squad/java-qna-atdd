@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,14 +42,14 @@ public class QuestionTest {
     }
 
     @Test
-    public void delete_owner() {
+    public void delete_owner() throws CannotDeleteException {
         originQuestion.delete(owner);
 
         assertTrue(originQuestion.isDeleted());
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void delete_not_owner() {
+    public void delete_not_owner() throws CannotDeleteException {
         originQuestion.delete(notOwner);
     }
 }

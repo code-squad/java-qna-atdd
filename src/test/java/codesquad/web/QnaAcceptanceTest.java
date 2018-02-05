@@ -81,7 +81,7 @@ public class QnaAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void show_list() {
-        Question question = qnaService.findQuestionById(2);
+        Question question = qnaService.findQuestionById(1);
         ResponseEntity<String> response = getForEntity(template(), "/");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
@@ -186,12 +186,12 @@ public class QnaAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void delete_owner_login() {
-        long id = 1;
+        long id = 2;
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .setRequestMethod("delete")
                 .build();
 
-        ResponseEntity<String> response = basicAuthTemplate()
+        ResponseEntity<String> response = basicAuthTemplate(findByUserId("sanjigi"))
                 .postForEntity(String.format("/questions/%d", id), request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));

@@ -1,5 +1,6 @@
 package codesquad.service;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service("qnaService")
@@ -54,15 +56,21 @@ public class QnaService {
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) {
+    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = questionRepository.findOne(questionId);
-        question.delete(loginUser);
+        if (question == null) {
+            throw new EntityNotFoundException("해당하는 데이터를 찾지 못하였습니다.");
+        }
+        deleteHistoryService.save(question.delete(loginUser));
     }
 
     @Transactional
     public void deleteAnswer(User loginUser, long id) {
         Answer answer = answerRepository.findOne(id);
-        answer.delete(loginUser);
+        if (answer == null) {
+            throw new EntityNotFoundException("해당하는 데이터를 찾지 못하였습니다.");
+        }
+        deleteHistoryService.save(answer.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -71,9 +79,5 @@ public class QnaService {
 
     public List<Question> findAll(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
-    }
-
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
     }
 }

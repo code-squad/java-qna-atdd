@@ -12,6 +12,8 @@ import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Answer extends AbstractEntity {
     @ManyToOne
@@ -87,11 +89,12 @@ public class Answer extends AbstractEntity {
         return new AnswerDto(this.getId(), this.contents);
     }
 
-    public void delete(User loginUser) {
+    public DeleteHistory delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
         }
 
         this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, super.getId(), loginUser, LocalDateTime.now());
     }
 }
