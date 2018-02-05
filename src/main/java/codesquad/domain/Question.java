@@ -1,19 +1,14 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import codesquad.etc.CannotDeleteException;
 import codesquad.etc.UnAuthorizedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
@@ -41,11 +36,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers;
 
     private boolean deleted = false;
 
@@ -72,13 +64,16 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public Question setAnswers(List<Answer> answers) {
-        this.answers = answers;
-        return this;
+    public void addAnswer(Answer answer) {
+        answers.addAnswer(answer);
     }
 
-    public Question setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public Answers getAnswers() {
+        return answers;
+    }
+
+    public Question setAnswers(Answers answers) {
+        this.answers = answers;
         return this;
     }
 
@@ -98,13 +93,27 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.writer = loginUser;
     }
 
-    public void addAnswer(Answer answer) {
-        answer.toQuestion(this);
-        answers.add(answer);
-    }
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        if (!writer.equals(loginUser))
+            throw new CannotDeleteException("Question delete failed. ");
 
-    public List<Answer> getAnswers() {
-        return this.answers;
+        this.deleted = true;
+        List<DeleteHistory> historyList = new ArrayList<>();
+        historyList.add(new DeleteHistory(ContentType.QUESTION,
+                getId(),
+                loginUser,
+                LocalDateTime.now()));
+
+        for(Answer answer : answers.getAnswers()) {
+            answer.delete(loginUser);
+
+            historyList.add(new DeleteHistory(ContentType.ANSWER,
+                    answer.getId(),
+                    loginUser,
+                    LocalDateTime.now()));
+        }
+
+        return historyList;
     }
 
     public void update(User loginUser, Question newQuestion) {

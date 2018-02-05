@@ -2,6 +2,7 @@ package codesquad.web;
 
 import codesquad.domain.Question;
 import codesquad.domain.User;
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import codesquad.dto.UserDto;
 import org.junit.Test;
@@ -19,6 +20,20 @@ public class ApiQuestionAcceptaceTest extends AcceptanceTest {
 
     private QuestionDto createQuestionDto(String title) {
         return new QuestionDto(title, "contents");
+    }
+
+    private AnswerDto createAnswerDto(QuestionDto question) {
+        return createAnswerDto("test answer", question);
+    }
+
+    private AnswerDto createAnswerDto(String contents, QuestionDto question) {
+        return new AnswerDto()
+                .setWriter(defaultUser())
+                .setContents(contents)
+                .setQuestion(new Question()
+                        .setTitle(question.getTitle())
+                        .setContents(question.getContents()));
+
     }
 
     @Test
@@ -67,7 +82,7 @@ public class ApiQuestionAcceptaceTest extends AcceptanceTest {
     }
 
     @Test
-    public void delete() throws Exception {
+    public void delete_no_comments() throws Exception {
         QuestionDto questionDto = createQuestionDto("test5");
         String location = createResourceDefaultLogin("/api/questions", questionDto);
 
@@ -79,12 +94,49 @@ public class ApiQuestionAcceptaceTest extends AcceptanceTest {
     }
 
     @Test
+    public void delete_contains_only_comments_written_by_the_writer() throws Exception {
+        QuestionDto questionDto = createQuestionDto("test5");
+        String location = createResourceDefaultLogin("/api/questions", questionDto);
+
+        QuestionDto dbQuestion = template().getForObject(location, QuestionDto.class);
+        User user = new User("sehwan", "1001", "sehwan", "email");
+
+        AnswerDto answerDto = createAnswerDto(dbQuestion);
+        location = createResourceDefaultLogin("/api/questions/" + dbQuestion.getId() +"/answers", answerDto);
+        AnswerDto dbAnswer = getResource(location, AnswerDto.class);
+
+        basicAuthTemplate(user).delete(location, dbQuestion);
+
+        dbQuestion = getResource(location, QuestionDto.class);
+        assertNotNull(dbQuestion);
+    }
+
+    @Test
     public void delete_no_authority() throws Exception {
         QuestionDto questionDto = createQuestionDto("test5");
         String location = createResourceDefaultLogin("/api/questions", questionDto);
 
         QuestionDto dbQuestion = template().getForObject(location, QuestionDto.class);
         User user = new User("sehwan", "1001", "sehwan", "email");
+        basicAuthTemplate(user).delete(location, dbQuestion);
+
+        dbQuestion = getResource(location, QuestionDto.class);
+        assertNotNull(dbQuestion);
+    }
+
+    @Test
+    public void delete_no_authority_contains_comments_written_by_others() throws Exception {
+        QuestionDto questionDto = createQuestionDto("test5");
+        String location = createResourceDefaultLogin("/api/questions", questionDto);
+
+        QuestionDto dbQuestion = template().getForObject(location, QuestionDto.class);
+        User user = new User("sehwan", "1001", "sehwan", "email");
+
+        AnswerDto answerDto = createAnswerDto(dbQuestion);
+        answerDto.setWriter(new User("sehwan", "test", "sehwan", "sehwan@woowa.com"));
+        location = createResourceDefaultLogin("/api/questions/" + dbQuestion.getId() +"/answers", answerDto);
+        AnswerDto dbAnswer = getResource(location, AnswerDto.class);
+
         basicAuthTemplate(user).delete(location, dbQuestion);
 
         dbQuestion = getResource(location, QuestionDto.class);

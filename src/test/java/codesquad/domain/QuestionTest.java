@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.etc.CannotDeleteException;
 import codesquad.etc.UnAuthorizedException;
 import org.junit.Test;
 
@@ -46,5 +47,46 @@ public class QuestionTest {
 
         Question target = new Question("new title", "new content");
         origin.update(loginUser, target);
+    }
+
+    @Test
+    public void delete_owner_with_no_comments() throws Exception {
+        Question origin = createQuestion("javajigi", "title", "contents");
+        User loginUser = newUser("javajigi");
+
+        origin.delete(loginUser);
+        assertThat(origin.isDeleted(), is(true));
+    }
+
+    @Test
+    public void delete_owner_with_own_comments() throws Exception {
+        Question origin = createQuestion("javajigi", "title", "contents");
+        User loginUser = newUser("javajigi");
+        origin.addAnswer(new Answer()
+                .setContents("test")
+                .setWriter(loginUser));
+
+        origin.delete(loginUser);
+        assertThat(origin.isDeleted(), is(true));
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_owner_with_comments_written_by_others() throws Exception {
+        Question origin = createQuestion("javajigi", "title", "contents");
+        User sanjigi = newUser(2L, "sanjigi", "pw");
+        origin.addAnswer(new Answer()
+                .setContents("test")
+                .setWriter(sanjigi));
+        User loginUser = newUser("javajigi");
+
+        origin.delete(loginUser);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_not_owner() throws Exception {
+        Question origin = createQuestion("javajigi", "title", "contents");
+        User loginUser = newUser(2L, "sanjigi", "pw");
+
+        origin.delete(loginUser);
     }
 }

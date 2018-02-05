@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -110,10 +111,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
                 '}';
     }
 
-    public void  delete(User loginUser) throws CannotDeleteException {
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
         if (this.writer.equals(loginUser)){
             this.deleted = true;
-            return;
+            return new DeleteHistory(ContentType.ANSWER,
+                    getId(),
+                    loginUser,
+                    LocalDateTime.now());
         }
 
         throw new CannotDeleteException("The user has no authorization.");
