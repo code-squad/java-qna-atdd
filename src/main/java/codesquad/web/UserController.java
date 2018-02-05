@@ -42,7 +42,7 @@ public class UserController {
         }
 
         httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
-        return "redirect:/users";
+        return "redirect:/";
     }
 
     @GetMapping("/form")
@@ -74,6 +74,12 @@ public class UserController {
     public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
         userService.update(loginUser, id, target);
         return "redirect:/users";
+    }
+
+    @GetMapping("/logout")
+    public String tryLogout(HttpSession session) {
+        HttpSessionUtils.logout(session);
+        return "redirect:/";
     }
 
 }

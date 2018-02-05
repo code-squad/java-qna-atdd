@@ -37,4 +37,9 @@ public class HttpSessionUtils {
 
         return (User) session.getAttribute(USER_SESSION_KEY);
     }
+
+    public static void logout(HttpSession httpSession) {
+        httpSession.removeAttribute(USER_SESSION_KEY);
+
+    }
 }

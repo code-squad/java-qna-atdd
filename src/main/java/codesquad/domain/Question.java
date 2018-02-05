@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -90,5 +92,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public void delete(User loginUser) throws CannotDeleteException {
+        if(!this.isOwner(loginUser))
+              throw new CannotDeleteException("Not owner");
+        this.deleted = true;
+    }
+
+    public Question update(User loginUser, Question updatedQuestion) {
+        if(!this.isOwner(loginUser))
+            throw new UnAuthorizedException();
+
+        this.title = updatedQuestion.title;
+        this.contents = updatedQuestion.contents;
+
+        return this;
     }
 }

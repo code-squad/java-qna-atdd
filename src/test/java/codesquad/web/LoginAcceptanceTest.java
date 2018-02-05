@@ -24,16 +24,10 @@ public class LoginAcceptanceTest extends AcceptanceTest {
     @Autowired
     private UserService userService;
 
-    private HtmlFormDataBuilder htmlFormDataBuilder;
-
-    @Before
-    public void setUp() throws Exception {
-        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-    }
 
     @Test
     public void login_success() throws Exception {
-       htmlFormDataBuilder.addParameter("userId", "sanjigi")
+       HtmlFormDataBuilder htmlFormDataBuilder = urlEncodedForm().addParameter("userId", "sanjigi")
                 .addParameter("password", "test");
 
         ResponseEntity<String> response = template().postForEntity("/users/login", htmlFormDataBuilder.build(), String.class);
@@ -44,7 +38,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
     @Test
     public void login_failed() throws Exception {
 
-        htmlFormDataBuilder.addParameter("userId", "sanjigi")
+        HtmlFormDataBuilder htmlFormDataBuilder = urlEncodedForm().addParameter("userId", "sanjigi")
                 .addParameter("password", "!!!");
 
         ResponseEntity<String> response = template().postForEntity("/users/login", htmlFormDataBuilder.build(), String.class);

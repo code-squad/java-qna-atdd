@@ -1,13 +1,30 @@
 package codesquad.web;
 
+import codesquad.domain.Question;
+import codesquad.dto.QuestionsDto;
+import codesquad.service.QnaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.annotation.Resource;
+
 @Controller
 public class HomeController {
+
+    @Resource(name = "qnaService")
+    private QnaService qnaService;
+
     @GetMapping("/")
     public String home(Model model) {
+        model.addAttribute("questions",qnaService.findAll());
         return "home";
+    }
+
+    @GetMapping("/login")
+    public String loginForm() {
+        return "/user/login";
     }
 }
