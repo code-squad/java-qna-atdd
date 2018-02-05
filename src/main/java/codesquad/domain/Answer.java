@@ -7,6 +7,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -29,9 +31,20 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public Answer() {
     }
 
+    public Answer(long id) {
+        super(id);
+    }
+
     public Answer(User writer, String contents) {
         this.writer = writer;
         this.contents = contents;
+    }
+
+    public Answer(User writer, Question question, String contents) {
+        this.writer = writer;
+        this.question = question;
+        this.contents = contents;
+        this.deleted = false;
     }
 
     public Answer(Long id, User writer, Question question, String contents) {
@@ -40,18 +53,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
         this.contents = contents;
         this.deleted = false;
-    }
-
-    public User getWriter() {
-        return writer;
-    }
-
-    public Question getQuestion() {
-        return question;
-    }
-
-    public String getContents() {
-        return contents;
     }
 
     public void toQuestion(Question question) {
@@ -66,9 +67,40 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), contents);
+    }
+
+    public boolean isQuestion(long questionId) {
+        return questionId == question.getId();
+    }
+
+    public Answer update(User loginUser, long questionId, String updateContents) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        if (!isQuestion(questionId)) {
+            throw new IllegalArgumentException();
+        }
+        contents = updateContents;
+        return this;
+    }
+
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        deleted = true;
+    }
+
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
+    }
+
+    @Override
+    public String generateApiUrl() {
+        return "/api" + generateUrl();
     }
 
     @Override

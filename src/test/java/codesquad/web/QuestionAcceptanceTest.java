@@ -33,9 +33,10 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() {
+        int size = questionRepository.findAll().size();
         ResponseEntity<String> response = createQna(basicAuthTemplate(defaultUser()));
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertThat(questionRepository.findAll().size(), is(3));
+        assertThat(questionRepository.findAll().size(), is(size + 1));
         assertTrue(response.getHeaders().getLocation().getPath().startsWith("/"));
     }
 
