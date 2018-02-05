@@ -1,11 +1,13 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +40,7 @@ public class QuestionTest {
 	}
 
 	@Test(expected = UnAuthorizedException.class)
-	public void update_not_owner()  {
+	public void update_not_owner() {
 		Question origin = QUESTION1;
 		origin.writeBy(USER1);
 
@@ -47,7 +49,7 @@ public class QuestionTest {
 	}
 
 	@Test
-	public void delete_owner() {
+	public void delete_owner() throws Exception {
 		Question question = QUESTION1;
 		question.writeBy(USER1);
 
@@ -57,10 +59,48 @@ public class QuestionTest {
 	}
 
 	@Test(expected = UnAuthorizedException.class)
-	public void delete_not_owner() {
+	public void delete_not_owner() throws Exception {
 		Question question = QUESTION1;
 		question.writeBy(USER1);
 
 		question.delete(USER2);
+	}
+
+	@Test
+	public void delete_질문작성자와_답변작성자가_같은경우() throws Exception {
+		Question question = QUESTION1;
+		question.writeBy(USER1);
+
+		Answer answer = new Answer(1L, USER1, question, "답변테스트");
+		question.addAnswer(answer);
+
+		question.delete(USER1);
+
+		assertTrue(question.isDeleted());
+	}
+
+	@Test(expected = CannotDeleteException.class)
+	public void delete_질문작성자와_답변작성자가_다른경우() throws Exception {
+		Question question = QUESTION1;
+		question.writeBy(USER1);
+
+		Answer answer = new Answer(1L, USER2, question, "답변테스트");
+		question.addAnswer(answer);
+
+		question.delete(USER1);
+	}
+
+	@Test(expected = CannotDeleteException.class)
+	public void delete_질문작성자와_답변작성자중_한명이_다른경우() throws Exception {
+		Question question = QUESTION1;
+		question.writeBy(USER1);
+
+		Answer answer1 = new Answer(1L, USER1, question, "답변테스트1");
+		Answer answer2 = new Answer(2L, USER2, question, "답변테스트2");
+
+		question.addAnswer(answer1);
+		question.addAnswer(answer2);
+
+		question.delete(USER1);
 	}
 }

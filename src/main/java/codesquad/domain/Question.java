@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
@@ -79,10 +81,36 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public void delete(User loginUser) {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if (!isOwner(loginUser))
             throw new UnAuthorizedException();
+
+        if (!canDelete(loginUser))
+            throw new CannotDeleteException("질문을 삭제할 수 없습니다.");
+
         this.deleted = true;
+
+        List<DeleteHistory> deleteHistories = deleteAnswers();
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser, LocalDateTime.now()));
+
+        return deleteHistories;
+    }
+
+    private List<DeleteHistory> deleteAnswers() throws CannotDeleteException {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+
+        for (Answer answer : answers) {
+            deleteHistories.add(answer.delete(writer));
+        }
+        return deleteHistories;
+    }
+
+    private boolean canDelete(User writer) {
+        for (Answer answer : answers) {
+            if (!answer.isOwner(writer))
+                return false;
+        }
+        return true;
     }
 
     @Override
