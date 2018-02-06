@@ -1,14 +1,12 @@
 package codesquad.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
+import codesquad.UnAuthorizedException;
+import codesquad.security.LoginUser;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -29,8 +27,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public Answer() {
     }
 
-    public Answer(User writer, String contents) {
+    public Answer(User writer, Question question, String contents) {
+        if (writer == null) throw new IllegalArgumentException();
         this.writer = writer;
+        this.question = question;
         this.contents = contents;
     }
 
@@ -64,6 +64,19 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
+
+    public Answer update(User loginUser, Answer updatedAnswer) {
+        if (!updatedAnswer.isOwner(loginUser)) {
+            throw new UnAuthorizedException("자신이 작성한 질문에 대해서만 수정/삭제가 가능합니다.");
+        }
+
+        this.contents = updatedAnswer.contents;
+        return this;
     }
 
     @Override

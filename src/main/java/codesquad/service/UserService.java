@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.annotation.Resource;
 
 import codesquad.security.BasicAuthInterceptor;
+import codesquad.security.HttpSessionUtils;
 import codesquad.security.LoginUser;
 import org.springframework.stereotype.Service;
 

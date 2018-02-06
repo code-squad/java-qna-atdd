@@ -37,7 +37,7 @@ public class UserLoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login_fail_then_redirect_users() throws Exception {
-        String userId = "testuser";
+        String userId = "javajigi";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
                 .addParameter("password", "password")
