@@ -93,7 +93,7 @@ public class User extends AbstractEntity {
     public boolean isGuestUser() {
         return false;
     }
-    
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {

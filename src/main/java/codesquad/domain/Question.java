@@ -2,6 +2,7 @@ package codesquad.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,9 +15,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.ObjectUtils;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -70,6 +76,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answers.add(answer);
     }
 
+    public void delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser)){
+            throw new CannotDeleteException("지울 수 있는 권한이 없습니다.");
+        }
+        this.deleted = true;
+    }
+
+    public void update(User loginUser, Question question) throws UnAuthenticationException {
+        if(!isOwner(loginUser)){
+            throw new UnAuthenticationException();
+        }
+        this.title = question.title;
+        this.contents = question.contents;
+    }
+
     public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
@@ -85,6 +106,19 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);
+    }
+
+
+    public boolean isContentsEquals(Object o) {
+        Question question = (Question) o;
+        return Objects.equals(title, question.title) &&
+                Objects.equals(contents, question.contents);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), title, contents);
     }
 
     @Override

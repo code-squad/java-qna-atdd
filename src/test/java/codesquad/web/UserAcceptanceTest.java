@@ -71,13 +71,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 
-       @Test
+    @Test
     public void updateForm_login() throws Exception {
-        User loginUser = defaultUser();
-        ResponseEntity<String> response = basicAuthTemplate(loginUser)
-                .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
+           User loginUser = defaultUser();
+           ResponseEntity<String> response = basicAuthTemplate(loginUser)
+                   .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
+           assertThat(response.getStatusCode(), is(HttpStatus.OK));
+           assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
     }
 
     @Test
