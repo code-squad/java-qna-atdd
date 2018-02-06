@@ -1,14 +1,17 @@
 package codesquad.domain;
 
 import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.*;
 
-public class QuestionTest {
+public class AnswerTest {
 
     private Question question;
+    private Answer answer;
     private User user1;
     private User user2;
 
@@ -17,41 +20,36 @@ public class QuestionTest {
         user1 = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
         user2 = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
         question = new Question("title", "content");
-        question.writeBy(user1);
+        answer = new Answer(user1,"answer");
+        question.addAnswer(answer);
     }
 
     @Test
     public void isOwner() {
-        assertThat(question.isOwner(user1)).isTrue();
-        assertThat(question.isOwner(user2)).isFalse();
+        assertThat(answer.isOwner(user1)).isTrue();
+        assertThat(answer.isOwner(user2)).isFalse();
     }
 
     @Test
     public void update() {
-        question.update(user1, new Question("update", "update"));
-        assertThat(question.getTitle()).isEqualTo("update");
+        answer.update(user1, new AnswerDto("update"));
+        assertThat(answer.getContents()).isEqualTo("update");
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void update_unauthorized() {
-        question.update(user2, new Question("update", "update"));
+    public void update_권한없음() {
+        answer.update(user2, new AnswerDto("update"));
     }
 
     @Test
     public void delete() {
-        question.delete(user1);
-        assertThat(question.isDeleted()).isTrue();
+        answer.delete(user1);
+        assertThat(answer.isDeleted()).isTrue();
     }
 
     @Test(expected = UnAuthorizedException.class)
     public void delete_unauthorized() {
-        question.delete(user2);
+        answer.delete(user2);
 
-    }
-
-    @Test
-    public void addAnswer() {
-        question.addAnswer(new Answer(user2,"answer"));
-        assertThat(question.getAnswer(0).getContents()).isEqualTo("answer");
     }
 }

@@ -2,6 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -26,10 +27,13 @@ public class QuestionServiceTest {
     @InjectMocks
     private QnaService qnaService;
 
+    private User user1;
+    private User user2;
+
     @Before
     public void setUp() throws Exception {
-        User user1 = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
-        User user2 = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
+        user1 = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
+        user2 = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
     }
 
     @Test
@@ -80,6 +84,15 @@ public class QuestionServiceTest {
         when(questionRepository.findOne(1L)).thenReturn(question);
         Question result = qnaService.findById(1L);
         assertThat(result.getTitle()).isEqualTo("title");
+    }
+
+    @Test
+    public void addAnswer() {
+        Question question = getTestQuestion();
+        when(questionRepository.findOne(1L)).thenReturn(question);
+        qnaService.addAnswer(user1, 1L, "answer");
+        question = qnaService.findById(1L);
+        assertThat(question.getAnswer(0).getContents()).isEqualTo("answer");
     }
 
     private Question getTestQuestion() {

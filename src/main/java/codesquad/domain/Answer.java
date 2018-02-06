@@ -7,6 +7,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -74,5 +76,24 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(contents);
+    }
+
+    public Answer update(User loginUser, AnswerDto update) {
+        if (!this.isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = update.getContents();
+        return this;
+    }
+
+    public void delete(User loginUser) {
+        if (!this.isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
     }
 }

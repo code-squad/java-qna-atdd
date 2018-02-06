@@ -5,8 +5,10 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.config.ResourceNotFoundException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +64,24 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+        if (question == null) {
+            throw new IllegalArgumentException(questionId + "가 존재하지 않습니다.");
+        }
+        return question.addAnswer(new Answer(loginUser,contents));
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) {
+        Answer answer = answerRepository.findOne(id);
+        answer.delete(loginUser);
+    }
+
+    @Transactional
+    public void updateAnswer(Question question, User loginUser, long answerId, AnswerDto update) {
+        Answer answer = answerRepository.findOne(answerId);
+        answer.update(loginUser, update);
     }
 }
