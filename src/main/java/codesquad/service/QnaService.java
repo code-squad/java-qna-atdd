@@ -1,11 +1,13 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
 import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,12 +65,25 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public Answer addAnswer(long questionId, Answer answer) {
+        Question question = questionRepository.findOne(questionId);
+        question.addAnswer(answer);
+        return answer;
     }
 
+    @Transactional
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        // TODO 답변 삭제 기능 구현
+        Answer answer = answerRepository.findOne(id);
+        answer.updateDelete(loginUser);
+        return answer;
+    }
+
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, Answer updateContent) {
+        Answer answer = answerRepository.findOne(id);
+        answer.updateAnswer(loginUser,updateContent);
+        return answer;
     }
 }

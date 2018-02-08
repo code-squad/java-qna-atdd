@@ -72,6 +72,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.deleted = true;
     }
 
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -107,6 +111,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public QuestionDto toQuestionDto() {
+        if(this.deleted) {
+            return null;
+        }
         return new QuestionDto(getId(), this.title, this.contents);
     }
 
@@ -114,4 +121,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
+
+
 }

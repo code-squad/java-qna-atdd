@@ -7,10 +7,14 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
+import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
+@Where(clause = "deleted = false")
 public class Answer extends AbstractEntity implements UrlGeneratable {
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
@@ -58,12 +62,30 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
-    public boolean isOwner(User loginUser) {
+    public void updateDelete(User loginUser) {
+        if(!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
+    }
+
+    public void updateAnswer(User loginUser, Answer answer) {
+        if(!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = answer.contents;
+    }
+
+    private boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(this.writer, this.contents);
     }
 
     @Override
@@ -75,4 +97,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
+
+
 }
