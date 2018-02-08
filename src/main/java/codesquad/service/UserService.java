@@ -18,7 +18,8 @@ public class UserService {
     private UserRepository userRepository;
 
     public User add(UserDto userDto) {
-        return userRepository.save(userDto.toUser());
+        User user = userDto.toUser();
+        return userRepository.save(user);
     }
 
     public User update(User loginUser, long id, UserDto updatedUser) {

@@ -63,7 +63,7 @@ public class QuestionServiceTest {
     public void delete() {
         when((questionRepository.findOne(3L))).thenReturn(question);
 
-        qnaService.deleteQuestion(user, qnaService.findById(3L));
+        qnaService.deleteQuestion(user, 3L);
 
         assertTrue(qnaService.findById(3L).isDeleted());
     }
@@ -72,6 +72,6 @@ public class QuestionServiceTest {
     public void CannotDeleteException_테스트() {
         when((questionRepository.findOne(3L))).thenReturn(question);
 
-        qnaService.deleteQuestion(wrongUser, qnaService.findById(3L));
+        qnaService.deleteQuestion(wrongUser, 3L);
     }
 }

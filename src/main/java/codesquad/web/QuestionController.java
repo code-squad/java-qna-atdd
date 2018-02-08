@@ -3,6 +3,7 @@ package codesquad.web;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.Question;
 import codesquad.domain.User;
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import codesquad.security.LoginUser;
 import codesquad.service.QnaService;
@@ -63,12 +64,12 @@ public class QuestionController {
 
     @DeleteMapping("{idx}")
     public String doDelete(@LoginUser User loginUser, @PathVariable Long idx) {
-        qnaService.deleteQuestion(loginUser, qnaService.findById(idx));
+        qnaService.deleteQuestion(loginUser, idx);
         return "redirect:/";
     }
 
     @PostMapping("{idx}/answers")
-    public String createAnswer(@LoginUser User loginUser, @PathVariable Long idx, String comment) {
+    public String createAnswer(@LoginUser User loginUser, @PathVariable Long idx, @RequestBody String comment) {
         if(idx == null) {
             return "redirect:/";
         }
@@ -76,5 +77,22 @@ public class QuestionController {
         return "redirect:/questions/"+idx;
     }
 
+    @PutMapping("{idx}/answers/{answerIdx}")
+    public String doAnswerUpdate(@LoginUser User loginUser, @PathVariable Long idx, @PathVariable Long answerIdx, @RequestBody AnswerDto answerDto) {
+        if(idx == null || answerIdx == null) {
+            return "redirect:/";
+        }
+        qnaService.updateAnswer(loginUser, answerIdx, answerDto);
+        return "redirect:/questions/"+idx;
+    }
+
+    @PostMapping("{idx}/answers/{answerIdx}")
+    public String doAnswerDelete(@LoginUser User loginUser, @PathVariable Long idx, @PathVariable Long answerIdx) {
+        if(idx == null || answerIdx == null) {
+            return "redirect:/";
+        }
+        qnaService.deleteAnswer(loginUser, answerIdx);
+        return "redirect:/questions/"+idx;
+    }
 
 }

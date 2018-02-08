@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +46,13 @@ public class QnaService {
     @Transactional
     public Question updateQuestion(Long id, User loginUser, QuestionDto questionDto) {
         Question question = questionRepository.findOne(id);
-        question.update(loginUser, questionDto);
-        return question;
+        return question.update(loginUser, questionDto);
     }
 
     @Transactional
-    public Question deleteQuestion(User loginUser, Question deletedQuestion) {
-        deletedQuestion.delete(loginUser);
-        return deletedQuestion;
+    public Question deleteQuestion(User loginUser, Long idx) {
+        Question deletedQuestion = questionRepository.findOne(idx);
+        return deletedQuestion.delete(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -68,16 +68,29 @@ public class QnaService {
                 .collect(Collectors.toList());
     }
 
+    public Answer findAnswerById(long idx) {
+        return answerRepository.findOne(idx);
+    }
+
     @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
         Question question = questionRepository.findOne(questionId);
-        Answer answer = new Answer(questionId, loginUser, question, contents);
+        Answer answer = new Answer(loginUser, contents);
         question.addAnswer(answer);
         return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
+    @Transactional
+    public Answer updateAnswer(User loginUser, long answerId, AnswerDto answerDto) {
+        Answer answer = answerRepository.findOne(answerId);
+        answer.update(loginUser, answerDto);
+        return answer;
+    }
 
-        return null;
+    @Transactional
+    public Answer deleteAnswer(User loginUser, long id) {
+        Answer answer = answerRepository.findOne(id);
+        answer.delete(loginUser);
+        return answer;
     }
 }

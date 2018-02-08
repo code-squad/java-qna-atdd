@@ -105,7 +105,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public Question delete(User loginUser) throws CannotDeleteException {
+    public Question delete(User loginUser) {
         if(!isOwner(loginUser)) {
             throw new CannotDeleteException("자신의 글만 삭제할 수 있습니다");
         }

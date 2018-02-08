@@ -7,6 +7,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -74,5 +77,21 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    public Answer delete(User loginUser) {
+        if(!isOwner(loginUser)) {
+            throw new CannotDeleteException("자신의 글만 삭제할 수 있습니다");
+        }
+        this.deleted = true;
+        return this;
+    }
+
+    public Answer update(User loginUser, AnswerDto answerDto) {
+        if(!isOwner(loginUser)) {
+            throw new UnAuthorizedException("자신의 글만 수정할 수 있습니다");
+        }
+        this.contents = answerDto.getContents();
+        return this;
     }
 }
