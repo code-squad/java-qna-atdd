@@ -1,8 +1,6 @@
 package codesquad.service;
 
-import codesquad.CannotDeleteException;
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.*;
 import codesquad.domain.*;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
@@ -11,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -30,7 +27,7 @@ public class QnaService {
     private DeleteHistoryService deleteHistoryService;
 
     public Question create(User loginUser, QuestionDto questionDto) {
-        if(loginUser.isGuestUser()){
+        if (loginUser.isGuestUser()) {
             throw new UnAuthorizedException();
         }
         Question question = questionDto.toQuestion();
@@ -47,7 +44,7 @@ public class QnaService {
     public void update(User loginUser, long id, QuestionDto questionDto) throws UnAuthenticationException {
         Question question = questionRepository.findOne(id);
 
-        if(ObjectUtils.isEmpty(question)){
+        if (ObjectUtils.isEmpty(question)) {
             throw new NullPointerException();
         }
 
@@ -58,7 +55,7 @@ public class QnaService {
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = questionRepository.findOne(questionId);
 
-        if(ObjectUtils.isEmpty(question)){
+        if (ObjectUtils.isEmpty(question)) {
             throw new CannotDeleteException("해당 질문이 존재하지 않습니다.");
         }
 
@@ -73,12 +70,40 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public Answer addAnswer(User loginUser, long questionId, String contents) throws CannotAddException {
+        Question question = this.questionRepository.findOne(questionId);
+        if (ObjectUtils.isEmpty(question)) {
+            throw new CannotAddException("답변을 달 수 없습니다.");
+        }
+
+        Answer answer = answerRepository.save(new Answer(0L, loginUser, question, contents));
+        return question.addAnswer(answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void updateAnswer(User user, Long answerID, String contents) throws CannotUpdateException {
+        Answer answer = this.findAnswerById(answerID);
+        if (ObjectUtils.isEmpty(answer)) {
+            throw new CannotUpdateException("수정 할 수 없습니다.");
+        }
+        answer.upadte(user, contents);
+    }
+
+    public void deleteAnswer(User loginUser, long answerID) throws CannotDeleteException {
+        Answer answer = this.findAnswerById(answerID);
+        if (ObjectUtils.isEmpty(answer)) {
+            throw new CannotDeleteException("삭제 할 수 없습니다.");
+        }
+        answer.delete(loginUser);
+    }
+
+    @Transactional
+    public List<Answer> findAnswersByQuestionId(Long id) {
+        return this.findById(id).getAnswers();
+    }
+
+    public Answer findAnswerById(Long id) {
+        return answerRepository.findOne(id);
     }
 }

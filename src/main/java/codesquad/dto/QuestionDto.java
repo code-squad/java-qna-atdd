@@ -53,6 +53,11 @@ public class QuestionDto {
         return this;
     }
 
+    public boolean isSameContents(QuestionDto questionDto) {
+        return questionDto.getContents().equals(this.getContents())
+                && questionDto.getTitle().equals(this.getTitle());
+    }
+
     public Question toQuestion() {
         return new Question(this.title, this.contents);
     }

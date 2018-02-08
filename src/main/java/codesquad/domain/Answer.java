@@ -1,14 +1,12 @@
 package codesquad.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
+import codesquad.UnAuthorizedException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -18,6 +16,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_to_question"))
+    @JsonIgnore
     private Question question;
 
     @Size(min = 5)
@@ -54,12 +53,26 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return contents;
     }
 
+    public void upadte(User user, String contents) {
+        if (!isOwner(user)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = contents;
+    }
+
     public void toQuestion(Question question) {
         this.question = question;
     }
 
     public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
+    }
+
+    public void delete(User loginUser) {
+        if (!this.isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
     }
 
     public boolean isDeleted() {
