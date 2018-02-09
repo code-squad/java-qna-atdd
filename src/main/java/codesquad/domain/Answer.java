@@ -63,7 +63,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
-    private boolean isOwner(User loginUser) {
+    public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
@@ -101,9 +101,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         }
     }
 
-    public void deleteBy(User loginUser, long questionId) {
+    public DeleteHistory deleteBy(User loginUser, long questionId) {
         validate(loginUser, questionId);
 
         this.deleted = true;
+
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
     }
 }

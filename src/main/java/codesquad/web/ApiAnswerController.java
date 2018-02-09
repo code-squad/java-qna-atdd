@@ -40,7 +40,7 @@ public class ApiAnswerController {
             return null;
         }
         logger.debug("question={}", question);
-        logger.debug("question answer size={}", question.getAnswers().size());
+        logger.debug("question answer size={}", question.getAnswersCount());
 
         Answer answer = question.findAnswer(answerId);
 

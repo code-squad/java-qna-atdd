@@ -2,21 +2,15 @@ package codesquad.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.hibernate.sql.Delete;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -34,10 +28,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -106,30 +98,24 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatedQuestion.contents;
     }
 
-    public void deleteBy(User loginUser) {
+    public List<DeleteHistory> deleteBy(User loginUser) {
         if ( !this.isOwner(loginUser)) {
-            throw new IllegalStateException("loginUser is not owner, loginUser=" + loginUser + ", question=" + this);
+            throw new IllegalStateException("loginUser is not owner of question, loginUser=" + loginUser + ", question=" + this);
         }
 
-        this.deleted = true;
-    }
+        List<DeleteHistory> histories = answers.deleteBy(loginUser, getId());
 
-    public List<Answer> getAnswers() {
-        return answers;
+        this.deleted = true;
+        histories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser));
+
+        return histories;
     }
 
     public Answer findAnswer(long answerId) {
-        List<Answer> answers = getAnswers();
-        for (Answer answer : answers) {
-            if (answer.getId() == answerId) {
-                return answer;
-            }
-        }
-
-        return null;
+        return answers.findAnswer(answerId);
     }
 
     public int getAnswersCount() {
-        return answers.size();
+        return answers.count();
     }
 }

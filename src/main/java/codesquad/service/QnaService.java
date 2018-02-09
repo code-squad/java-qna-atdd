@@ -55,7 +55,7 @@ public class QnaService {
             throw new CannotDeleteException("questions is not exist");
         }
 
-        question.deleteBy(loginUser);
+        deleteHistoryService.saveAll(question.deleteBy(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -95,6 +95,6 @@ public class QnaService {
             throw new CannotDeleteException("answer is not exist. answerId=" + answerId);
         }
 
-        answer.deleteBy(loginUser, questionId);
+        deleteHistoryService.save(answer.deleteBy(loginUser, questionId));
     }
 }
