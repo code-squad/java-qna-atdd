@@ -13,6 +13,8 @@ import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
     @ManyToOne
@@ -93,5 +95,9 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         }
         this.contents = answerDto.getContents();
         return this;
+    }
+
+    public DeleteHistory toDeleteHistory(User loginUser) {
+        return new DeleteHistory(ContentType.ANSWER, id, loginUser, LocalDateTime.now());
     }
 }

@@ -1,10 +1,7 @@
 package codesquad.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
+import codesquad.NotFoundException;
+import codesquad.domain.*;
 import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
@@ -13,12 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("qnaService")
 public class QnaService {
@@ -46,13 +40,29 @@ public class QnaService {
     @Transactional
     public Question updateQuestion(Long id, User loginUser, QuestionDto questionDto) {
         Question question = questionRepository.findOne(id);
+
+        if(question == null) {
+            throw new NotFoundException("업데이트하고자 하는 질문이 존재하지 않습니다.");
+        }
+
         return question.update(loginUser, questionDto);
     }
 
     @Transactional
     public Question deleteQuestion(User loginUser, Long idx) {
         Question deletedQuestion = questionRepository.findOne(idx);
-        return deletedQuestion.delete(loginUser);
+
+        if(deletedQuestion == null) {
+            throw new NotFoundException("삭제하고자 하는 질문이 존재하지 않습니다.");
+        }
+
+        deletedQuestion.delete(loginUser);
+
+        if(deletedQuestion.isDeleted()) {
+            deleteHistoryService.saveAll(deletedQuestion.toDeleteHistory());
+        }
+
+        return deletedQuestion;
     }
 
     public Iterable<Question> findAll() {

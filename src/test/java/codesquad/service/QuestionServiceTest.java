@@ -1,10 +1,9 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.NotFoundException;
 import codesquad.UnAuthorizedException;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import codesquad.domain.*;
 import codesquad.dto.QuestionDto;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,11 +23,14 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionServiceTest {
 
+    @InjectMocks
+    private QnaService qnaService;
+
     @Mock
     private QuestionRepository questionRepository;
 
-    @InjectMocks
-    private QnaService qnaService;
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
 
     private Question question;
     private User user;
@@ -52,7 +54,7 @@ public class QuestionServiceTest {
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void UnAuthorizedException_테스트() {
+    public void delete_질문한_사람과_로그인한_사람이_다른_경우() {
         when((questionRepository.findOne(3L))).thenReturn(question);
 
         qnaService.updateQuestion(3L, wrongUser, new QuestionDto("abc", "abc"));
@@ -66,6 +68,55 @@ public class QuestionServiceTest {
         qnaService.deleteQuestion(user, 3L);
 
         assertTrue(qnaService.findById(3L).isDeleted());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void delete_질문이_존재하지_않는_경우() {
+        when((questionRepository.findOne(1L))).thenReturn(null);
+        qnaService.deleteQuestion(user, 1L);
+    }
+
+    @Test
+    public void delete_질문한_사람과_로그인한_사람이_같으면서_답변이_없는_경우() {
+        Question question = new Question("test", "test");
+        question.writeBy(user);
+
+        when((questionRepository.findOne(0L))).thenReturn(question);
+
+        qnaService.deleteQuestion(user, 0L);
+
+        Question deletedQuestion = qnaService.findById(0L);
+        assertTrue(deletedQuestion.isDeleted());
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_질문한_사람과_로그인한_사람이_같으면서_답변의_글쓴이가_다른_경우() {
+        Question question = new Question("test", "test");
+        question.writeBy(user);
+
+        question.addAnswer(new Answer(wrongUser, "1"));
+        question.addAnswer(new Answer(wrongUser, "2"));
+
+        when((questionRepository.findOne(0L))).thenReturn(question);
+
+        qnaService.deleteQuestion(user, 0L);
+    }
+
+    @Test
+    public void delete_질문한_사람과_로그인한_사람이_같으면서_답변의_글쓴이도_같은_경우() {
+        Question question = new Question("test", "test");
+        question.writeBy(user);
+
+        question.addAnswer(new Answer(user, "1"));
+        question.addAnswer(new Answer(user, "2"));
+
+        when((questionRepository.findOne(0L))).thenReturn(question);
+
+        qnaService.deleteQuestion(user, 0L);
+
+        Question deletedQuestion = qnaService.findById(0L);
+        assertTrue(deletedQuestion.isDeleted());
+        assertTrue(deletedQuestion.getAnswers().isAllDeleted());
     }
 
     @Test(expected = CannotDeleteException.class)

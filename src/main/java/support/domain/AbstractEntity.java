@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class AbstractEntity {
     @Id
     @GeneratedValue
-    private long id;
+    protected long id;
 
     @CreatedDate
     private LocalDateTime createDate;

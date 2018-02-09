@@ -1,17 +1,12 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import codesquad.CannotDeleteException;
@@ -37,11 +32,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     private User writer;
 
-    //임베디드로 빼고 일급콜렉션으로 만들어도 됨
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -106,10 +98,24 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public Question delete(User loginUser) {
-        if(!isOwner(loginUser)) {
+        if(!isOwner(loginUser) || !answers.isAllSameOwner(loginUser)) {
             throw new CannotDeleteException("자신의 글만 삭제할 수 있습니다");
         }
         this.deleted = true;
+        answers.delete(loginUser);
         return this;
+    }
+
+    public List<DeleteHistory> toDeleteHistory() {
+        return Stream.concat(
+                Stream.of(new DeleteHistory(ContentType.QUESTION, id, writer, LocalDateTime.now())),
+                answers.getAll()
+                        .stream()
+                        .map(answer -> answer.toDeleteHistory(writer))
+        ).collect(Collectors.toList());
+    }
+
+    public Answers getAnswers() {
+        return answers;
     }
 }
