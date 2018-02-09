@@ -1,6 +1,8 @@
 package codesquad.dto;
 
 import javax.validation.constraints.Size;
+import java.util.Objects;
+import java.util.Optional;
 
 public class AnswerDto {
     private long id;
@@ -8,13 +10,19 @@ public class AnswerDto {
     @Size(min = 3)
     private String contents;
 
-    public AnswerDto(String contents) {
-        this(0, contents);
+    private Long questionId;
+
+    public AnswerDto() {
     }
 
-    public AnswerDto(long id, String contents) {
+    public AnswerDto(String contents, Long questionId) {
+        this(0, contents, questionId);
+    }
+
+    public AnswerDto(long id, String contents, Long questionId) {
         this.id = id;
         this.contents = contents;
+        this.questionId = questionId;
     }
 
     public long getId() {
@@ -33,5 +41,18 @@ public class AnswerDto {
     public AnswerDto setContents(String contents) {
         this.contents = contents;
         return this;
+    }
+
+    public Long getQuestionId() {
+        return Optional.of(questionId).orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnswerDto answerDto = (AnswerDto) o;
+        return Objects.equals(contents, answerDto.contents) &&
+                Objects.equals(questionId, answerDto.questionId);
     }
 }

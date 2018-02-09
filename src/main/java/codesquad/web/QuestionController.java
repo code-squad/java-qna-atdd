@@ -16,35 +16,34 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 
 @Controller
-@RequestMapping("/questions")
-public class QnAController {
+@RequestMapping(value = "/questions")
+public class QuestionController {
 
     @Resource(name = "qnaService")
     private QnAService qnAService;
 
-    @GetMapping("/{id}")
+    @PostMapping("")
+    public String create(
+            @LoginUser User loginUser,
+            QuestionDto questionDto,
+            Model model) {
+        model.addAttribute("question",
+                qnAService.create(loginUser, questionDto));
+        return "/qna/show";
+    }
+
+    @GetMapping(value = "/{id}")
     public String show(@PathVariable long id, Model model) {
         model.addAttribute("question", qnAService.findById(id));
         return "/qna/show";
     }
 
-    @GetMapping("/form")
-    public String form() {
+    @GetMapping(value = "/form")
+    public String form(@LoginUser User loginUser) {
         return "/qna/form";
     }
 
-    @PostMapping("/")
-    public String create(
-            @LoginUser User loginUser,
-            @RequestParam("title") String title,
-            @RequestParam("contents") String contents,
-            Model model) {
-        model.addAttribute("question",
-                qnAService.create(loginUser, new QuestionDto(title, contents)));
-        return "/qna/show";
-    }
-
-    @GetMapping("/{id}/form")
+    @GetMapping(value = "/{id}/form")
     public String update(
             @PathVariable long id,
             @LoginUser User loginUser,
@@ -54,19 +53,18 @@ public class QnAController {
         return "/qna/updateForm";
     }
 
-    @PostMapping("/{id}/update")
+    @PostMapping(value = "/{id}/update")
     public String update(
             @LoginUser User loginUser,
             @PathVariable long id,
-            @RequestParam("title") String title,
-            @RequestParam("contents") String contents,
+            QuestionDto questionDto,
             Model model) {
         model.addAttribute("question",
-                qnAService.update(loginUser, id, new Question(title, contents)));
+                qnAService.update(loginUser, id, questionDto));
         return "/qna/show";
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}")
     public String delete(
             @LoginUser User loginUser,
             @PathVariable long id,

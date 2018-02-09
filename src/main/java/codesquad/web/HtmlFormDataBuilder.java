@@ -27,13 +27,21 @@ public class HtmlFormDataBuilder {
     }
 
     public static HtmlFormDataBuilder urlEncodedForm() {
-        return new HtmlFormDataBuilder(defaultHeaders());
+        return new HtmlFormDataBuilder(getHeadersBy(MediaType.APPLICATION_FORM_URLENCODED));
+    }
+
+    public static HtmlFormDataBuilder jsonDataBuilder() {
+        return new HtmlFormDataBuilder(getHeadersBy(MediaType.APPLICATION_JSON));
     }
 
     public static HttpHeaders defaultHeaders() {
+        return getHeadersBy(MediaType.APPLICATION_FORM_URLENCODED);
+    }
+
+    public static HttpHeaders getHeadersBy(MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_JSON));
+        headers.setContentType(mediaType);
         return headers;
     }
 }

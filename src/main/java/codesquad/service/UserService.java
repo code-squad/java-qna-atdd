@@ -1,20 +1,14 @@
 package codesquad.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.Resource;
-
-import codesquad.security.BasicAuthInterceptor;
-import codesquad.security.HttpSessionUtils;
-import codesquad.security.LoginUser;
-import org.springframework.stereotype.Service;
-
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service("userService")
 public class UserService {

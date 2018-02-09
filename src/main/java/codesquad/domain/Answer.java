@@ -1,7 +1,7 @@
 package codesquad.domain;
 
 import codesquad.UnAuthorizedException;
-import codesquad.security.LoginUser;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -70,13 +70,17 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = true;
     }
 
-    public Answer update(User loginUser, Answer updatedAnswer) {
-        if (!updatedAnswer.isOwner(loginUser)) {
+    public Answer update(User loginUser, Answer answer) {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("자신이 작성한 질문에 대해서만 수정/삭제가 가능합니다.");
         }
 
-        this.contents = updatedAnswer.contents;
+        this.contents = answer.contents;
         return this;
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), this.contents, this.question.getId());
     }
 
     @Override

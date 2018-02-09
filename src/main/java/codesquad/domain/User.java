@@ -1,16 +1,14 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Email;
+import support.domain.AbstractEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import codesquad.UnAuthorizedException;
-import codesquad.dto.UserDto;
-import support.domain.AbstractEntity;
 
 @Entity
 public class User extends AbstractEntity {

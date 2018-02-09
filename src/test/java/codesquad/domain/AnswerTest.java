@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 public class AnswerTest {
@@ -32,11 +31,6 @@ public class AnswerTest {
     @Test (expected = UnAuthorizedException.class)
     public void update_not_owner() {
         answer.update(SANJIGI, answer);
-    }
-
-    @Test (expected = UnAuthorizedException.class)
-    public void update_other_ownerAnswer() {
-        answer.update(JAVAJIGI, new Answer(SANJIGI, question, "new answer"));
     }
 
     @Test

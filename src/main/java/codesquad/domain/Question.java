@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Entity
 public class  Question extends AbstractEntity implements UrlGeneratable {
@@ -79,13 +78,13 @@ public class  Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public Question update(User loginUser, Question updatedQuestion) {
+    public Question update(User loginUser, Question question) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("자신이 작성한 질문에 대해서만 수정/삭제가 가능합니다.");
         }
 
-        this.title = updatedQuestion.title;
-        this.contents = updatedQuestion.contents;
+        this.title = question.title;
+        this.contents = question.contents;
         return this;
     }
 

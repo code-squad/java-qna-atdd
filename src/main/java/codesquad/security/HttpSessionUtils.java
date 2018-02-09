@@ -1,11 +1,10 @@
 package codesquad.security;
 
-import javax.servlet.http.HttpSession;
-
+import codesquad.domain.User;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import codesquad.domain.User;
+import javax.servlet.http.HttpSession;
 
 public class HttpSessionUtils {
     public static final String USER_SESSION_KEY = "loginedUser";

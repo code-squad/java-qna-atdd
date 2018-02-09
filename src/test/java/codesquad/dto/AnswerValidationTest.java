@@ -23,7 +23,7 @@ public class AnswerValidationTest {
 
     @Test
     public void contentsWhenIsEmpty() throws Exception {
-        AnswerDto answer = new AnswerDto("");
+        AnswerDto answer = new AnswerDto("", 0l);
         Set<ConstraintViolation<AnswerDto>> constraintViolcations = validator.validate(answer);
         assertThat(constraintViolcations.size(), is(1));
     }
