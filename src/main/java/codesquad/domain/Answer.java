@@ -68,11 +68,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
-    public void delete(User loginUser) {
+    public DeleteHistory delete(User loginUser) {
         if (!this.isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
+
         this.deleted = true;
+
+        return makeDeleteHistory(loginUser);
+    }
+
+    private DeleteHistory makeDeleteHistory(User loginUser) {
+        return new DeleteHistory(ContentType.ANSWER, this.getId(), loginUser);
     }
 
     public boolean isDeleted() {

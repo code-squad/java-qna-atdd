@@ -59,7 +59,7 @@ public class QnaService {
             throw new CannotDeleteException("해당 질문이 존재하지 않습니다.");
         }
 
-        question.delete(loginUser);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {

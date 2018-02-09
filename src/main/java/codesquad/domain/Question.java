@@ -1,8 +1,10 @@
 package codesquad.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -77,15 +79,32 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return answer;
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
-        if(!isOwner(loginUser)){
+    /*
+        질문과 답변 삭제 이력에 대한 정보를 DeleteHistory를 활용해 남긴다.
+    */
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        List<DeleteHistory> deleteHistories = Collections.emptyList();
+
+        if (!isOwner(loginUser)) {
             throw new CannotDeleteException("지울 수 있는 권한이 없습니다.");
         }
+
+        deleteHistories = this.getAnswers().stream()
+                .map(answer -> answer.delete(loginUser))
+                .collect(Collectors.toList());
+
         this.deleted = true;
+
+        return addDeleteHistory(loginUser, deleteHistories);
+    }
+
+    private List<DeleteHistory> addDeleteHistory(User loginUser, List<DeleteHistory> deleteHistories) {
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, this.getId(), loginUser));
+        return deleteHistories;
     }
 
     public void update(User loginUser, Question question) throws UnAuthenticationException {
-        if(!isOwner(loginUser)){
+        if (!isOwner(loginUser)) {
             throw new UnAuthenticationException();
         }
         this.title = question.title;
@@ -98,6 +117,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public boolean isEmptyAnswer() {
+        return this.getAnswers().isEmpty();
     }
 
     @Override
