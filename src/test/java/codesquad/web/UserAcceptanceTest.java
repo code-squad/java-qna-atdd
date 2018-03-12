@@ -79,6 +79,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 		User loginUser = defaultUser();
 		ResponseEntity<String> response = basicAuthTemplate(loginUser)
 				.getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
+		log.debug("body : {}", response.getBody());
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
 	}
@@ -90,18 +91,11 @@ public class UserAcceptanceTest extends AcceptanceTest {
 	}
 
 	private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-		params.add("_method", "put");
-		params.add("password", "password2");
-		params.add("name", "자바지기2");
-		params.add("email", "javajigi@slipp.net");
-		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params,
-				headers);
-
+		HtmlFormDataBuilder dataBuilder = HtmlFormDataBuilder.urlEncodedForm().
+				addParameter("_method", "put").
+				addParameter("password", "password2").
+				addParameter("email", "javajigi@slipp.net");
+		HttpEntity<MultiValueMap<String, Object>> request = dataBuilder.build();
 		return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
 	}
 

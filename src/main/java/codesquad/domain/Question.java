@@ -42,6 +42,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     private boolean deleted = false;
 
     public Question() {
+    	
     }
 
     public Question(String title, String contents) {
@@ -87,8 +88,15 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return new QuestionDto(getId(), this.title, this.contents);
     }
 
+    public void update(QuestionDto updatequestion) {
+    	this.title = updatequestion.getTitle();
+    	this.contents = updatequestion.getContents();
+    	
+    }
+    
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
 }

@@ -27,7 +27,7 @@ public class UserServiceTest {
 
     @Test
     public void login_success() throws Exception {
-        User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
+        User user = new User("ksm0814", "k5696", "name", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
         User loginUser = userService.login(user.getUserId(), user.getPassword());
@@ -36,14 +36,14 @@ public class UserServiceTest {
 
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_user_not_found() throws Exception {
-        when(userRepository.findByUserId("sanjigi")).thenReturn(Optional.empty());
+        when(userRepository.findByUserId("ksm0814")).thenReturn(Optional.empty());
 
-        userService.login("sanjigi", "password");
+        userService.login("ksm0814", "k5696");
     }
 
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_mismatch_password() throws Exception {
-        User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
+        User user = new User("ksm0814", "fail", "name", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
         userService.login(user.getUserId(), user.getPassword() + "2");
