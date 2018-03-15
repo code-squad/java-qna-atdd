@@ -70,7 +70,9 @@ public class QnaService {
 	}
 
 	public Answer addAnswer(User loginUser, long questionId, String contents) {
-		return null;
+		Answer newAnswer = new Answer(loginUser, contents);
+		findById(questionId).addAnswer(newAnswer);
+		return answerRepository.save(newAnswer);
 	}
 
 	public Answer deleteAnswer(User loginUser, long id) {

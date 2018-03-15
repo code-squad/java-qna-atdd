@@ -15,14 +15,19 @@ import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import codesquad.dto.QuestionDto;
+import codesquad.service.QnaService;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
-    @Size(min = 3, max = 100)
+	private static final Logger log = LoggerFactory.getLogger(Question.class);
+
+	@Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
 

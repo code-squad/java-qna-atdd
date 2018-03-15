@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -12,6 +14,7 @@ import codesquad.dto.UserDto;
 import support.test.AcceptanceTest;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
+	private static final Logger log = LoggerFactory.getLogger(ApiUserAcceptanceTest.class);
 
     @Test
     public void create() throws Exception {
@@ -19,7 +22,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
         String location = response.getHeaders().getLocation().getPath();  
-        
+
         UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
         assertThat(dbUser, is(newUser));
     }
