@@ -2,11 +2,14 @@ package codesquad.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import codesquad.UnAuthorizedException;
 import codesquad.dto.UserDto;
@@ -16,6 +19,11 @@ import support.domain.AbstractEntity;
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
 
+//    @Id
+//	@GeneratedValue
+//	@JsonProperty
+//	private long id;
+    
     @Size(min = 3, max = 20)
     @Column(unique = true, nullable = false, length = 20)
     private String userId;

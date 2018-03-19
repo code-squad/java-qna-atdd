@@ -70,11 +70,11 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="active"><a href="/">Posts</a></li>
                 {{^ loginedUser }}
-                <li><a href="/login" role="button">로그인</a></li>
+                <li><a href="/users/loginForm" role="button">로그인</a></li>
                 <li><a href="/users/form" role="button">회원가입</a></li>
                 {{/ loginedUser }}
                 {{# loginedUser }}
-                <li><a href="/logout" role="button">로그아웃</a></li>
+                <li><a href="/users/logout" role="button">로그아웃</a></li>
                 <li><a href="/users/{{id}}/form" role="button">개인정보수정</a></li>
                 {{/ loginedUser }}
             </ul>

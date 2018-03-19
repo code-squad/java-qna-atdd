@@ -41,7 +41,11 @@ public class UserAcceptanceTest extends AcceptanceTest {
 	public void create() throws Exception {
 		HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
 		String userId = "testuser";
-		htmlFormDataBuilder.addUser(userId);
+
+		htmlFormDataBuilder.addSampleUser(userId);
+
+		htmlFormDataBuilder.addSampleUser(userId);
+
 		HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
 
 		ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
