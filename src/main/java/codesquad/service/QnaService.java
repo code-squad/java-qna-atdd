@@ -1,6 +1,8 @@
 package codesquad.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -13,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
+import codesquad.domain.DeleteHistory;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
+import codesquad.dto.QuestionsDto;
 
 @Service("qnaService")
 public class QnaService {
@@ -43,22 +47,14 @@ public class QnaService {
 
 	public Question update(User loginUser, long id, QuestionDto updatequestion) {
 		Question oldQuestion = findById(id);
-		if (!oldQuestion.isOwner(loginUser))
-			throw new IllegalStateException("자신의 질문만 수정/삭제 가능합니다.");
-
-		oldQuestion.update(updatequestion);
+		oldQuestion.update(loginUser, updatequestion);
 		return questionRepository.save(oldQuestion);
 	}
 
 	@Transactional
 	public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
-		Question oldQuestion = findById(id);
-		if(loginUser.equals(null))
-			log.debug("난 널이다!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-		if (!oldQuestion.isOwner(loginUser))
-			throw new IllegalStateException("자신의 질문만 수정/삭제 가능합니다.");
-
-		questionRepository.delete(id);
+		List<DeleteHistory> deleteHistories = Optional.ofNullable(findById(id).delete(loginUser)).orElse(new ArrayList<>());
+		deleteHistoryService.saveAll(deleteHistories);
 	}
 
 	public Iterable<Question> findAll() {
@@ -71,12 +67,17 @@ public class QnaService {
 
 	public Answer addAnswer(User loginUser, long questionId, String contents) {
 		Answer newAnswer = new Answer(loginUser, contents);
+		Question question = findById(questionId);
+
+		if(question.isDeleted())
+			throw new IllegalStateException("이미 삭제되어있는 질문입니다.");
+		
 		findById(questionId).addAnswer(newAnswer);
 		return answerRepository.save(newAnswer);
 	}
 
 	public Answer deleteAnswer(User loginUser, long id) {
-		// TODO 답변 삭제 기능 구현
-		return null;
+		Answer deleteAnswer = answerRepository.findOne(id);
+		return deleteAnswer;
 	}
 }

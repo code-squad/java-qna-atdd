@@ -31,8 +31,13 @@ public class UserController {
 	private UserService userService;
 
 	@GetMapping("/form")
-	public String form() {
+	public String loginForm() {
 		return "/user/form";
+	}
+	
+	@GetMapping("/login")
+	public String form() {
+		return "/user/login";
 	}
 
 	@PostMapping("")

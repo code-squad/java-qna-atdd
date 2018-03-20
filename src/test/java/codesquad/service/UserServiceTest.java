@@ -36,9 +36,9 @@ public class UserServiceTest {
 
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_user_not_found() throws Exception {
-        when(userRepository.findByUserId("ksm0814")).thenReturn(Optional.empty());
+        when(userRepository.findByUserId("idontknow")).thenReturn(Optional.empty());
 
-        userService.login("ksm0814", "k5696");
+        userService.login("idontknow", "fail");
     }
 
     @Test(expected = UnAuthenticationException.class)

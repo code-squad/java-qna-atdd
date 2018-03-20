@@ -24,8 +24,7 @@ public class HomeController {
 	
     @GetMapping("/")
     public String home(Model model, Pageable pageable) {
-    	List<Question> question = qnaService.findAll(pageable);
-		log.debug("question size : {}", question.size());
+    	Iterable<Question> question = qnaService.findAll();
     	model.addAttribute("questions", question);
         return "home";
     }
