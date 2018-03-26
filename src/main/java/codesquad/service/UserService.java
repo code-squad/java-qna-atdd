@@ -1,14 +1,11 @@
 package codesquad.service;
 
-import static org.mockito.Mockito.when;
-
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.annotation.Resource;
 
-import org.mockito.exceptions.misusing.NullInsteadOfMockException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -16,9 +13,12 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;
+import codesquad.web.QuestionController;
 
 @Service("userService")
 public class UserService {
+	private static final Logger log = LoggerFactory.getLogger(QuestionController.class);
+	
 	@Resource(name = "userRepository")
 	private UserRepository userRepository;
 
@@ -45,7 +45,7 @@ public class UserService {
 	}
 
 	public User login(String userId, String password) throws UnAuthenticationException {
-		System.out.println("============ access ID : " + userId + " | access PASSWORD : " + password + " ============");
+		log.debug("============ access ID : " + userId + " | access PASSWORD : " + password + " ============");
 		User user = userRepository.findByUserId(userId).orElseThrow(UnAuthenticationException::new);
 		
 		if (!user.matchPassword(password)) {

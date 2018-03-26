@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import codesquad.CannotDeleteException;
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -75,6 +76,14 @@ public class QuestionController {
 		return "/qna/updateForm";
 	}
 	
+	@PostMapping("/{id}/answers")
+	public String addAnswer(@PathVariable Long id, @LoginUser User loginUser, String contents) {
+		Question question = qnaService.findById(id);
+		Answer answer = new Answer(loginUser, contents);
+		question.addAnswer(answer);
+		return "redirect:/questions/{id}";
+	}
+	
 	@PutMapping("/{id}")
 	public String update(@PathVariable Long id, @LoginUser User loginUser, String title, String contents, Model model) throws CannotDeleteException {
 		Question question = qnaService.findById(id);
@@ -82,7 +91,7 @@ public class QuestionController {
 			log.debug("권한이 없습니다.");
 			return "redirect:/questions/{id}/updateFail";
 		}
-		question.update(title, contents);
+		question.update(loginUser, title, contents);
 		question = qnaService.update(loginUser, id, question);
 		model.addAttribute("question", question);
 		return "redirect:/questions/{id}";

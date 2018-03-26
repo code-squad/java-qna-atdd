@@ -18,11 +18,6 @@ import support.domain.AbstractEntity;
 @Entity
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
-
-//    @Id
-//	@GeneratedValue
-//	@JsonProperty
-//	private long id;
     
     @Size(min = 3, max = 20)
     @Column(unique = true, nullable = false, length = 20)

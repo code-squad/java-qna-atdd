@@ -12,67 +12,81 @@ import support.domain.UrlGeneratable;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
-    private User writer;
+	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
+	private User writer;
 
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_to_question"))
-    private Question question;
+	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_to_question"))
+	private Question question;
 
-    @Size(min = 5)
-    @Lob
-    private String contents;
+	@Size(min = 5)
+	@Lob
+	private String contents;
 
-    private boolean deleted = false;
+	private boolean deleted = false;
 
-    public Answer() {
-    }
+	public Answer() {
+	}
 
-    public Answer(User writer, String contents) {
-        this.writer = writer;
-        this.contents = contents;
-    }
+	public Answer(User writer, String contents) {
+		this.writer = writer;
+		this.contents = contents;
+	}
 
-    public Answer(Long id, User writer, Question question, String contents) {
-        super(id);
-        this.writer = writer;
-        this.question = question;
-        this.contents = contents;
-        this.deleted = false;
-    }
+	public Answer(Long id, User writer, Question question, String contents) {
+		super(id);
+		this.writer = writer;
+		this.question = question;
+		this.contents = contents;
+		this.deleted = false;
+	}
 
-    public User getWriter() {
-        return writer;
-    }
+	public Answer update(String contents) {
+		this.contents = contents;
+		return this;
+	}
+	
+	public Answer delete(User loginUser) {
+		if (!this.isOwner(loginUser)) {
+			return this;
+		}
+		
+		this.deleted = true;
+		return this;
+	}
 
-    public Question getQuestion() {
-        return question;
-    }
+	public User getWriter() {
+		return writer;
+	}
 
-    public String getContents() {
-        return contents;
-    }
+	public Question getQuestion() {
+		return question;
+	}
 
-    public void toQuestion(Question question) {
-        this.question = question;
-    }
+	public String getContents() {
+		return contents;
+	}
 
-    public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
-    }
+	public void toQuestion(Question question) {
+		this.question = question;
+	}
 
-    public boolean isDeleted() {
-        return deleted;
-    }
+	public boolean isOwner(User loginUser) {
+		return writer.equals(loginUser);
+	}
 
-    @Override
-    public String generateUrl() {
-        return String.format("%s/answers/%d", question.generateUrl(), getId());
-    }
+	public boolean isDeleted() {
+		return deleted;
+	}
 
-    @Override
-    public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
-    }
+	@Override
+	public String generateUrl() {
+		return String.format("%s/answers/%d", question.generateUrl(), getId());
+	}
+
+	@Override
+	public String toString() {
+		return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+	}
 }

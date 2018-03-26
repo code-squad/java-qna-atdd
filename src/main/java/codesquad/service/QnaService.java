@@ -16,6 +16,8 @@ import codesquad.domain.AnswerRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
+import codesquad.dto.QuestionDto;
+import codesquad.dto.UserDto;
 
 @Service("qnaService")
 public class QnaService {
@@ -35,14 +37,25 @@ public class QnaService {
 		log.debug("question : {}", question);
 		return questionRepository.save(question);
 	}
+	
+	public Question add(QuestionDto questionDto, User loginUser) {
+		Question question = questionDto.toQuestion();
+		question.writeBy(loginUser);
+		return questionRepository.save(question);
+	}
 
 	public Question findById(long id) {
 		return questionRepository.findOne(id);
 	}
 
 	public Question update(User loginUser, long id, Question updatedQuestion) throws CannotDeleteException {
-		questionRepository.save(updatedQuestion);
-		return updatedQuestion;
+		Question question = questionRepository.findOne(id);
+		
+		if (!question.isOwner(loginUser)) {
+			throw new CannotDeleteException("수정 권한이 없습니다.");
+		}
+		question.update(loginUser, updatedQuestion.getTitle(), updatedQuestion.getContents());
+		return questionRepository.save(question);
 	}
 
 	@Transactional
@@ -63,11 +76,30 @@ public class QnaService {
 	}
 
 	public Answer addAnswer(User loginUser, long questionId, String contents) {
-		return null;
+		Question question = questionRepository.findOne(questionId);
+		Answer answer = new Answer(loginUser, contents);
+		
+		question.addAnswer(answer);
+		answerRepository.save(answer);
+		questionRepository.save(question);
+		return answer;
+	}
+	
+	public Answer updateAnswer(User loginUser, long id, String contents) {
+		Answer answer = answerRepository.findOne(id);
+		if (!answer.isOwner(loginUser)) {
+			return answer;
+		}
+		answerRepository.save(answer.update(contents));
+		return answer;
 	}
 
 	public Answer deleteAnswer(User loginUser, long id) {
-		// TODO 답변 삭제 기능 구현 
-		return null;
+		Answer answer = answerRepository.findOne(id);
+		if (!answer.isOwner(loginUser)) {
+			return answer;
+		}
+		answer.delete(loginUser);
+		return answerRepository.save(answer);
 	}
 }
