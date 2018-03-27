@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,5 +66,15 @@ public class ApiQuestionController {
 			throw new CannotDeleteException("로그인후에 이용할 수 있습니다.");
 		}
 		qnaService.update(loginUser, id, updatedQuestion.toQuestion());
+	}
+	
+	@DeleteMapping("/{id}")
+	public void delete(@LoginUser User loginUser, @PathVariable long id) throws CannotDeleteException {
+		try {
+			log.debug("delete in");
+			qnaService.deleteQuestion(loginUser, id);
+		} catch (NullPointerException e) {
+			throw new CannotDeleteException("질문이 없습니다.");
+		}
 	}
 }

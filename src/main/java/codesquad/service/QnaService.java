@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.AnswerRepository;
+import codesquad.domain.DeleteHistory;
+import codesquad.domain.DeleteHistoryRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -61,10 +63,10 @@ public class QnaService {
 	@Transactional
 	public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
 		Question question = questionRepository.findOne(questionId);
-		if (!question.isDeleted()) {
-			question.deleteQuestion();
-		}
-		return;
+		List<DeleteHistory> histories = question.deleteQuestion(loginUser);
+		deleteHistoryService.saveAll(histories);
+		questionRepository.save(question);
+		log.debug("question delete status : " + question.isDeleted());
 	}
 
 	public Iterable<Question> findAll() {
@@ -94,7 +96,7 @@ public class QnaService {
 		return answer;
 	}
 
-	public Answer deleteAnswer(User loginUser, long id) {
+	public Answer deleteAnswer(User loginUser, long id) throws CannotDeleteException {
 		Answer answer = answerRepository.findOne(id);
 		if (!answer.isOwner(loginUser)) {
 			return answer;
