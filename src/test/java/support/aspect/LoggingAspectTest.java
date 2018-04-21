@@ -21,4 +21,7 @@ public class LoggingAspectTest {
         UserDto user = new UserDto("aspectuser", "password", "name2", "javajigi@slipp.net2");
         userController.create(user);
     }
+
+
+
 }

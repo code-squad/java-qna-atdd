@@ -30,7 +30,7 @@ public class UserServiceTest {
         User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
-        User loginUser = userService.login(user.getUserId(), user.getPassword());
+       User loginUser = userService.login(user.getUserId(), user.getPassword());
         assertThat(loginUser, is(user));
     }
 
@@ -45,7 +45,6 @@ public class UserServiceTest {
     public void login_failed_when_mismatch_password() throws Exception {
         User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-
         userService.login(user.getUserId(), user.getPassword() + "2");
     }
 }

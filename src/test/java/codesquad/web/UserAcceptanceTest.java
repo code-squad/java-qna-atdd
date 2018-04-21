@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private UserRepository userRepository;
+    private HttpHeaders headers;
+    private MultiValueMap<String, Object> params;
+
+    @Before
+    public void setUp() throws Exception {
+        headers = new HttpHeaders();
+        params  = new LinkedMultiValueMap<>();
+    }
 
     @Test
     public void createForm() throws Exception {
@@ -50,7 +59,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         params.add("name", "자바지기");
         params.add("email", "javajigi@slipp.net");
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        
+
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
@@ -108,5 +117,25 @@ public class UserAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = update(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
+    }
+
+    @Test
+    public void login() throws Exception {
+        ResponseEntity<String> response = template().postForEntity("/users/login", HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("userId","yoon")
+                .addParameter("password","test")
+                .build(), String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
+        assertThat(response.getHeaders().getLocation().getPath(), is("/users/login"));
+    }
+
+    private HttpEntity<MultiValueMap<String, Object>> build() {
+        return new HttpEntity<>(params, headers);
+    }
+
+    private void addParam(String userId, String password) {
+        params.add("userId", userId);
+        params.add("password", password);
     }
 }

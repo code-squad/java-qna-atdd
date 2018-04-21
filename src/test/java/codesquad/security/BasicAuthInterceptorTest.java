@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Base64;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
