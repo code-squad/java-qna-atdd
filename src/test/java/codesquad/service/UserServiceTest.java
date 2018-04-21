@@ -29,7 +29,6 @@ public class UserServiceTest {
     public void login_success() throws Exception {
         User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-
         User loginUser = userService.login(user.getUserId(), user.getPassword());
         assertThat(loginUser, is(user));
     }
@@ -37,7 +36,6 @@ public class UserServiceTest {
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_user_not_found() throws Exception {
         when(userRepository.findByUserId("sanjigi")).thenReturn(Optional.empty());
-
         userService.login("sanjigi", "password");
     }
 
