@@ -1,9 +1,11 @@
 package codesquad.web;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.UnAuthenticationException;
+import codesquad.domain.User;
+import codesquad.dto.UserDto;
+import codesquad.security.HttpSessionUtils;
+import codesquad.security.LoginUser;
+import codesquad.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -14,10 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import codesquad.domain.User;
-import codesquad.dto.UserDto;
-import codesquad.security.LoginUser;
-import codesquad.service.UserService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/users")
@@ -57,5 +58,18 @@ public class UserController {
         userService.update(loginUser, id, target);
         return "redirect:/users";
     }
+
+    @GetMapping("/login")
+    public String loginForm() {
+        return "/user/login";
+    }
+
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession httpSession) throws UnAuthenticationException {
+        User loginUser = userService.login(userId, password);
+        httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
+        return "redirect:/users";
+    }
+
 
 }
