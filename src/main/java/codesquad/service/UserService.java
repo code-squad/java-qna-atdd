@@ -41,7 +41,11 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        Optional<User> maybeUser = userRepository.findByUserId(userId);
+        //TODO 한 라인으로 구현해볼것 (문제가 있었는데 optional을 또 optional로 감쌌었다 ofNullable)
+        return maybeUser
+                .filter(u -> u.matchPassword(password))
+                .orElseThrow(UnAuthenticationException::new);
+
     }
 }
