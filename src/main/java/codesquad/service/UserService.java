@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.jnlp.UnavailableServiceException;
 
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,6 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        return userRepository.findByUserId(userId).filter(user -> user.matchUserId(userId) && user.matchPassword(password)).orElseThrow(UnAuthenticationException::new);
     }
 }

@@ -27,7 +27,7 @@ public class UserServiceTest {
 
     @Test
     public void login_success() throws Exception {
-        User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
+        User user = new User("javajigi", "test", "자바지기", "javajigi@slipp.net");
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
         User loginUser = userService.login(user.getUserId(), user.getPassword());
