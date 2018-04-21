@@ -36,12 +36,22 @@ public class UserService {
         return user;
     }
 
+    public User findByUserId(String userId) throws UnAuthenticationException {
+        Optional<User> optional = userRepository.findByUserId(userId);
+        return optional.orElseThrow(() -> new UnAuthenticationException());
+    }
+
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        User user = findByUserId(userId);
+
+        if(!user.getPassword().equals(password)) {
+            throw new UnAuthenticationException();
+        }
+        return user;
     }
 }
