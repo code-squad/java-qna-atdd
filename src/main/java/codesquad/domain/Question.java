@@ -1,7 +1,9 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import codesquad.dto.QuestionDto;
+import org.hibernate.annotations.Where;
+import support.domain.AbstractEntity;
+import support.domain.UrlGeneratable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,12 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.Where;
-
-import codesquad.dto.QuestionDto;
-import support.domain.AbstractEntity;
-import support.domain.UrlGeneratable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -49,6 +47,12 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public Question(User loginUser, QuestionDto questionDto) {
+        this.title = questionDto.getTitle();
+        this.contents = questionDto.getContents();
+        writeBy(loginUser);
+    }
+
     public String getTitle() {
         return title;
     }
@@ -76,6 +80,23 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public Question update(User user, QuestionDto questionDto) throws CannotUpdateException {
+        if (!isOwner(user)) {
+            throw new CannotUpdateException("본인의 질문만 수정 할 수 있습니다.");
+        }
+
+        title = questionDto.getTitle();
+        contents = questionDto.getContents();
+        return this;
+    }
+
+    public void delete(User user) throws CannotDeleteException {
+        if (!isOwner(user)) {
+            throw new CannotDeleteException("본인의 질문만 삭제 할 수 있습니다.");
+        }
+        deleted = true;
     }
 
     @Override

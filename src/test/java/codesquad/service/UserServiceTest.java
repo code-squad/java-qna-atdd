@@ -12,10 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import codesquad.UnAuthenticationException;
+import codesquad.domain.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
-import codesquad.service.UserService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {

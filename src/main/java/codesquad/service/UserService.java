@@ -1,7 +1,7 @@
 package codesquad.service;
 
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.domain.UnAuthenticationException;
+import codesquad.domain.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;

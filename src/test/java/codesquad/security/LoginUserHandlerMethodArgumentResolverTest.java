@@ -13,11 +13,8 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import codesquad.UnAuthorizedException;
+import codesquad.domain.UnAuthorizedException;
 import codesquad.domain.User;
-import codesquad.security.HttpSessionUtils;
-import codesquad.security.LoginUser;
-import codesquad.security.LoginUserHandlerMethodArgumentResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginUserHandlerMethodArgumentResolverTest {

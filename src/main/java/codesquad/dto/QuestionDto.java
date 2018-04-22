@@ -11,6 +11,8 @@ public class QuestionDto {
     @Size(min = 3)
     private String contents;
 
+    private QuestionDto() {}
+
     public QuestionDto(String title, String contents) {
         this(0, title, contents);
     }

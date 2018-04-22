@@ -1,4 +1,4 @@
-package codesquad;
+package codesquad.domain;
 
 public class CannotDeleteException extends Exception {
     private static final long serialVersionUID = 1L;
