@@ -1,23 +1,14 @@
 package codesquad.web;
 
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
-import codesquad.dto.UserDto;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import support.html.HtmlFormDataBuilder;
 import support.test.AcceptanceTest;
-
-import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -30,23 +21,20 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login_form() {
-        ResponseEntity<String> response = template().getForEntity("/users/login", String.class);
+        ResponseEntity<String> response = template().getForEntity("/login", String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         log.debug("body : {}", response.getBody());
     }
 
     @Test
     public void login() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder
+                .urlEncodedForm()
+                .addParameter("userId", "javajigi")
+                .addParameter("password", "test")
+                .build();
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", "javajigi");
-        params.add("password", "test");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity(params, headers);
-
-        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         log.debug("body : {}", response.getBody());
@@ -55,16 +43,13 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login_fail() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder
+                .urlEncodedForm()
+                .addParameter("userId", "javajigi")
+                .addParameter("password", "invalidPassword")
+                .build();
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", "javajigi");
-        params.add("password", "bad_password");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity(params, headers);
-
-        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
     }

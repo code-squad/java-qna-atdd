@@ -22,20 +22,20 @@ public abstract class AcceptanceTest {
 
     public TestRestTemplate template() {
         return template;
-    } 
-    
+    }
+
     public TestRestTemplate basicAuthTemplate() {
         return basicAuthTemplate(defaultUser());
     }
-    
+
     public TestRestTemplate basicAuthTemplate(User loginUser) {
         return template.withBasicAuth(loginUser.getUserId(), loginUser.getPassword());
     }
-    
+
     protected User defaultUser() {
         return findByUserId(DEFAULT_LOGIN_USER);
     }
-    
+
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
     }
