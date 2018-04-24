@@ -65,6 +65,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer;
     }
 
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
     public void writeBy(User loginUser) {
         this.writer = loginUser;
     }
@@ -72,6 +76,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
         answers.add(answer);
+    }
+
+    public void removeAnswer(Answer answer) {
+        answers.remove(answer);
     }
 
     public boolean isOwner(User loginUser) {
@@ -102,6 +110,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
+    }
+
+    @Override
+    public String resourceUrl() {
+        return String.format("/api/questions/%d", getId());
     }
 
     public QuestionDto toQuestionDto() {

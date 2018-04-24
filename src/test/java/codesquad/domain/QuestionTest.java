@@ -68,6 +68,23 @@ public class QuestionTest {
         Assertions.assertThat(question.isDeleted()).isTrue();
     }
 
+    @Test
+    public void 질문은_답변들을_가진다() {
+        //given
+        Question question = createQuestionBy(defaultUser);
+        Answer answer = new Answer(defaultUser, "this is my answer");
+
+        Assertions.assertThat(question.getAnswers()).isEmpty();
+        Assertions.assertThat(answer.getQuestion()).isNull();
+
+        //when
+        question.addAnswer(answer);
+
+        //then
+        Assertions.assertThat(question.getAnswers().size()).isEqualTo(1);
+        Assertions.assertThat(answer.getQuestion()).isNotNull();
+    }
+
     private Question createQuestionBy(User user) {
         Question question = new Question("mytitle", "mycontents");
         question.writeBy(user);

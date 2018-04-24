@@ -88,12 +88,6 @@ public class QnaServiceTest {
         Assertions.fail("존재하지 않는 질문을 삭제 시도 하면 예외가 발생해야 한다.");
     }
 
-    private Question createQuestionBy(User user) {
-        Question question = new Question("foo", "bar");
-        question.writeBy(user);
-        return question;
-    }
-
     private User createUserIdOf(long id) {
         return new User(id, "foo", "hunter1", "name", "foo@bar.com");
     }

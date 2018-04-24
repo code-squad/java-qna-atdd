@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.domain.Answer;
+import codesquad.domain.AnswerNotFoundException;
 import codesquad.domain.AnswerRepository;
 import codesquad.domain.CannotDeleteException;
 import codesquad.domain.CannotUpdateException;
@@ -63,11 +64,27 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+        Answer answer = new Answer(loginUser, contents);
+        question.addAnswer(answer);
+
+        return answerRepository.save(answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, String content) throws CannotUpdateException {
+        Answer answer = findAnswerById(id);
+        return answer.update(loginUser, content);
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        Answer answer = findAnswerById(id);
+        answer.delete(loginUser);
+    }
+
+    private Answer findAnswerById(long id) {
+        return answerRepository.findOne(id)
+                .orElseThrow(AnswerNotFoundException::new);
     }
 }

@@ -1,14 +1,14 @@
 package codesquad.domain;
 
+import support.domain.AbstractEntity;
+import support.domain.UrlGeneratable;
+
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
-
-import support.domain.AbstractEntity;
-import support.domain.UrlGeneratable;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -58,7 +58,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
-    public boolean isOwner(User loginUser) {
+    private boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
@@ -66,9 +66,35 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public Answer update(User user, String content) throws CannotUpdateException {
+        if (!isOwner(user)) {
+            throw new CannotUpdateException("본인의 답변만 수정 할 수 있습니다.");
+        }
+
+        this.contents = content;
+        return this;
+    }
+
+    public void delete(User user) throws CannotDeleteException {
+        if (!isOwner(user)) {
+            throw new CannotDeleteException("본인의 답변 삭제 할 수 있습니다.");
+        }
+        deleted = true;
+        question.removeAnswer(this);
+    }
+
     @Override
     public String generateUrl() {
-        return String.format("%s/answers/%d", question.generateUrl(), getId());
+        return answerUrlOf(question.generateUrl());
+    }
+
+    @Override
+    public String resourceUrl() {
+        return answerUrlOf(question.resourceUrl());
+    }
+
+    private String answerUrlOf(String questionUrl) {
+        return String.format("%s/answers/%d", questionUrl, getId());
     }
 
     @Override
