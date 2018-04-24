@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import codesquad.CannotUpdateException;
+import codesquad.UnAuthorizedException;
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -40,21 +43,25 @@ public class QnaService {
         return questionRepository.findOne(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    @Transactional
+    public void update(User loginUser, long id, Question updatedQuestion) throws CannotUpdateException {
+        questionRepository.findOne(id).update(loginUser, updatedQuestion);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        questionRepository.findOne(questionId).delete(loginUser);
     }
 
-    public Iterable<Question> findAll() {
+    public Iterable<Question> findAllNotDeleted() {
         return questionRepository.findByDeleted(false);
     }
 
-    public List<Question> findAll(Pageable pageable) {
+    public List<Question> findListNotDeleted(Pageable pageable) {
+        return questionRepository.findByDeleted(false, pageable);
+    }
+
+    public List<Question> findList(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
     }
 
@@ -63,7 +70,7 @@ public class QnaService {
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
+        // TODO 답변 삭제 기능 구현
         return null;
     }
 }

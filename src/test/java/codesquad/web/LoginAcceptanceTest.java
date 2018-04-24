@@ -21,7 +21,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 	private UserRepository userRepository;
 	
 	private ResponseEntity<String> login(String userId, String password) {
-		return template().postForEntity("/users/login",
+		return template().postForEntity("/login",
 				HtmlFormDataBuilder.urlEncodedForm()
 						.addParameter("userId", userId)
 						.addParameter("password", password)

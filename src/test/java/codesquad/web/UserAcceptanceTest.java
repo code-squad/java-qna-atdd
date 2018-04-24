@@ -56,37 +56,39 @@ public class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getBody().contains(defaultUser().getEmail()), is(true));
     }
 
+    private ResponseEntity<String> updateForm(TestRestTemplate template) {
+        return template
+                .getForEntity(String.format("/users/%d/form", defaultUser().getId()), String.class);
+    }
+
     @Test
     public void updateForm_no_login() throws Exception {
-        ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
-                String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(updateForm(template()).getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test
     public void updateForm_login() throws Exception {
-        User loginUser = defaultUser();
-        ResponseEntity<String> response = basicAuthTemplate(loginUser)
-                .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
+        ResponseEntity<String> response = updateForm(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
+        assertThat(response.getBody().contains(defaultUser().getEmail()), is(true));
+    }
+
+    private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
+        return template
+                .postForEntity(String.format("/users/%d", defaultUser().getId()),
+                        HtmlFormDataBuilder.urlEncodedForm()
+                                .putForEntity()
+                                .addParameter("password", "password2")
+                                .addParameter("name", "자바지기2")
+                                .addParameter("email", "javajigi@slipp.net")
+                                .build(),
+                        String.class);
     }
 
     @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template());
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
-    }
-
-    private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        return template.postForEntity(String.format("/users/%d", defaultUser().getId()),
-                HtmlFormDataBuilder.urlEncodedForm()
-                        .addParameter("_method", "put")
-                        .addParameter("password", "password2")
-                        .addParameter("name", "자바지기2")
-                        .addParameter("email", "javajigi@slipp.net")
-                        .build(),
-                String.class);
     }
 
     @Test
