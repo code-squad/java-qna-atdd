@@ -35,6 +35,11 @@ public class UserController {
         return "/user/form";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "/user/login";
+    }
+
     @PostMapping("")
     public String create(UserDto userDto) {
         userService.add(userDto);
@@ -64,7 +69,7 @@ public class UserController {
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession httpSession) {
         try {
-            httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY,userService.login(userId,password).toString());
+            httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY,userService.login(userId,password));
             return "redirect:/users";
         } catch (Exception ex) {
             return "redirect:/login_failed";

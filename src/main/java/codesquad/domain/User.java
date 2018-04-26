@@ -64,17 +64,29 @@ public class User extends AbstractEntity {
         return email;
     }
 
-    private boolean matchUserId(String userId) {
+    public boolean matchUserId(String userId) {
         return this.userId.equals(userId);
     }
 
-    public void update(User loginUser, User target) {
-        if (!matchUserId(loginUser.getUserId())) {
-            throw new UnAuthorizedException();
+    public boolean matchUserPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public boolean matchUser(User user) {
+
+        if(!this.matchUserId(user.userId)) {
+            return false;
         }
 
-        if (!matchPassword(target.getPassword())) {
-            return;
+        if(!this.matchPassword(user.password)) {
+            return false;
+        }
+        return true;
+    }
+
+    public void update(User loginUser, User target) {
+        if (!loginUser.matchUser(target)) {
+            throw new UnAuthorizedException();
         }
 
         this.name = target.name;

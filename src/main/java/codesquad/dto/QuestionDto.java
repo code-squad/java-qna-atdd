@@ -11,6 +11,8 @@ public class QuestionDto {
     @Size(min = 3)
     private String contents;
 
+    public QuestionDto() {}
+
     public QuestionDto(String title, String contents) {
         this(0, title, contents);
     }
@@ -46,5 +48,15 @@ public class QuestionDto {
     public QuestionDto setContents(String contents) {
         this.contents = contents;
         return this;
+    }
+
+
+    @Override
+    public String toString() {
+        return "QuestionDto{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", contents='" + contents + '\'' +
+                '}';
     }
 }
