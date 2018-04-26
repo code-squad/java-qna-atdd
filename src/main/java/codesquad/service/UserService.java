@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
+import codesquad.security.HttpSessionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -42,6 +45,14 @@ public class UserService {
 
     public User login(String userId, String password) throws UnAuthenticationException {
         // TODO 로그인 기능 구현
-        return null;
+        Optional<User> user = userRepository.findByUserId(userId);
+        //Optional<User> user = userRepository.findByUserIdAndPassword(userId, password);
+        user.orElseThrow(UnAuthenticationException::new);
+
+        if(!user.get().matchPassword(password)) {
+            throw new UnAuthenticationException();
+        }
+
+        return user.get();
     }
 }
