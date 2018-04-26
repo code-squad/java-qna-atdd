@@ -1,21 +1,17 @@
 package codesquad.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
+import codesquad.domain.*;
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service("qnaService")
 public class QnaService {
@@ -30,24 +26,35 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
+
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
     }
+    public Question add(QuestionDto questionDto) {
+        return questionRepository.save(questionDto.toQuestion());
+    }
+
 
     public Question findById(long id) {
         return questionRepository.findOne(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    @Transactional
+    public void update(User loginUser, long id, QuestionDto updatedQuestion) {
+        Question original = questionRepository.findOne(id);
+        original.update(loginUser, updatedQuestion.toQuestion());
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        Question question = questionRepository.findOne(questionId);
+        if(!question.isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        questionRepository.delete(questionId);
+
     }
 
     public Iterable<Question> findAll() {
