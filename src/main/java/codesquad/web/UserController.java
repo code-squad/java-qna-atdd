@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 import codesquad.UnAuthenticationException;
+import codesquad.security.HttpSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -64,7 +65,7 @@ public class UserController {
     public String login(String userId, String password, HttpSession httpSession) {
         try {
             final User user = userService.login(userId, password);
-            httpSession.setAttribute("User", user);
+            httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
             return "redirect:/users";
         }
         catch (UnAuthenticationException ex) {
