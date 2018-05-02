@@ -9,20 +9,14 @@ import codesquad.utils.HtmlFormDataBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Test
     public void createForm() throws Exception {
@@ -44,7 +38,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
                 String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertNotNull(findByUserId(userId));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
     }
 

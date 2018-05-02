@@ -17,7 +17,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        List<Question> questions = qnaService.findListNotDeleted(new PageRequest(0, 10));
+        List<Question> questions = qnaService.findListQuestionNotDeleted(new PageRequest(0, 10));
         model.addAttribute("questions", questions);
         return "home";
     }

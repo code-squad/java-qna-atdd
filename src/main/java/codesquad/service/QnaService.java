@@ -1,12 +1,15 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 
 import codesquad.CannotUpdateException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -32,45 +35,60 @@ public class QnaService {
 
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
-
-    public Question create(User loginUser, Question question) {
+    
+    @Transactional
+    public Question createQuestion(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return questionRepository.findOne(id);
+    public Question findQuestionById(long id) {
+        return questionRepository.findOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 질문이므로 조회할 수 없습니다."));
     }
 
     @Transactional
-    public void update(User loginUser, long id, Question updatedQuestion) throws CannotUpdateException {
-        questionRepository.findOne(id).update(loginUser, updatedQuestion);
+    public void updateQuestion(User loginUser, long id, Question updatedQuestion) throws CannotUpdateException {
+        findQuestionById(id).update(loginUser, updatedQuestion);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        questionRepository.findOne(questionId).delete(loginUser);
+    public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
+        findQuestionById(id).delete(loginUser);
     }
 
-    public Iterable<Question> findAllNotDeleted() {
+    public Iterable<Question> findAllQuestionNotDeleted() {
         return questionRepository.findByDeleted(false);
     }
 
-    public List<Question> findListNotDeleted(Pageable pageable) {
+    public List<Question> findListQuestionNotDeleted(Pageable pageable) {
         return questionRepository.findByDeleted(false, pageable);
     }
 
-    public List<Question> findList(Pageable pageable) {
+    public List<Question> findListQuestion(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
     }
-
+    
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        findQuestionById(questionId).addAnswer(answer);
+        return answer;
     }
-
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현
-        return null;
+    
+    public Answer findAnswerById(long id) {
+        return answerRepository.findOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 답변이므로 조회할 수 없습니다."));
+    }
+    
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        findAnswerById(id).delete(loginUser);
+    }
+    
+    @Transactional
+    public void updateAnswer(User loginUser, long id, Answer updateAnswer) throws CannotUpdateException {
+        findAnswerById(id).update(loginUser, updateAnswer);
     }
 }

@@ -1,7 +1,5 @@
 package codesquad.service;
 
-import codesquad.CannotDeleteException;
-import codesquad.CannotUpdateException;
 import codesquad.domain.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +39,7 @@ public class QnaServiceTest {
 		Question question = newDefaultQuestion(SSOSSO);
 		when(questionRepository.save(question)).thenReturn(question);
 		
-		Question createQuestion = qnaService.create(SSOSSO, question);
+		Question createQuestion = qnaService.createQuestion(SSOSSO, question);
 		assertThat(createQuestion, is(question));
 		assertThat(createQuestion.isOwner(SSOSSO), is(true));
 	}

@@ -2,7 +2,6 @@ package codesquad.web;
 
 import codesquad.CannotDeleteException;
 import codesquad.CannotUpdateException;
-import codesquad.UnAuthorizedException;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
@@ -31,19 +30,19 @@ public class QuestionController {
 
 	@PostMapping("")
 	public String create(@LoginUser User loginUser, String title, String contents) {
-		Question question = qnaService.create(loginUser, new Question(title, contents));
+		Question question = qnaService.createQuestion(loginUser, new Question(title, contents));
 		return "redirect:/questions/" + question.getId();
 	}
 
 	@GetMapping("/{id}")
 	public String show(@PathVariable long id, Model model) {
-		model.addAttribute("question", qnaService.findById(id));
+		model.addAttribute("question", qnaService.findQuestionById(id));
 		return "/qna/show";
 	}
 
 	@GetMapping("/{id}/form")
 	public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
-		Question question = qnaService.findById(id);
+		Question question = qnaService.findQuestionById(id);
 		if (question.isOwner(loginUser)) {
 			model.addAttribute("question", question);
 			return "/qna/updateForm";
@@ -54,7 +53,7 @@ public class QuestionController {
 	@PutMapping("/{id}")
 	public String update(@LoginUser User loginUser, @PathVariable long id, QuestionDto target) {
 		try {
-			qnaService.update(loginUser, id, target.toQuesiton());
+			qnaService.updateQuestion(loginUser, id, target.toQuesiton());
 			return "redirect:/questions/" + id;
 		} catch (CannotUpdateException e) {
 			return "/qna/update_failed";

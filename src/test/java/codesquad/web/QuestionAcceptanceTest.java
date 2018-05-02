@@ -2,16 +2,15 @@ package codesquad.web;
 
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import codesquad.service.QnaService;
 import codesquad.utils.HtmlFormDataBuilder;
-import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
@@ -24,26 +23,19 @@ import static org.junit.Assert.*;
 public class QuestionAcceptanceTest extends AcceptanceTest {
 	private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
-	private Question defaultQuestion;
-
 	@Autowired
 	private QuestionRepository questionRepository;
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
 	private QnaService qnaService;
 
-	private User newUser(String userId) {
-		return userRepository.save(new User(userId, "password", "name", "email@domain.com"));
-	}
+	private int generateQuestionIndex;
 
-	@Before
-	public void setUp() throws Exception {
-		defaultQuestion = new Question("제목테스트", "내용테스트");
+	private Question newQuestion() {
+		generateQuestionIndex++;
+		Question defaultQuestion = new Question("제목테스트" + generateQuestionIndex, "내용테스트" + generateQuestionIndex);
 		defaultQuestion.writeBy(defaultUser());
-		defaultQuestion = questionRepository.save(defaultQuestion);
+		return questionRepository.save(defaultQuestion);
 	}
 
 	@Test
@@ -69,46 +61,41 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 	
 	@Test
 	public void list() throws Exception {
+		Question question = newQuestion();
 		ResponseEntity<String> response = template().getForEntity("/", String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		log.debug("body : {}", response.getBody());
-		assertTrue(response.getBody().contains(defaultQuestion.getTitle()));
-	}
-
-	@Test
-	public void list_not_contain_deleted() throws Exception {
-		qnaService.deleteQuestion(defaultUser(), defaultQuestion.getId());
-		ResponseEntity<String> response = template().getForEntity("/", String.class);
-		assertFalse(response.getBody().contains(defaultQuestion.getTitle()));
 	}
 
 	@Test
 	public void show() {
-		ResponseEntity<String>	response = template().getForEntity("/questions/" + defaultQuestion.getId(), String.class);
+		Question question = newQuestion();
+		ResponseEntity<String>	response = template().getForEntity("/questions/" + question.getId(), String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
-		assertTrue(response.getBody().contains(defaultQuestion.getTitle()));
+		assertTrue(response.getBody().contains(question.getTitle()));
 	}
 
-	private ResponseEntity<String> updateForm(TestRestTemplate template) {
+	private ResponseEntity<String> updateForm(TestRestTemplate template, long id) {
 		return template
-				.getForEntity(String.format("/questions/%d/form", defaultQuestion.getId()), String.class);
+				.getForEntity(String.format("/questions/%d/form", id), String.class);
 	}
 
 	@Test
 	public void updateForm_wrong_owner() {
-		assertThat(updateForm(basicAuthTemplate(newUser("updateFormUser"))).getStatusCode(), is(HttpStatus.OK));
+		assertThat(updateForm(basicAuthTemplate(newUser("updateFormUser")), newQuestion().getId()).getStatusCode(), is(HttpStatus.OK));
 	}
 
 	@Test
 	public void updateForm_owner() {
-		ResponseEntity<String> response = updateForm(basicAuthTemplate());
+		Question question = newQuestion();
+		ResponseEntity<String> response = updateForm(basicAuthTemplate(), question.getId());
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
-		assertTrue(response.getBody().contains(defaultQuestion.getContents()));
+		assertTrue(response.getBody().contains(question.getContents()));
 	}
 
-	private ResponseEntity<String> update(TestRestTemplate template) {
+	private ResponseEntity<String> update(TestRestTemplate template, long id) {
 		return template
-				.postForEntity(String.format("/questions/%d", defaultQuestion.getId()),
+				.postForEntity(String.format("/questions/%d", id),
 						HtmlFormDataBuilder.urlEncodedForm()
 								.putForEntity()
 								.addParameter("title", "변경테스트")
@@ -119,20 +106,21 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 	@Test
 	public void update_wrong_owner() {
-		assertThat(update(basicAuthTemplate(newUser("updateUser"))).getStatusCode(), is(HttpStatus.OK));
+		assertThat(update(basicAuthTemplate(newUser("updateUser")), newQuestion().getId()).getStatusCode(), is(HttpStatus.OK));
 	}
 
 	@Test
 	public void update() {
-		ResponseEntity<String> response = update(basicAuthTemplate());
+		Question question = newQuestion();
+		ResponseEntity<String> response = update(basicAuthTemplate(), question.getId());
 		assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-		assertThat(response.getHeaders().getLocation().getPath(), is(String.format("/questions/%d", defaultQuestion.getId())));
-		assertThat(questionRepository.findOne(defaultQuestion.getId()).getTitle(), is("변경테스트"));
+		assertThat(response.getHeaders().getLocation().getPath(), is(String.format("/questions/%d", question.getId())));
+		assertThat(questionRepository.findOne(question.getId()).getTitle(), is("변경테스트"));
 	}
 
-	private ResponseEntity<String> delete(TestRestTemplate template) {
+	private ResponseEntity<String> delete(TestRestTemplate template, long id) {
 		return template
-				.postForEntity(String.format("/questions/%d", defaultQuestion.getId()),
+				.postForEntity(String.format("/questions/%d", id),
 						HtmlFormDataBuilder.urlEncodedForm()
 								.deleteForEntity()
 								.build(),
@@ -141,14 +129,15 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
 	@Test
 	public void delete_wrong_owner() {
-		assertThat(delete(basicAuthTemplate(newUser("deleteUser"))).getStatusCode(), is(HttpStatus.OK));
+		assertThat(delete(basicAuthTemplate(newUser("deleteUser")), newQuestion().getId()).getStatusCode(), is(HttpStatus.OK));
 	}
 
 	@Test
 	public void delete() {
-		ResponseEntity<String> response = delete(basicAuthTemplate());
+		Question question = newQuestion();
+		ResponseEntity<String> response = delete(basicAuthTemplate(), question.getId());
 		assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 		assertThat(response.getHeaders().getLocation().getPath(), is("/"));
-		assertTrue(questionRepository.findOne(defaultQuestion.getId()).isDeleted());
+		assertTrue(questionRepository.findOne(question.getId()).isDeleted());
 	}
 }

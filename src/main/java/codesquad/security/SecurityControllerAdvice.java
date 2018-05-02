@@ -2,6 +2,7 @@ package codesquad.security;
 
 import javax.persistence.EntityNotFoundException;
 
+import codesquad.CannotUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,9 @@ public class SecurityControllerAdvice {
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public void emptyResultData() {
+    public void emptyResultData(EntityNotFoundException exception) {
         log.debug("EntityNotFoundException is happened!");
+        log.debug("persistence error : {}", exception.getMessage());
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
@@ -32,5 +34,12 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public void unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
+    }
+    
+    @ExceptionHandler({CannotUpdateException.class, CannotUpdateException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public void CannotUpdateOrDeleteException(Exception exception) {
+        log.debug(exception.getClass().getName() + " is happened!");
+        log.debug("persistence error : {}", exception.getMessage());
     }
 }
