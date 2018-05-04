@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import codesquad.UnAuthenticationException;
+import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class QnaService {
 
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
+
 
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
@@ -66,12 +68,23 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    @Transactional
+    public void addAnswer(User loginUser, long questionId, Answer answer) throws UnAuthenticationException {
+        Question original = findById(questionId);
+        original.addAnswer(loginUser,answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void deleteAnswer(User loginUser, long answerId) throws UnAuthenticationException {
+        // TODO 답변 삭제 기능 구현
+        Answer answer = answerRepository.findOne(answerId);
+        answer.delete(loginUser);
+    }
+
+    @Transactional
+    public void updateAnswer(User loginUser, long answerId, Answer updatedAnswer) {
+        // TODO 수정 기능 구현
+        Answer original = answerRepository.findOne(answerId);
+        original.update(loginUser,updatedAnswer);
     }
 }

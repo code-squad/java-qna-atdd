@@ -12,9 +12,11 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.transaction.Transactional;
 import javax.validation.constraints.Size;
 
 import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -67,9 +69,12 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.writer = loginUser;
     }
 
-    public void addAnswer(Answer answer) {
-        answer.toQuestion(this);
-        answers.add(answer);
+    public List<AnswerDto> getAnswersDtoes() {
+        List<AnswerDto> answerDtoList = new ArrayList<AnswerDto>();
+        for(Answer answer : answers) {
+            answerDtoList.add(answer.toAnswerDto());
+        }
+        return answerDtoList;
     }
 
     public boolean isOwner(User loginUser) {
@@ -100,5 +105,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         }
         this.contents = target.contents;
         this.title = target.title;
+    }
+
+    @Transactional
+    public void addAnswer(User loginUser, Answer answer) {
+        if (!writer.matchUser(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        answer.toQuestion(this);
+        answers.add(answer);
     }
 }

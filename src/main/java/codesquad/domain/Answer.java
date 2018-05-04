@@ -7,6 +7,10 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
+import codesquad.dto.QuestionDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -54,6 +58,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return contents;
     }
 
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(contents);
+    }
+
     public void toQuestion(Question question) {
         this.question = question;
     }
@@ -64,6 +72,20 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void delete(User loginUser) throws UnAuthenticationException {
+        if(!isOwner(loginUser)) {
+            throw new UnAuthenticationException();
+        }
+        this.deleted = true;
+    }
+
+    public void update(User loginUser, Answer target) {
+        if (!writer.matchUser(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = target.contents;
     }
 
     @Override

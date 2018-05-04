@@ -30,7 +30,6 @@ public class QuestionTest {
         Question updateQeustion = new Question("불행피하기기술","영리하게인생을움직이는52가지비밀");
 
         originalQuestion.update(SANJIGI,updateQeustion);
-
     }
 
     @Test
