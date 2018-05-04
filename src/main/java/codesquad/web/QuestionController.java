@@ -2,6 +2,7 @@ package codesquad.web;
 
 import codesquad.CannotDeleteException;
 import codesquad.CannotUpdateException;
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 @Controller
-@RequestMapping("/questions")
+@RequestMapping(QuestionController.BASE_URL)
 public class QuestionController {
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+	static final String BASE_URL = "/questions";
 	
 	@Resource(name = "qnaService")
 	private QnaService qnaService;
@@ -31,7 +33,7 @@ public class QuestionController {
 	@PostMapping("")
 	public String create(@LoginUser User loginUser, String title, String contents) {
 		Question question = qnaService.createQuestion(loginUser, new Question(title, contents));
-		return "redirect:/questions/" + question.getId();
+		return "redirect:" + BASE_URL + "/" + question.getId();
 	}
 
 	@GetMapping("/{id}")
@@ -45,7 +47,7 @@ public class QuestionController {
 		Question question = qnaService.findQuestionById(id);
 		if (question.isOwner(loginUser)) {
 			model.addAttribute("question", question);
-			return "/qna/updateForm";
+			return "/qna/question_updateForm";
 		}
 		return "/qna/update_failed";
 	}
@@ -66,7 +68,13 @@ public class QuestionController {
 			qnaService.deleteQuestion(loginUser, id);
 			return "redirect:/";
 		} catch (CannotDeleteException e) {
-			return "/qna/update_failed";
+			return "/qna/delete_failed";
 		}
+	}
+	
+	@PostMapping("/{id}/answers")
+	public String addAnswer(@LoginUser User loginUser, @PathVariable long id, String answerContents) {
+		qnaService.addAnswer(loginUser, id, answerContents);
+		return "redirect:" + BASE_URL + "/" + id;
 	}
 }

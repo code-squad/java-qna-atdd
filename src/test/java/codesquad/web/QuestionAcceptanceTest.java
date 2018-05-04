@@ -1,16 +1,15 @@
 package codesquad.web;
 
+import codesquad.domain.ContentType;
+import codesquad.domain.DeleteHistoryRepository;
 import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
 import codesquad.service.QnaService;
 import codesquad.utils.HtmlFormDataBuilder;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
@@ -24,18 +23,17 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 	private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
 	@Autowired
-	private QuestionRepository questionRepository;
+	private QnaService qnaService;
 
 	@Autowired
-	private QnaService qnaService;
+	private DeleteHistoryRepository deleteHistoryRepository;
 
 	private int generateQuestionIndex;
 
 	private Question newQuestion() {
 		generateQuestionIndex++;
-		Question defaultQuestion = new Question("제목테스트" + generateQuestionIndex, "내용테스트" + generateQuestionIndex);
-		defaultQuestion.writeBy(defaultUser());
-		return questionRepository.save(defaultQuestion);
+		Question defaultQuestion = new Question("제목테스트" + generateQuestionIndex, "내용테스트" + generateQuestionIndex, defaultUser());
+		return qnaService.createQuestion(defaultUser(), defaultQuestion);
 	}
 
 	@Test
@@ -115,7 +113,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 		ResponseEntity<String> response = update(basicAuthTemplate(), question.getId());
 		assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 		assertThat(response.getHeaders().getLocation().getPath(), is(String.format("/questions/%d", question.getId())));
-		assertThat(questionRepository.findOne(question.getId()).getTitle(), is("변경테스트"));
+		assertThat(qnaService.findQuestionById(question.getId()).getTitle(), is("변경테스트"));
 	}
 
 	private ResponseEntity<String> delete(TestRestTemplate template, long id) {
@@ -138,6 +136,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 		ResponseEntity<String> response = delete(basicAuthTemplate(), question.getId());
 		assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 		assertThat(response.getHeaders().getLocation().getPath(), is("/"));
-		assertTrue(questionRepository.findOne(question.getId()).isDeleted());
+		assertTrue(qnaService.findQuestionById(question.getId()).isDeleted());
+		assertTrue(deleteHistoryRepository.findByContentIdAndContentType(question.getId(), ContentType.QUESTION).isPresent());
 	}
 }

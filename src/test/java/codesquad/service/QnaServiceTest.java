@@ -29,9 +29,7 @@ public class QnaServiceTest {
 	private static final User SSOSSO = new User(0L,"ssosso", "password", "name", "ssossohow@gmail.com");
 	
 	private static Question newDefaultQuestion(User writer) {
-		Question question = new Question("제목", "내용");
-		question.writeBy(writer);
-		return question;
+		return new Question("제목", "내용", writer);
 	}
 
 	@Test

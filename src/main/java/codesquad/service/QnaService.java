@@ -1,15 +1,12 @@
 package codesquad.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
 
 import codesquad.CannotUpdateException;
-import codesquad.UnAuthorizedException;
-import codesquad.dto.QuestionDto;
-import org.hibernate.ObjectNotFoundException;
+import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -55,7 +47,8 @@ public class QnaService {
 
     @Transactional
     public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
-        findQuestionById(id).delete(loginUser);
+        Question question = findQuestionById(id);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Iterable<Question> findAllQuestionNotDeleted() {
@@ -84,7 +77,7 @@ public class QnaService {
     
     @Transactional
     public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
-        findAnswerById(id).delete(loginUser);
+        deleteHistoryService.save(findAnswerById(id).delete(loginUser));
     }
     
     @Transactional

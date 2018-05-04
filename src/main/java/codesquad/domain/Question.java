@@ -28,10 +28,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -41,6 +39,12 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public Question(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public Question(String title, String contents, User writer) {
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
     }
 
     public String getTitle() {
@@ -55,7 +59,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer;
     }
     
-    public List<Answer> getAnswers() {
+    public Answers getAnswers() {
         return answers;
     }
 
@@ -99,12 +103,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatedQuestion.getContents();
     }
     
-    public void delete(User loginUser) throws CannotDeleteException {
-        if (!isOwner(loginUser)) {
-            throw new CannotDeleteException("자신이 작성한 글만 삭제할 수 있습니다.");
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        if (!canDelete(loginUser)) {
+            throw new CannotDeleteException("자신이 작성한 글이 아니거나 다른 사람이 작성한 답변이 달려있어 삭제할 수 없습니다.");
         }
-     
+
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
         deleted = true;
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser));
+        deleteHistories.addAll(answers.deleteAll(loginUser));
+
+        return deleteHistories;
     }
     
+    private boolean canDelete(User loginUser) {
+        return isOwner(loginUser) &&
+                (answers.isEmpty() || answers.equalAllAnswerWriterWithQuestionWriter());
+    }
 }

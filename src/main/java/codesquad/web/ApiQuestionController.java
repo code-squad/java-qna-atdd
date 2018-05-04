@@ -3,6 +3,7 @@ package codesquad.web;
 import codesquad.CannotDeleteException;
 import codesquad.CannotUpdateException;
 import codesquad.domain.Answer;
+import codesquad.domain.Answers;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.AnswerDto;
@@ -71,12 +72,10 @@ public class ApiQuestionController {
 	
 	@GetMapping("{id}/answers")
 	public ResponseEntity<?> listAnswer(@PathVariable long id, @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-		List<Answer> answers = qnaService.findQuestionById(id)
+		Answers answers = qnaService.findQuestionById(id)
 				.getAnswers();
 		
-		return ResponseEntity.ok(answers.stream()
-				.skip(pageNumber * pageSize)
-				.limit(pageSize)
+		return ResponseEntity.ok(answers.getPageRequest(pageNumber, pageSize).stream()
 				.map(Answer::toAnswerDto)
 				.collect(toList()));
 	}

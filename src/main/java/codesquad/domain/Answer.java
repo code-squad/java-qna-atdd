@@ -84,12 +84,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
     
-    public void delete(User loginUser) throws CannotDeleteException {
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
         if (!isOwner(loginUser)) {
             throw new CannotDeleteException("자신이 작성한 글만 삭제할 수 있습니다.");
         }
-    
+
         deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
     }
     
     public AnswerDto toAnswerDto() {
@@ -102,5 +103,9 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         }
         
         this.contents = updateAnswer.contents;
+    }
+    
+    public boolean equalWriterWithQuestion() {
+        return question.isOwner(writer);
     }
 }
