@@ -41,6 +41,13 @@ public class HtmlFormDataBuilder {
         return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
     }
 
+    public static HtmlFormDataBuilder json() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HtmlFormDataBuilder(headers);
+    }
+
     public static HtmlFormDataBuilder urlEncodedForm() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
