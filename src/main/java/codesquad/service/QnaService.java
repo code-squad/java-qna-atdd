@@ -52,7 +52,7 @@ public class QnaService {
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = findById(questionId);
-        question.delete(loginUser);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -80,7 +80,7 @@ public class QnaService {
     @Transactional
     public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
         Answer answer = findAnswerById(id);
-        answer.delete(loginUser);
+        deleteHistoryService.save(answer.delete(loginUser));
     }
 
     private Answer findAnswerById(long id) {

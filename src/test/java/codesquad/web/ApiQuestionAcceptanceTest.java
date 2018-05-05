@@ -2,6 +2,9 @@ package codesquad.web;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
+import codesquad.domain.Answer;
+import codesquad.domain.AnswerRepository;
+import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.dto.QuestionDto;
 import org.assertj.core.api.Assertions;
@@ -22,6 +25,9 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     QuestionRepository questionRepository;
+
+    @Autowired
+    AnswerRepository answerRepository;
 
     private HtmlFormDataBuilder htmlFormDataBuilder;
 
@@ -75,14 +81,14 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void 본인_질문_수정() {
         //given
         QuestionDto originQuestion = new QuestionDto("origin-title", "origin-contents");
-        String resourceLocation = createResource(ADI_QUESTION_BASE_PATH, originQuestion, defaultUser());
+        Question savedQuestion = questionRepository.save(new Question(defaultUser(), originQuestion));
         QuestionDto updateQuestion = new QuestionDto("new-title", "new-contents");
 
         //when
-        basicAuthTemplate().put(resourceLocation, updateQuestion);
+        basicAuthTemplate().put(savedQuestion.resourceUrl(), updateQuestion);
 
         //then
-        ResponseEntity<String> response = getResource(resourceLocation, String.class);
+        ResponseEntity<String> response = getResource(savedQuestion.resourceUrl(), String.class);
 
         Assertions.assertThat(response.getBody()).doesNotContain(originQuestion.getTitle());
         Assertions.assertThat(response.getBody()).doesNotContain(originQuestion.getContents());
@@ -95,14 +101,14 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void 타인_질문_수정_시도() {
         //given
         QuestionDto originQuestion = new QuestionDto("origin-title", "origin-contents");
-        String resourceLocation = createResource(ADI_QUESTION_BASE_PATH, originQuestion, defaultUser());
+        Question savedQuestion = questionRepository.save(new Question(defaultUser(), originQuestion));
         QuestionDto updateQuestion = new QuestionDto("new-title", "new-contents");
 
         //when
-        basicAuthTemplate(findByUserId("sanjigi")).put(resourceLocation, updateQuestion);
+        basicAuthTemplate(findByUserId("sanjigi")).put(savedQuestion.resourceUrl(), updateQuestion);
 
         //then
-        ResponseEntity<String> response = getResource(resourceLocation, String.class);
+        ResponseEntity<String> response = getResource(savedQuestion.resourceUrl(), String.class);
 
         Assertions.assertThat(response.getBody()).contains(originQuestion.getTitle());
         Assertions.assertThat(response.getBody()).contains(originQuestion.getContents());
@@ -115,15 +121,38 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void 본인_질문_삭제() {
         //given
         QuestionDto originQuestion = new QuestionDto("origin-title", "origin-contents");
-        String resourceLocation = createResource(ADI_QUESTION_BASE_PATH, originQuestion, defaultUser());
+        Question savedQuestion = questionRepository.save(new Question(defaultUser(), originQuestion));
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
 
         //when
         ResponseEntity<String> response = basicAuthTemplate()
-                .exchange(resourceLocation, HttpMethod.DELETE, request, String.class);
+                .exchange(savedQuestion.resourceUrl(), HttpMethod.DELETE, request, String.class);
 
         //then
         assertResponseStatus(response, HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void 타인의_답변이_있는_질문_삭제_시도() {
+        //given
+        QuestionDto originQuestion = new QuestionDto("origin-title", "origin-contents");
+        Question savedQuestion = questionRepository.save(new Question(defaultUser(), originQuestion));
+
+        String content = "my answer";
+        Answer othersAnswer = new Answer(findByUserId("sanjigi"), content);
+        othersAnswer.toQuestion(savedQuestion);
+
+        Answer savedAnswer = answerRepository.save(othersAnswer);
+        savedQuestion.addAnswer(savedAnswer);
+
+        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
+
+        //when
+        ResponseEntity<String> response = basicAuthTemplate()
+                .exchange(savedQuestion.resourceUrl(), HttpMethod.DELETE, request, String.class);
+
+        //then
+        assertResponseStatus(response, HttpStatus.FORBIDDEN);
     }
 
     @Test

@@ -145,11 +145,13 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void 자신의_질문을_삭제할_수_있다() {
-        ResponseEntity<String> response = basicAuthTemplate()
-                .exchange("/questions/1", HttpMethod.DELETE, new HttpEntity<>(""), String.class);
+        Question question = saveQuestionWriteBy(defaultUser());
+        Question savedQuestion = questionRepository.save(question);
 
-        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        Assertions.assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/");
+        ResponseEntity<String> response = basicAuthTemplate()
+                .exchange(savedQuestion.resourceUrl(), HttpMethod.DELETE, new HttpEntity<>(""), String.class);
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     private Question saveQuestionWriteBy(User user) {

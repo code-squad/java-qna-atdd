@@ -1,19 +1,16 @@
 package codesquad.domain;
 
 import codesquad.dto.QuestionDto;
-import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +29,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -66,7 +61,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public List<Answer> getAnswers() {
-        return answers;
+        return answers.getAll();
     }
 
     public void writeBy(User loginUser) {
@@ -100,11 +95,18 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public void delete(User user) throws CannotDeleteException {
+    public List<DeleteHistory> delete(User user) throws CannotDeleteException {
         if (!isOwner(user)) {
             throw new CannotDeleteException("본인의 질문만 삭제 할 수 있습니다.");
         }
+
+        List<DeleteHistory> histories = new ArrayList<>();
+        histories.addAll(answers.delete(user));
+
         deleted = true;
+        histories.add(new DeleteHistory(this, user));
+
+        return histories;
     }
 
     @Override

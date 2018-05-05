@@ -58,7 +58,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
-    private boolean isOwner(User loginUser) {
+    public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
@@ -75,12 +75,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    public void delete(User user) throws CannotDeleteException {
+    public DeleteHistory delete(User user) throws CannotDeleteException {
         if (!isOwner(user)) {
             throw new CannotDeleteException("본인의 답변 삭제 할 수 있습니다.");
         }
         deleted = true;
-        question.removeAnswer(this);
+
+        return new DeleteHistory(this, user);
     }
 
     @Override

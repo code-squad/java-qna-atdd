@@ -1,7 +1,5 @@
 package codesquad.domain;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -10,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.time.LocalDateTime;
 
 @Entity
 public class DeleteHistory {
@@ -28,14 +27,21 @@ public class DeleteHistory {
 
     private LocalDateTime createDate = LocalDateTime.now();
 
-    public DeleteHistory() {
-    }
+    private DeleteHistory() { }
 
     public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
         this.contentType = contentType;
         this.contentId = contentId;
         this.deletedBy = deletedBy;
         this.createDate = createDate;
+    }
+
+    public DeleteHistory(Question deletedQuestion, User deletedBy) {
+        this(ContentType.QUESTION, deletedQuestion.getId(), deletedBy, LocalDateTime.now());
+    }
+
+    public DeleteHistory(Answer deletedAnswer, User deletedBy) {
+        this(ContentType.ANSWER, deletedAnswer.getId(), deletedBy, LocalDateTime.now());
     }
 
     @Override

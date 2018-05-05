@@ -5,6 +5,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
+
 public class QuestionTest {
 
     private User defaultUser;
@@ -56,16 +59,17 @@ public class QuestionTest {
     }
 
     @Test
-    public void 자신의_질문을_삭제할_수_있다() throws CannotDeleteException {
+    public void 자신의_질문을_삭제하면_삭제_플래그가_변경된다() throws CannotDeleteException {
         //given
         Question question = createQuestionBy(defaultUser);
         Assertions.assertThat(question.isDeleted()).isFalse();
 
         //when
-        question.delete(defaultUser);
+        List<DeleteHistory> deleteHistories = question.delete(defaultUser);
 
         //then
         Assertions.assertThat(question.isDeleted()).isTrue();
+        Assertions.assertThat(deleteHistories.size()).isEqualTo(1);
     }
 
     @Test
@@ -83,6 +87,36 @@ public class QuestionTest {
         //then
         Assertions.assertThat(question.getAnswers().size()).isEqualTo(1);
         Assertions.assertThat(answer.getQuestion()).isNotNull();
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void 타인의_답변이_있는_질문을_삭제할_수_없다() throws CannotDeleteException {
+        //given
+        Question question = createQuestionBy(defaultUser);
+        question.addAnswer(new Answer(other, "this is my answer"));
+        List<DeleteHistory> histories = Collections.emptyList();
+
+        //when
+        question.delete(defaultUser);
+
+        //then
+        Assertions.fail("타인의 답변이 있는 질문을 삭제 시도하면 예외가 발생해야 한다.");
+    }
+
+    @Test
+    public void 자신의_답변만_있는_질문은_삭제할_수_있다() throws CannotDeleteException {
+        //given
+        Question question = createQuestionBy(defaultUser);
+        Answer answer = new Answer(defaultUser, "this is my answer");
+        question.addAnswer(answer);
+
+        //when
+        List<DeleteHistory> deleteHistories = question.delete(defaultUser);
+
+        //then
+        Assertions.assertThat(question.isDeleted()).isTrue();
+        Assertions.assertThat(answer.isDeleted()).isTrue();
+        Assertions.assertThat(deleteHistories.size()).isEqualTo(2);
     }
 
     private Question createQuestionBy(User user) {

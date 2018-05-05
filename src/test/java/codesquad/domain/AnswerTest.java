@@ -15,20 +15,6 @@ public class AnswerTest {
         other = new User(2L, "sanjigi", "test", "김둘리", "a@b.com");
     }
 
-    @Test
-    public void 답변을_삭제_상태로_변경하면_질문의_답변목록에서도_제외된다() throws CannotDeleteException {
-        //given
-        Question question = createQuestionBy(defaultUser);
-        Answer answer = answerWithDefaultUser(question);
-
-        //when
-        answer.delete(defaultUser);
-
-        //then
-        Assertions.assertThat(question.getAnswers()).isEmpty();
-        Assertions.assertThat(answer.isDeleted()).isTrue();
-    }
-
     @Test(expected = CannotDeleteException.class)
     public void 타인의_답변을_삭제할_수_없다() throws CannotDeleteException {
         //given
