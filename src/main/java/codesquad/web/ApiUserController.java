@@ -5,6 +5,8 @@ import java.net.URI;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,9 @@ import codesquad.service.UserService;
 @RestController
 @RequestMapping("/api/users")
 public class ApiUserController {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiUserController.class);
+
     @Resource(name = "userService")
     private UserService userService;
 
@@ -32,8 +37,8 @@ public class ApiUserController {
         User savedUser = userService.add(user);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/api/users/" + savedUser.getId()));
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        headers.setLocation(URI.create(savedUser.generateResourceURI()));
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
     
     @GetMapping("{id}")
@@ -43,7 +48,9 @@ public class ApiUserController {
     }
     
     @PutMapping("{id}")
-    public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody UserDto updatedUser) {
+    public ResponseEntity<Void> update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody UserDto updatedUser) {
+        log.debug("param: {}", updatedUser);
         userService.update(loginUser, id, updatedUser);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

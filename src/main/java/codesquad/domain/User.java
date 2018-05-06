@@ -88,12 +88,16 @@ public class User extends AbstractEntity {
     public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
-    
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;
     }
-    
+
+    public String generateResourceURI() {
+        return String.format("/api/users/%d", getId());
+    }
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {

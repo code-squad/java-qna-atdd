@@ -12,12 +12,6 @@ public class QuestionTest {
     private User defaultUser;
     private User otherUser;
 
-    @Before
-    public void init() {
-        defaultUser = new User(1, "javajigi", "test", "자바지기", "javajigi@slipp.net");
-        otherUser = new User(2, "sanjigi", "test", "산지기", "sanjigi@slipp.net");
-    }
-
     private Question saveQuestionBy(User user) {
         String title = "test";
         String contents = "contents";
@@ -25,6 +19,12 @@ public class QuestionTest {
         question.writeBy(user);
 
         return question;
+    }
+
+    @Before
+    public void init() {
+        defaultUser = new User(1, "javajigi", "test", "자바지기", "javajigi@slipp.net");
+        otherUser = new User(2, "sanjigi", "test", "산지기", "sanjigi@slipp.net");
     }
 
     @Test(expected = UnAuthorizedException.class)

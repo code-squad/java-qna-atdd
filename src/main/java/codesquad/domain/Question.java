@@ -1,25 +1,15 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
 import codesquad.UnAuthorizedException;
-import org.hibernate.annotations.Where;
-
 import codesquad.dto.QuestionDto;
+import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -71,8 +61,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answers.add(answer);
     }
 
-    public void update(User loginUser, Question updatingQuestion) throws UnAuthorizedException{
-        if(!isOwner(loginUser)) {
+    public void update(User loginUser, Question updatingQuestion) throws UnAuthorizedException {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
         this.title = updatingQuestion.getTitle();
@@ -80,7 +70,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public void delete(User loginUser) throws UnAuthorizedException {
-        if(!isOwner(loginUser)) {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
         deleted = true;
@@ -99,6 +89,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return String.format("/questions/%d", getId());
     }
 
+    public String generateResourceURI() {
+        return String.format("/api%s", generateUrl());
+    }
+
     public QuestionDto toQuestionDto() {
         return new QuestionDto(getId(), this.title, this.contents);
     }
@@ -107,4 +101,5 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
 }

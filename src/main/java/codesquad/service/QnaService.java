@@ -1,22 +1,15 @@
 package codesquad.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import codesquad.UnAuthorizedException;
+import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service("qnaService")
 public class QnaService {
@@ -44,8 +37,6 @@ public class QnaService {
     @Transactional
     public void update(User loginUser, long id, Question updatedQuestion) throws UnAuthorizedException {
         Question question = findById(id);
-        log.debug("question: {}", question);
-
         question.update(loginUser, updatedQuestion);
     }
 
@@ -63,12 +54,22 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+        Answer answer = new Answer(loginUser, contents);
+        question.addAnswer(answer);
+        return answerRepository.save(answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public void deleteAnswer(User loginUser, long id) throws UnAuthorizedException {
+        Answer deletingAnswer = answerRepository.findOne(id);
+        deletingAnswer.delete(loginUser);
+    }
+
+    @Transactional
+    public void updateAnswer(User loginUser, long answerId, String updatingContents) throws UnAuthorizedException{
+        Answer answer = answerRepository.findOne(answerId);
+        answer.update(loginUser, updatingContents);
     }
 }
