@@ -16,6 +16,7 @@ import support.domain.UrlGeneratable;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -46,10 +47,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
-    public User getWriter() {
-        return writer;
-    }
-
     public Question getQuestion() {
         return question;
     }
@@ -67,16 +64,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     }
 
     public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
-    }
-
-    public boolean isDeleted() {
-        return deleted;
+        return writer.matchUser(loginUser);
     }
 
     public void delete(User loginUser) throws UnAuthenticationException {
         if(!isOwner(loginUser)) {
-            throw new UnAuthenticationException();
+            throw new UnAuthenticationException("로그인 자와 답변자가 동일하지 않습니다.");
         }
         this.deleted = true;
     }
@@ -86,6 +79,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
             throw new UnAuthorizedException();
         }
         this.contents = target.contents;
+    }
+
+    public boolean isAnswerOwner(User loginUser) {
+        if (!writer.matchUser(loginUser)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -1,10 +1,12 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
 import codesquad.UnAuthenticationException;
+import codesquad.domain.*;
 import codesquad.dto.AnswerDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -51,13 +48,11 @@ public class QnaService {
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException, UnAuthenticationException {
-        // TODO 삭제 기능 구현
-        Question original = questionRepository.findOne(questionId);
-        if(!original.isOwner(loginUser)) {
-            throw new UnAuthenticationException();
-        }
-        questionRepository.delete(questionId);
+    public void deleteQuestion(User loginUser, long questionId) throws UnAuthenticationException {
+        // TODO 삭제 기능 구현 ATDD 4단계
+        Question original = Optional.of(questionRepository.findOne(questionId)).orElseThrow(NullPointerException::new);
+        List<DeleteHistory> histories = original.deleteQuestion(loginUser);
+        deleteHistoryService.saveAll(histories);
     }
 
     public Iterable<Question> findAll() {
@@ -71,7 +66,7 @@ public class QnaService {
     @Transactional
     public void addAnswer(User loginUser, long questionId, Answer answer) throws UnAuthenticationException {
         Question original = findById(questionId);
-        original.addAnswer(loginUser,answer);
+        original.addAnswer(answer);
     }
 
     @Transactional

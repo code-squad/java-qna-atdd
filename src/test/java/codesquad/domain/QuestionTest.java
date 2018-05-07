@@ -1,7 +1,11 @@
 package codesquad.domain;
 
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -35,13 +39,63 @@ public class QuestionTest {
     @Test
     public void certifyWriter() {
         originalQuestion.writeBy(JAVAJIGI);
-        assertTrue(originalQuestion.isOwner(JAVAJIGI));
+        assertTrue(originalQuestion.isQuestionOwner(JAVAJIGI));
+    }
+
+    @Test(expected = UnAuthorizedException.class)
+    public void certify_not_Writer() {
+        originalQuestion.writeBy(JAVAJIGI);
+        assertFalse(originalQuestion.isQuestionOwner(SANJIGI));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void delete_null_question() throws UnAuthenticationException {
+        Question question = null;
+        List<DeleteHistory> histories = question.deleteQuestion(JAVAJIGI);
+        assertNotNull(histories);
     }
 
     @Test
-    public void certify_not_Writer() {
-        originalQuestion.writeBy(JAVAJIGI);
-        assertFalse(originalQuestion.isOwner(SANJIGI));
+    public void deleteQuestion_nullAnswers_sucess() throws UnAuthenticationException {
+        Question question = new Question("무엇을 질문해야 할까", "궁금한걸 질문하자");
+        question.writeBy(JAVAJIGI);
+        List<DeleteHistory> histories = question.deleteQuestion(JAVAJIGI);
+        assertNotNull(histories);
+        assertThat(1, is(histories.size()));
     }
 
+    @Test
+    public void deleteQuestion_notNullAnswers_sucess() throws UnAuthenticationException {
+        Question question = new Question("무엇을 질문해야 할까", "궁금한걸 질문하자");
+        Answer answer1 = new Answer(JAVAJIGI,"답변이다1");
+        Answer answer2 = new Answer(JAVAJIGI,"답변이다2");
+        question.writeBy(JAVAJIGI);
+        question.addAnswer(answer1);
+        question.addAnswer(answer2);
+        List<DeleteHistory> histories = question.deleteQuestion(JAVAJIGI);
+        assertNotNull(histories);
+        assertThat(3, is(histories.size()));
+
+    }
+
+    @Test(expected = UnAuthenticationException.class)
+    public void deleteQuestion_notNullAnswers_fail() throws UnAuthenticationException {
+        Question question = new Question("무엇을 질문해야 할까", "궁금한걸 질문하자");
+        Answer answer1 = new Answer(SANJIGI,"답변이다1");
+        Answer answer2 = new Answer(SANJIGI,"답변이다2");
+        question.writeBy(JAVAJIGI);
+        question.addAnswer(answer1);
+        question.addAnswer(answer2);
+        List<DeleteHistory> histories = question.deleteQuestion(JAVAJIGI);
+        assertNotNull(histories);
+    }
+
+    @Test(expected = UnAuthorizedException.class)
+    public void deleteQuestion_notLoginUser_fail() throws UnAuthenticationException {
+        Question question = new Question("무엇을 질문해야 할까", "궁금한걸 질문하자");
+
+        question.writeBy(JAVAJIGI);
+        List<DeleteHistory> histories = question.deleteQuestion(SANJIGI);
+        assertNotNull(histories);
+    }
 }

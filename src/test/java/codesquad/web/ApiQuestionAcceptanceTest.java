@@ -98,13 +98,13 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void delete_다른사람() throws Exception {
-        User loginUser = defaultUser();
+    public void delete_다른사람() throws Exception {User loginUser = defaultUser();
         User diffrUser = new User("kjp2673", "password12", "name", "javajigi@slipp.net");
         basicAuthTemplate(diffrUser).delete(String.format("/api/questions/%d", 1));
 
         Question question = getResource(String.format("/api/questions/info/%d", 1), Question.class,loginUser);
         assertThat(question.getTitle(), is("국내에서 Ruby on Rails와 Play가 활성화되기 힘든 이유는 뭘까?"));
+
 
     }
 }

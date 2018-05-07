@@ -1,20 +1,14 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.transaction.Transactional;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.AnswerDto;
 import org.hibernate.annotations.Where;
@@ -25,6 +19,10 @@ import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+
+    @Embedded
+    private Answers answers;
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -36,11 +34,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
 
     private boolean deleted = false;
 
@@ -70,28 +63,22 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public List<AnswerDto> getAnswersDtoes() {
-        List<AnswerDto> answerDtoList = new ArrayList<AnswerDto>();
-        for(Answer answer : answers) {
-            answerDtoList.add(answer.toAnswerDto());
+        return answers.getAnswersDtoes();
+    }
+
+    public List<DeleteHistory> deleteQuestion(User loginUser) throws UnAuthenticationException {
+
+        List<DeleteHistory> histories = new ArrayList<>();
+
+        isQuestionOwner(loginUser);
+
+        if(answers != null) {
+            histories.addAll(answers.deleteAnswers(loginUser));
         }
-        return answerDtoList;
-    }
 
-    public boolean isOwner(User loginUser) {
-        return writer.matchUser(loginUser);
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    @Override
-    public String generateUrl() {
-        return String.format("/questions/%d", getId());
-    }
-
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
+        deleted = true;
+        histories.add(new DeleteHistory(ContentType.QUESTION,this.getId(),loginUser, LocalDateTime.now()));
+        return histories;
     }
 
     @Override
@@ -107,12 +94,25 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.title = target.title;
     }
 
+    @Override
+    public String generateUrl() {
+        return String.format("/questions/%d", getId());
+    }
+
     @Transactional
-    public void addAnswer(User loginUser, Answer answer) {
-        if (!writer.matchUser(loginUser)) {
-            throw new UnAuthorizedException();
+    public void addAnswer(Answer answer) {
+
+        if(answers == null) {
+            answers = new Answers();
         }
         answer.toQuestion(this);
-        answers.add(answer);
+        answers.addAnswer(answer);
+    }
+
+    public boolean isQuestionOwner(User loginUser) {
+        if (!writer.matchUser(loginUser)) {
+            throw new UnAuthorizedException("다른 사람의 글은 삭제할 수 없다.");
+        }
+        return true;
     }
 }

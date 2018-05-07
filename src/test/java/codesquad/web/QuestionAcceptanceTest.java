@@ -1,14 +1,14 @@
 package codesquad.web;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.helper.HtmlFormDataBuilder;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +65,22 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
                 .addParameter("contents","내용물입니다.").build();
 
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
-                .postForEntity(String.format("/questions/%d/form", loginUser.getId()), request, String.class);
+                .postForEntity(String.format("/questions/%d", loginUser.getId()), request, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
+    }
+
+    @Test
+    public void question_delete_sucess() {
+        User loginUser = defaultUser();
+        basicAuthTemplate(loginUser).delete(String.format("/questions/%d", 1)); //302 Found
+    }
+
+
+    @Test
+    public void question_delete_fail() {
+        User diffrUser = new User("kjp2673", "password12", "name", "javajigi@slipp.net");
+        basicAuthTemplate(diffrUser).delete(String.format("/questions/%d", 1)); //403 forBidden
     }
 
 }
