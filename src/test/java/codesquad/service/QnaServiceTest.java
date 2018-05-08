@@ -47,13 +47,13 @@ public class QnaServiceTest {
         String title = "질문제목";
         String contents = "본문내용";
         Question mockQuestion = new Question(title, contents);
-        when(questionRepository.findOne(questionId)).thenReturn(mockQuestion);
+        when(questionRepository.findByIdAndDeleted(questionId, false)).thenReturn(mockQuestion);
 
         final Question question = qnaService.findById(questionId);
 
         assertThat(question.getTitle(), is(title));
         assertThat(question.getContents(), is(contents));
-        verify(questionRepository, times(1)).findOne(10L);
+        verify(questionRepository, times(1)).findByIdAndDeleted(10L, false);
     }
 
     @Test(expected = UnAuthorizedException.class)
@@ -65,7 +65,7 @@ public class QnaServiceTest {
         String contents = "본문내용";
         Question mockQuestion = new Question(title, contents);
         mockQuestion.writeBy(writer);
-        when(questionRepository.findOne(questionId)).thenReturn(mockQuestion);
+        when(questionRepository.findByIdAndDeleted(questionId, false)).thenReturn(mockQuestion);
 
         qnaService.findOwnedById(loginUser, questionId);
     }
@@ -79,7 +79,7 @@ public class QnaServiceTest {
         String contents = "본문내용";
         Question mockQuestion = new Question(title, contents);
         mockQuestion.writeBy(writer);
-        when(questionRepository.findOne(questionId)).thenReturn(mockQuestion);
+        when(questionRepository.findByIdAndDeleted(questionId, false)).thenReturn(mockQuestion);
 
         qnaService.findOwnedById(loginUser, questionId);
     }
@@ -129,7 +129,6 @@ public class QnaServiceTest {
         verify(questionRepository, times(1)).findOne(questionId);
 
         verify(spy).delete(loginUser);
-        verify(questionRepository, times(1)).save(spy);
         assertTrue(spy.isDeleted());
     }
 }

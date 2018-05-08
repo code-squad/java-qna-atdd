@@ -1,9 +1,15 @@
 package codesquad.dto;
 
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
+import codesquad.domain.User;
 
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class QuestionDto {
     private long id;
@@ -14,17 +20,32 @@ public class QuestionDto {
     @Size(min = 3)
     private String contents;
 
+    private UserDto writer;
+
+    private List<AnswerDto> answers;
+
     public QuestionDto() {
     }
 
-    public QuestionDto(String title, String contents) {
-        this(0, title, contents);
-    }
-
-    public QuestionDto(long id, String title, String contents) {
+    public QuestionDto(long id, String title, String contents, User writer, List<Answer> answers) {
         this.id = id;
         this.title = title;
         this.contents = contents;
+        if (writer != null)
+            this.writer = writer.toUserDto();
+
+        if (answers != null) {
+            this.answers = new ArrayList<>();
+            this.answers = answers.stream().map(Answer::toAnswerDto).collect(Collectors.toList());
+        }
+    }
+
+    public QuestionDto(String title, String contents) {
+        this(0, title, contents, null, null);
+    }
+
+    public QuestionDto(long id, String title, String contents) {
+        this(id, title, contents, null, null);
     }
 
     public long getId() {
@@ -52,6 +73,22 @@ public class QuestionDto {
     public QuestionDto setContents(String contents) {
         this.contents = contents;
         return this;
+    }
+
+    public UserDto getWriter() {
+        return writer;
+    }
+
+    public void setWriter(UserDto writer) {
+        this.writer = writer;
+    }
+
+    public List<AnswerDto> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<AnswerDto> answers) {
+        this.answers = answers;
     }
 
     public Question toQuestion() {

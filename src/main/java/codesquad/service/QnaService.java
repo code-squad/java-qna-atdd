@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -39,7 +40,7 @@ public class QnaService {
     }
 
     public Question findById(long id) {
-        return questionRepository.findOne(id);
+        return questionRepository.findByIdAndDeleted(id, false);
     }
 
     public Question findOwnedById(User loginUser, long id) {
@@ -60,10 +61,8 @@ public class QnaService {
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
         final Question question = questionRepository.findOne(questionId);
         question.delete(loginUser);
-        questionRepository.save(question);
     }
 
     public Iterable<Question> findAll() {
@@ -75,11 +74,24 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        final Question question = findById(questionId);
+        Answer newAnswer = new Answer(loginUser, contents);
+        question.addAnswer(newAnswer);
+        questionRepository.save(question);
+        answerRepository.save(newAnswer);
+        return newAnswer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public Answer findAnswerById(long questionId, long answerId) {
+        final Question question = findById(questionId);
+        return question.getAnswer(answerId);
+    }
+
+    public Answer deleteAnswer(User loginUser, long questionId, long answerId) {
+        Question question = findById(questionId);
+        final Answer answer = question.getAnswer(answerId);
+        answer.delete(loginUser);
+        answerRepository.save(answer);
+        return answer;
     }
 }
