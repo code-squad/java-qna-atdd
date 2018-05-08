@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import org.hibernate.annotations.Where;
@@ -8,6 +9,7 @@ import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +27,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -69,11 +69,19 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatingQuestion.getContents();
     }
 
-    public void delete(User loginUser) throws UnAuthorizedException {
+    public List<DeleteHistory> delete(User loginUser) throws UnAuthorizedException {
         if (!isOwner(loginUser)) {
-            throw new UnAuthorizedException();
+            throw new UnAuthorizedException("다른 사람의 질문은 삭제할 수 없습니다.");
         }
+
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+
+        deleteHistories = answers.delete(writer);
+
         deleted = true;
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), writer, LocalDateTime.now()));
+
+        return deleteHistories;
     }
 
     public boolean isOwner(User loginUser) {

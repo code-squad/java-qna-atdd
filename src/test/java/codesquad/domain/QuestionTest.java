@@ -47,6 +47,8 @@ public class QuestionTest {
         assertThat(question.getContents().equals(updatedQuestion.getContents())).isEqualTo(true);
     }
 
+
+    // 질문한 사람과 로그인한 사람이 다른 경우
     @Test(expected = UnAuthorizedException.class)
     public void 질문삭제_타인의글() {
         Question question = saveQuestionBy(defaultUser);
@@ -55,11 +57,34 @@ public class QuestionTest {
         assertThat(question.isDeleted()).isEqualTo(false);
     }
 
+    // 질문한 사람과 로그인한 사람이 같으면서 답변이 없는 경우
     @Test
-    public void 질문삭제_자신의글() {
+    public void 질문삭제_자신의글_NO댓글() {
         Question question = saveQuestionBy(defaultUser);
         question.delete(defaultUser);
 
         assertThat(question.isDeleted()).isEqualTo(true);
+    }
+
+    // 질문한 사람과 로그인한 사람이 같으면서 답변의 글쓴이도 같은 경우
+    @Test
+    public void 질문삭제_자신의글_Only자신의댓글() {
+        Question question = saveQuestionBy(defaultUser);
+        Answer answer = new Answer(defaultUser, "contents");
+        question.addAnswer(answer);
+
+        question.delete(defaultUser);
+        assertThat(question.isDeleted()).isEqualTo(true);
+    }
+
+    // 질문한 사람과 로그인한 사람이 같으면서 답변의 글쓴이가 다른 경우
+    @Test(expected = UnAuthorizedException.class)
+    public void 질문삭제_자신의글_타인댓글포함() {
+        Question question = saveQuestionBy(defaultUser);
+        Answer answer = new Answer(otherUser, "contents");
+        question.addAnswer(answer);
+
+        question.delete(defaultUser);
+        assertThat(question.isDeleted()).isEqualTo(false);
     }
 }

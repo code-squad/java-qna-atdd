@@ -1,10 +1,12 @@
 package codesquad.web;
 
 
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.dto.QuestionDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,14 +35,6 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     private Question myQuestion;
     private Question otherQuestion;
 
-    /**
-     * [질문]
-     * - Question 도메인 클래스에 default constructor를 만들어 주지않으면 아래와같은 에러가 발생합니다.
-     * 현상: no suitable constructor found, can not deserialize from Object value
-     *
-     * //        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-     * //        params.add("updatingQuestion", updatingQuestion); // 객체 맵핑이 안됨 why?
-     */
 
     @Before
     public void init() {
@@ -137,18 +131,61 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
+
+
     /**
+     * # 질문을 정상적으로 삭제할 수 있는 경우
+     *
      * input : 질문 ID
      * output : HTTP 204 (No Content)
+     *
      */
     @Test
-    public void 질문삭제_자신의글() {
-
+    public void 질문삭제_자신의글_NO댓글() {
+        QuestionDto questionDto = new QuestionDto("title", "contents");
+        String resourceLocation = createResourceByLoginUser("/api/questions", questionDto);
         ResponseEntity<String> response = basicAuthTemplate().exchange(
-                myQuestion.generateResourceURI(), HttpMethod.DELETE, new HttpEntity(null), String.class);
+                resourceLocation, HttpMethod.DELETE, new HttpEntity(null), String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
     }
+
+    @Test
+    public void 질문삭제_자신의글_Only자신의댓글() {
+        QuestionDto questionDto = new QuestionDto("title", "contents");
+        String resourceLocation = createResourceByLoginUser("/api/questions", questionDto);
+        Question savedQuestion = getResource(resourceLocation, Question.class, defaultUser());
+
+        String answer = "answer";
+        resourceLocation = createResourceByLoginUser(String.format("%s/answers", savedQuestion.generateResourceURI()), answer);
+
+
+        ResponseEntity<String> response = basicAuthTemplate().exchange(
+                resourceLocation, HttpMethod.DELETE, new HttpEntity(null), String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    }
+
+    /**
+     * # 질문을 삭제할 수 없는 경우
+     */
+
+    @Test
+    public void 질문삭제_자신의글_타인댓글포함() {
+        QuestionDto questionDto = new QuestionDto("title", "contents");
+        String resourceLocation = createResourceByLoginUser("/api/questions", questionDto);
+        Question savedQuestion = getResource(resourceLocation, Question.class, defaultUser());
+
+        String answer = "answer";
+        ResponseEntity<String> response = basicAuthTemplate(findByUserId("sanjigi"))
+                .postForEntity(String.format("%s/answers", savedQuestion.generateResourceURI()), answer, String.class);
+
+       response = basicAuthTemplate().exchange(
+                response.getHeaders().getLocation().getPath(), HttpMethod.DELETE, new HttpEntity(null), String.class);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+    }
+
 
     /**
      * input : 질문 ID
