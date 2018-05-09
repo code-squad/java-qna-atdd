@@ -7,6 +7,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -34,6 +36,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public Answer(User writer, Question question, String contents) {
+        this.writer = writer;
+        this.question = question;
+        this.contents = contents;
+        this.deleted = false;
+    }
+
     public Answer(Long id, User writer, Question question, String contents) {
         super(id);
         this.writer = writer;
@@ -58,12 +67,28 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
     }
 
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), question.getId(), this.getContents());
+    }
+
     public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void delete(User loginUser) {
+        if (isOwner(loginUser))
+            this.deleted = true;
+    }
+
+    public void update(User loginUser, AnswerDto answerDto) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = answerDto.getContents();
     }
 
     @Override

@@ -2,6 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.domain.*;
+import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,12 +64,32 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Question question = findById(questionId);
+        Answer answer = new Answer(loginUser, question,contents);
+        answerRepository.save(answer);
+
+        return answer;
     }
 
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id,  AnswerDto answerDto){
+        Answer answer = answerRepository.findOne(id);
+        answer.update(loginUser, answerDto);
+
+        return answer;
+    }
+
+    public Answer findAnserById(long id){
+        return answerRepository.findOne(id);
+    }
+
+    @Transactional
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        // TODO 답변 삭제 기능 구현
+        Answer answer = answerRepository.findOne(id);
+        answer.delete(loginUser);
+        return answer;
     }
 }
