@@ -1,9 +1,12 @@
 package codesquad.web;
 
+import codesquad.UnAuthenticationException;
+import codesquad.security.HttpSessionUtils;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,40 +25,52 @@ import codesquad.service.UserService;
 @Controller
 @RequestMapping("/users")
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @Resource(name = "userService")
-    private UserService userService;
+  private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping("/form")
-    public String form() {
-        return "/user/form";
+  @Resource(name = "userService")
+  private UserService userService;
+
+  @PostMapping("/login")
+  public String login(String userId, String password, HttpSession httpSession) {
+    try {
+      httpSession
+          .setAttribute(HttpSessionUtils.USER_SESSION_KEY, userService.login(userId, password));
+      return "redirect:/users";
+    } catch (UnAuthenticationException e) {
+      return "redirect:/user/login_failed";
     }
+  }
 
-    @PostMapping("")
-    public String create(UserDto userDto) {
-        userService.add(userDto);
-        return "redirect:/users";
-    }
+  @GetMapping("/form")
+  public String form() {
+    return "/user/form";
+  }
 
-    @GetMapping("")
-    public String list(Model model) {
-        List<User> users = userService.findAll();
-        log.debug("user size : {}", users.size());
-        model.addAttribute("users", users);
-        return "/user/list";
-    }
+  @PostMapping("")
+  public String create(UserDto userDto) {
+    userService.add(userDto);
+    return "redirect:/users";
+  }
 
-    @GetMapping("/{id}/form")
-    public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
-        model.addAttribute("user", userService.findById(loginUser, id));
-        return "/user/updateForm";
-    }
+  @GetMapping("")
+  public String list(Model model) {
+    List<User> users = userService.findAll();
+    log.debug("user size : {}", users.size());
+    model.addAttribute("users", users);
+    return "/user/list";
+  }
 
-    @PutMapping("/{id}")
-    public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
-        userService.update(loginUser, id, target);
-        return "redirect:/users";
-    }
+  @GetMapping("/{id}/form")
+  public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
+    model.addAttribute("user", userService.findById(loginUser, id));
+    return "/user/updateForm";
+  }
+
+  @PutMapping("/{id}")
+  public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
+    userService.update(loginUser, id, target);
+    return "redirect:/users";
+  }
 
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import javax.security.sasl.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -15,33 +16,34 @@ import codesquad.dto.UserDto;
 
 @Service("userService")
 public class UserService {
-    @Resource(name = "userRepository")
-    private UserRepository userRepository;
 
-    public User add(UserDto userDto) {
-        return userRepository.save(userDto.toUser());
-    }
+  @Resource(name = "userRepository")
+  private UserRepository userRepository;
 
-    public User update(User loginUser, long id, UserDto updatedUser) {
-        User original = userRepository.findOne(id);
-        original.update(loginUser, updatedUser.toUser());
-        return userRepository.save(original);
-    }
+  public User add(UserDto userDto) {
+    return userRepository.save(userDto.toUser());
+  }
 
-    public User findById(User loginUser, long id) {
-        User user = userRepository.findOne(id);
-        if (!user.equals(loginUser)) {
-            throw new UnAuthorizedException();
-        }
-        return user;
-    }
+  public User update(User loginUser, long id, UserDto updatedUser) {
+    User original = userRepository.findOne(id);
+    original.update(loginUser, updatedUser.toUser());
+    return userRepository.save(original);
+  }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+  public User findById(User loginUser, long id) {
+    User user = userRepository.findOne(id);
+    if (!user.equals(loginUser)) {
+      throw new UnAuthorizedException();
     }
+    return user;
+  }
 
-    public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
-    }
+  public List<User> findAll() {
+    return userRepository.findAll();
+  }
+
+  public User login(String userId, String password) throws UnAuthenticationException {
+    return userRepository.findByUserId(userId).filter(user -> user.getPassword().equals(password))
+        .orElseThrow(UnAuthenticationException::new);
+  }
 }
