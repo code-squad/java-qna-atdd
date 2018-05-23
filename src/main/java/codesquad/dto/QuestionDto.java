@@ -2,6 +2,8 @@ package codesquad.dto;
 
 import javax.validation.constraints.Size;
 
+import codesquad.domain.Question;
+
 public class QuestionDto {
     private long id;
 
@@ -49,4 +51,8 @@ public class QuestionDto {
         this.contents = contents;
         return this;
     }
+
+	public Question toQuestion() {
+		return new Question(this.title, this.contents);
+	}
 }

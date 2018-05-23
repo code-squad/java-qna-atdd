@@ -3,6 +3,7 @@ package codesquad.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.AuthenticationException;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Where;
 
+import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -91,4 +93,12 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
+	public void update(Question updatedQuestion, User loginUser ) throws AuthenticationException {
+		if(!isOwner(loginUser)) {
+			throw new AuthenticationException("자신의 글만 수정 가능");
+		}
+		this.title = updatedQuestion.title;
+		this.contents = updatedQuestion.contents;
+	}
 }

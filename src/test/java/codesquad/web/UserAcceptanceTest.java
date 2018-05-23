@@ -1,7 +1,6 @@
 package codesquad.web;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -37,17 +36,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void create() throws Exception {
         String userId = "testUser";
-        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-        htmlFormDataBuilder.addParameter("userId", userId);
-        htmlFormDataBuilder.addParameter("password", "password");
-        htmlFormDataBuilder.addParameter("name", "자바지기");
-        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();    
-        
+        HttpEntity<MultiValueMap<String, Object>> request =  HtmlFormDataBuilder.urlEncodedForm()
+        .addParameter("userId", userId)
+        .addParameter("password", "password")
+        .addParameter("name", "자바지기")
+        .addParameter("email", "javajigi@slipp.net").build();
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertThat(userRepository.findByUserId(userId).isPresent(), is(true));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
     }
 
@@ -83,12 +80,11 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
     	
-    	HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-    	htmlFormDataBuilder.addParameter("_method", "put");
-    	htmlFormDataBuilder.addParameter("password", "password2");
-    	htmlFormDataBuilder.addParameter("name", "자바지기2");
-    	htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
+    	HttpEntity<MultiValueMap<String, Object>> request = 
+    	HtmlFormDataBuilder.urlEncodedForm().put()
+    	.addParameter("password", "password2")
+    	.addParameter("name", "자바지기2")
+    	.addParameter("email", "javajigi@slipp.net").build();
 
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }

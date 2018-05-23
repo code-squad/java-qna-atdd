@@ -33,5 +33,15 @@ public class HtmlFormDataBuilder {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		return new HtmlFormDataBuilder(headers);
 	}
+	
+	public HtmlFormDataBuilder put(){
+		this.params.add("_method", "put");
+		return this;
+	}
+
+	public HtmlFormDataBuilder delete() {
+		this.params.add("_method", "delete");
+		return this;
+	}
 
 }

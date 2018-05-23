@@ -40,6 +40,6 @@ public class UserService {
     public User login(String userId, String password) throws UnAuthenticationException {
     	return userRepository.findByUserId(userId)
     			.filter(user -> user.matchPassword(password))
-    			.orElseThrow(UnAuthenticationException::new);
+    			.orElseThrow(() -> new UnAuthenticationException("오류"));
     }
 }

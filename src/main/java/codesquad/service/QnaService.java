@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.naming.AuthenticationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import codesquad.domain.AnswerRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
+import codesquad.dto.UserDto;
 
 @Service("qnaService")
 public class QnaService {
@@ -41,14 +43,19 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    public Question update(User loginUser, long id, Question updatedQuestion) throws AuthenticationException{
+    	/*기존
+    	Question question =  questionRepository.findById(id).filter(q -> q.isOwner(loginUser)).orElseThrow(() -> new AuthenticationException("본인만 수정 가능"));
+    	*/
+    	Question question = questionRepository.findById(id).get();
+    	question.update(updatedQuestion, loginUser);
+    	return questionRepository.save(question);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+    public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
+    	Question question = questionRepository.findById(id).filter(q -> q.isOwner(loginUser)).orElseThrow(() -> new CannotDeleteException("본인만 수정 가능"));
+    	questionRepository.delete(question);  
     }
 
     public Iterable<Question> findAll() {
