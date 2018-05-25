@@ -55,4 +55,46 @@ public class QuestionDto {
 	public Question toQuestion() {
 		return new Question(this.title, this.contents);
 	}
+
+	@Override
+	public String toString() {
+		return "QuestionDto [id=" + id + ", title=" + title + ", contents=" + contents + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((contents == null) ? 0 : contents.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		QuestionDto other = (QuestionDto) obj;
+		if (contents == null) {
+			if (other.contents != null)
+				return false;
+		} else if (!contents.equals(other.contents))
+			return false;
+		if (id != other.id)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+	
+	
+	
 }

@@ -1,10 +1,15 @@
 package support.test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import codesquad.domain.User;
@@ -45,4 +50,18 @@ public abstract class AcceptanceTest {
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
     }
+    
+    protected String createResource(TestRestTemplate template, String path, Object bodyPayload) {
+        ResponseEntity<String> response = template.postForEntity(path, bodyPayload, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        return response.getHeaders().getLocation().getPath();
+    }
+    
+    protected <T> T getResource(String location, Class<T> responseType, User loginUser) {
+        return basicAuthTemplate(loginUser).getForObject(location, responseType);
+    }
+
+    
+
+    
 }
