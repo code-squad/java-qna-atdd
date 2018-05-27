@@ -19,6 +19,7 @@ import codesquad.domain.UserRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
     private static final String DEFAULT_LOGIN_USER = "javajigi";
+    private static final String DEFAULT_LOGIN_ANOTHER_USER = "sanjigi";
     private static final String DEFAULT_LOGIN_OTHER_USER = "gram";
 
     @Autowired
@@ -41,6 +42,10 @@ public abstract class AcceptanceTest {
     
     protected User defaultUser() {
         return findByUserId(DEFAULT_LOGIN_USER);
+    }
+    
+    protected User defaultAnotherUser() {
+    	return findByUserId(DEFAULT_LOGIN_ANOTHER_USER);
     }
 
     protected User defaultOtherUser() {

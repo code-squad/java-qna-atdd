@@ -4,6 +4,7 @@ package codesquad.web;
 import java.net.URI;
 
 import javax.annotation.Resource;
+import javax.naming.AuthenticationException;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
@@ -36,7 +37,7 @@ public class ApiAnswerController {
 	}
 	
 	@DeleteMapping("{id}")
-	public void delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException {
+	public void delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException, AuthenticationException {
 		qnaService.deleteAnswer(loginUser, id);
 	}
 }

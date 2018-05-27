@@ -102,12 +102,40 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 		this.contents = updatedQuestion.contents;
 	}
 
-	  public void delete() throws CannotDeleteException {
-	    	if(this.deleted) {
-	    		throw new CannotDeleteException("이미 삭제된 댓글");
-	    	}
-	    	this.deleted = true;
-	    }
+	public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException, AuthenticationException {
+		checkQuestionStatus(loginUser);
+		List<DeleteHistory> histories = deleteAnswer(loginUser);
+		deleted = true;
+		histories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser));
+		return histories;
+	}
+	
+	public void checkQuestionStatus(User loginUser) throws AuthenticationException, CannotDeleteException {
+		if (!isOwner(loginUser)) {
+			throw new AuthenticationException("자신의 글만 삭제 가능");
+		}
+		if (isDeleted()) {
+			throw new CannotDeleteException("이미 삭제된 글입니다.");
+		}
+	}
 
+	public boolean checkAnswerStatus(User loginUser) {
+		boolean result = true;
+		for (int i = 0; i < answers.size(); i++) {
+			result &= answers.get(i).isOwner(loginUser);
+		}
+		return result;
+	}
+
+	public List<DeleteHistory> deleteAnswer(User loginUser) throws CannotDeleteException, AuthenticationException {
+		if (!checkAnswerStatus(loginUser)) {
+			throw new CannotDeleteException("다른 사용자의 답변이 존재합니다.");
+		}
+	    List<DeleteHistory> histories = new ArrayList<>();
+		for (int i = 0; i < answers.size(); i++) {
+			histories.add(answers.get(i).delete(loginUser));
+		}
+		return histories;
+	}
 
 }

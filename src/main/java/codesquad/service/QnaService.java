@@ -47,16 +47,20 @@ public class QnaService {
 	public Question update(User loginUser, long id, Question updatedQuestion) throws AuthenticationException {
 		Question question = questionRepository.findById(id).orElseThrow(NullPointerException::new);
 		question.update(updatedQuestion, loginUser);
-//		return questionRepository.save(question);
 		return question;
 	}
 
 	@Transactional
-	public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
-		Question question = questionRepository.findById(id).filter(q -> q.isOwner(loginUser))
-				.orElseThrow(() -> new CannotDeleteException("본인만 수정 가능"));
-		question.delete(); 
-//		questionRepository.delete(question);
+	public void deleteQuestion(User loginUser, long id) throws CannotDeleteException, AuthenticationException {
+		Question question = questionRepository.findById(id).orElseThrow(NullPointerException::new);
+		deleteHistoryService.saveAll(question.delete(loginUser));
+		/*
+		 * 이거들어가니까 먼가로직적오류가나긴합니다.
+		DeleteHistory deleteHistory = new DeleteHistory(ContentType.QUESTION, id, loginUser);
+		List<DeleteHistory> deleteHistories = null;
+		deleteHistoryService.saveAll(deleteHistories);
+		*/
+		
 	}
 
 	public Iterable<Question> findAll() {
@@ -73,10 +77,8 @@ public class QnaService {
 	}
 
 	@Transactional
-	public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
-		Answer answer = answerRepository.findById(id).filter(a -> a.isOwner(loginUser))
-				.orElseThrow(() -> new CannotDeleteException("본인만 삭제 가능"));
-		answer.delete();
-//		answerRepository.save(answer);
+	public void deleteAnswer(User loginUser, long id) throws CannotDeleteException, AuthenticationException{
+		Answer answer = answerRepository.findById(id).orElseThrow(NullPointerException::new);
+		answer.delete(loginUser);
 	}
 }

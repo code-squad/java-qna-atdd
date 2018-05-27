@@ -76,7 +76,7 @@ public class QuestionController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public String delete(@LoginUser User loginUser, @PathVariable Long id) {
+	public String delete(@LoginUser User loginUser, @PathVariable Long id) throws AuthenticationException {
 		try {
 			qnaService.deleteQuestion(loginUser, id);
 		} catch (CannotDeleteException e) {

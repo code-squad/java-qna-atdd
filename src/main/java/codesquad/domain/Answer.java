@@ -1,11 +1,13 @@
 package codesquad.domain;
 
+import javax.naming.AuthenticationException;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
+
 
 import codesquad.CannotDeleteException;
 import support.domain.AbstractEntity;
@@ -73,11 +75,16 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
     
-    public void delete() throws CannotDeleteException {
+    
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException, AuthenticationException {
+    	if (!isOwner(loginUser)) {
+			throw new AuthenticationException("자신의 글만 삭제 가능");
+		}
     	if(this.deleted) {
     		throw new CannotDeleteException("이미 삭제된 댓글");
     	}
     	this.deleted = true;
+    	return new DeleteHistory(ContentType.ANSWER, getId(),loginUser);
     }
 
     @Override
