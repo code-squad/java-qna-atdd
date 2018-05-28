@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -15,6 +17,8 @@ import codesquad.dto.UserDto;
 
 @Service("userService")
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     @Resource(name = "userRepository")
     private UserRepository userRepository;
 
@@ -39,7 +43,13 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        Optional<User> maybeUser = userRepository.findByUserId(userId);
+        if (!maybeUser.isPresent()) {
+            logger.debug("NO user with user ID: {} found", userId);
+            throw new UnAuthenticationException();
+        }
+        return maybeUser
+                .filter(user -> user.matchPassword(password))
+                .orElseThrow(UnAuthenticationException::new);
     }
 }

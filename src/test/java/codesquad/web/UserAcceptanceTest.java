@@ -23,6 +23,7 @@ import org.springframework.util.MultiValueMap;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
+import support.test.HtmlFormDataBuilder;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -39,22 +40,19 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
+        HtmlFormDataBuilder builder = HtmlFormDataBuilder.urlEncodedForm();
         String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        builder.addParams("userId", userId);
+        builder.addParams("password", "password");
+        builder.addParams("name", "자바지기");
+        builder.addParams("email", "javajigi@slipp.net");
+
+        HttpEntity<MultiValueMap<String, Object>> request = builder.build();
         
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertThat(userRepository.findByUserId(userId).isPresent(), is(true));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
     }
 

@@ -3,7 +3,10 @@ package codesquad.web;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
+import codesquad.UnAuthenticationException;
+import codesquad.security.HttpSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -58,4 +61,16 @@ public class UserController {
         return "redirect:/users";
     }
 
+    @PostMapping("/login")
+    public String login(HttpSession session, String userId, String password) {
+        try {
+            User loginUser = userService.login(userId, password);
+            session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
+            log.debug("User login SUCCESS");
+            return "redirect:/users";
+        } catch (UnAuthenticationException e) {
+            log.debug("User login FAILED");
+            return "/user/login_failed";
+        }
+    }
 }
