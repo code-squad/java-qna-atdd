@@ -1,5 +1,7 @@
 package codesquad.dto;
 
+import codesquad.domain.Question;
+
 import javax.validation.constraints.Size;
 
 public class QuestionDto {

@@ -40,9 +40,8 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
         String userId = "testuser5";
-        HtmlFormDataBuilder htmlFormDataBuilder = new HtmlFormDataBuilder(headers)
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm()
                 .addParams("userId", userId)
                 .addParams("password", "password")
                 .addParams("name", "테스트")
@@ -86,8 +85,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        HtmlFormDataBuilder htmlFormDataBuilder = new HtmlFormDataBuilder(headers)
+        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm()
                 .addParams("_method", "put")
                 .addParams("password", "test2")
                 .addParams("name", "자바지기2")

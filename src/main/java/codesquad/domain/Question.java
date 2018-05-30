@@ -17,11 +17,15 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log =  LoggerFactory.getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -47,6 +51,20 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public Question(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public Question(String title, String contents, User writer) {
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
+    }
+
+    public void update(User writer, Question target) {
+        if (!isOwner(writer))
+            throw new IllegalStateException("글쓴이만 수정할 수 있습니다.");
+        this.title = target.title;
+        this.contents = target.contents;
+        log.info("update success");
     }
 
     public String getTitle() {
@@ -90,5 +108,13 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 }

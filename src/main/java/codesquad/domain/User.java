@@ -88,12 +88,12 @@ public class User extends AbstractEntity {
     public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
-    
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;
     }
-    
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {
