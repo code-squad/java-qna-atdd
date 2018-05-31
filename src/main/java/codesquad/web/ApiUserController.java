@@ -33,7 +33,7 @@ public class ApiUserController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/users/" + savedUser.getId()));
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<Void>(headers, HttpStatus.CREATED); // 올바른 응답코드를 반환 - Restful
     }
     
     @GetMapping("{id}")

@@ -3,7 +3,9 @@ package codesquad.web;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
+import codesquad.UnAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,8 @@ import codesquad.domain.User;
 import codesquad.dto.UserDto;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
+
+import static codesquad.security.HttpSessionUtils.USER_SESSION_KEY;
 
 @Controller
 @RequestMapping("/users")
@@ -56,6 +60,18 @@ public class UserController {
     public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
         userService.update(loginUser, id, target);
         return "redirect:/users";
+    }
+
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession session) {
+        try {
+            User loginUser = userService.login(userId, password);
+            session.setAttribute(USER_SESSION_KEY, loginUser);
+            return "redirect:/users";
+        } catch (UnAuthenticationException e) {
+//            e.printStackTrace();
+            return "user/login_failed";
+        }
     }
 
 }

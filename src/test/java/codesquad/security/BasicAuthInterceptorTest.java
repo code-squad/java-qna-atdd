@@ -18,6 +18,10 @@ import codesquad.security.BasicAuthInterceptor;
 import codesquad.security.HttpSessionUtils;
 import codesquad.service.UserService;
 
+/*
+* DB에 의존하는 테스트를 Mock을 이용하여 가짜로 테스트 하기 때문에 서버를 켜지 않고 금방 끝남
+* */
+
 @RunWith(MockitoJUnitRunner.class)
 public class BasicAuthInterceptorTest {
     @Mock
@@ -31,7 +35,9 @@ public class BasicAuthInterceptorTest {
         String userId = "userId";
         String password = "password";
         MockHttpServletRequest request = basicAuthHttpRequest(userId, password);
-        User loginUser = new User(userId, "password", "name", "javajigi@slipp.net");
+        User loginUser = new User(userId, password, "name", "javajigi@slipp.net");
+
+        // 해당 기능을 만나게 되면, thenReturn 값으로 리턴하라는 뜻. 이때 login method에 의존하고 있는 userService를 Mock으로 설정.
         when(userService.login(userId, password)).thenReturn(loginUser);
 
         basicAuthInterceptor.preHandle(request, null, null);

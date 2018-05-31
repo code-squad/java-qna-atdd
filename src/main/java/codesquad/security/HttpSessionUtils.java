@@ -7,6 +7,8 @@ import org.springframework.web.context.request.WebRequest;
 
 import codesquad.domain.User;
 
+import java.util.Optional;
+
 public class HttpSessionUtils {
     public static final String USER_SESSION_KEY = "loginedUser";
 
@@ -23,11 +25,7 @@ public class HttpSessionUtils {
     }
 
     public static boolean isLoginUser(HttpSession session) {
-        Object sessionedUser = session.getAttribute(USER_SESSION_KEY);
-        if (sessionedUser == null) {
-            return false;
-        }
-        return true;
+        return Optional.ofNullable(session.getAttribute(USER_SESSION_KEY)).isPresent();
     }
 
     public static User getUserFromSession(HttpSession session) {

@@ -93,7 +93,8 @@ public class User extends AbstractEntity {
     public boolean isGuestUser() {
         return false;
     }
-    
+
+    // 테스트를 위한 객체? 혹은 로그인하지 않은 일반 사용자로 실제 사용되는 객체?
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {
