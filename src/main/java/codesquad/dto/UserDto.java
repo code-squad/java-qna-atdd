@@ -1,10 +1,8 @@
 package codesquad.dto;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
 import codesquad.domain.User;
+
+import javax.validation.constraints.Size;
 
 public class UserDto {
     @Size(min = 3, max = 20)
@@ -16,9 +14,8 @@ public class UserDto {
     @Size(min = 3, max = 20)
     private String name;
 
-    @Email
     private String email;
-    
+
     public UserDto() {
     }
 
@@ -69,7 +66,7 @@ public class UserDto {
     public User toUser() {
         return new User(this.userId, this.password, this.name, this.email);
     }
-    
+
 
     @Override
     public String toString() {
@@ -112,10 +109,7 @@ public class UserDto {
         } else if (!password.equals(other.password))
             return false;
         if (userId == null) {
-            if (other.userId != null)
-                return false;
-        } else if (!userId.equals(other.userId))
-            return false;
-        return true;
+            return other.userId == null;
+        } else return userId.equals(other.userId);
     }
 }

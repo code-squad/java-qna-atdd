@@ -1,9 +1,9 @@
 package codesquad.converter;
 
+import org.springframework.core.convert.converter.Converter;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-import org.springframework.core.convert.converter.Converter;
 
 public final class LocalDateTimeConverter implements Converter<String, LocalDateTime> {
 
@@ -15,7 +15,7 @@ public final class LocalDateTimeConverter implements Converter<String, LocalDate
 
     @Override
     public LocalDateTime convert(String source) {
-        if (source == null || source.isEmpty()) {
+        if (source.isEmpty()) {
             return null;
         }
 

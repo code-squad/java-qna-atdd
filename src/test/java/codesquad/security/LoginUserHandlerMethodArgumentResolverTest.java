@@ -1,9 +1,7 @@
 package codesquad.security;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
+import codesquad.UnAuthorizedException;
+import codesquad.domain.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,11 +11,9 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import codesquad.UnAuthorizedException;
-import codesquad.domain.User;
-import codesquad.security.HttpSessionUtils;
-import codesquad.security.LoginUser;
-import codesquad.security.LoginUserHandlerMethodArgumentResolver;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginUserHandlerMethodArgumentResolverTest {

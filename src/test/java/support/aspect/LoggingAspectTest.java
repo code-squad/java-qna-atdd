@@ -1,14 +1,13 @@
 package support.aspect;
 
+import codesquad.QnaApplication;
+import codesquad.dto.UserDto;
+import codesquad.web.UserController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import codesquad.QnaApplication;
-import codesquad.dto.UserDto;
-import codesquad.web.UserController;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = QnaApplication.class)
