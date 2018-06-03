@@ -10,6 +10,8 @@ import javax.validation.constraints.Size;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
     @ManyToOne
@@ -64,6 +66,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public DeleteHistory deleteAnswer(User user) {
+        //TODO: Authorization
+        this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, super.getId(), user, LocalDateTime.now());
     }
 
     @Override

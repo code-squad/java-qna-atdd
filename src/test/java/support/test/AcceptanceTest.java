@@ -1,5 +1,6 @@
 package support.test;
 
+import codesquad.domain.QuestionRepository;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,9 @@ public abstract class AcceptanceTest {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
     
     public TestRestTemplate template() {
         return template;

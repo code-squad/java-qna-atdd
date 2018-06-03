@@ -35,13 +35,13 @@ public class UserController {
         return "/user/form";
     }
 
-    @PostMapping("")
+    @PostMapping("/create")
     public String create(UserDto userDto) {
         userService.add(userDto);
-        return "redirect:/users";
+        return "redirect:/users/list";
     }
 
-    @GetMapping("")
+    @GetMapping("/list")
     public String list(Model model) {
         List<User> users = userService.findAll();
         log.debug("user size : {}", users.size());
@@ -61,16 +61,27 @@ public class UserController {
         return "redirect:/users";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "user/login";
+    }
+
     @PostMapping("/login")
     public String login(HttpSession session, String userId, String password) {
         try {
             User loginUser = userService.login(userId, password);
             session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
             log.debug("User login SUCCESS");
-            return "redirect:/users";
+            return "redirect:/users/list";
         } catch (UnAuthenticationException e) {
             log.debug("User login FAILED");
             return "/user/login_failed";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        HttpSessionUtils.endSession(session);
+        return "redirect:/";
     }
 }

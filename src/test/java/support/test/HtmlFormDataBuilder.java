@@ -1,6 +1,5 @@
 package support.test;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,6 +31,9 @@ public class HtmlFormDataBuilder {
     }
 
     public HttpEntity<MultiValueMap<String, Object>> build() {
-        return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        if (params.size() == 0) {
+            return new HttpEntity<>(headers);
+        }
+        return new HttpEntity<>(params, headers);
     }
 }

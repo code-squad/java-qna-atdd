@@ -1,7 +1,9 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -78,17 +81,59 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public QuestionDto toQuestionDto() {
+        return new QuestionDto(getId(), this.title, this.contents);
+    }
+
+    public void updateQuestion(Question updated, User loginUser) throws UnAuthorizedException {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = updated.contents;
+    }
+
+    public DeleteHistory deleteQuestion(User loginUser) throws UnAuthorizedException {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        deleted = true;
+        return new DeleteHistory(ContentType.QUESTION, super.getId(), loginUser, LocalDateTime.now());
+    }
+
+    public List<DeleteHistory> deleteAnswers(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        List<DeleteHistory> deletedAnswers = new ArrayList<>();
+        for (Answer answer : answers) {
+            DeleteHistory deletedAnswer = answer.deleteAnswer(writer);
+            deletedAnswers.add(deletedAnswer);
+        }
+        return deletedAnswers;
+    }
+
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
     }
 
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
-    }
-
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Question)) return false;
+        Question question = (Question) o;
+        System.out.println(title + "    " + question.title);
+        return Objects.equals(title, question.title);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), title);
     }
 }

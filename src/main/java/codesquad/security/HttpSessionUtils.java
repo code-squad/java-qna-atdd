@@ -2,6 +2,7 @@ package codesquad.security;
 
 import javax.servlet.http.HttpSession;
 
+import codesquad.UnAuthenticationException;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -36,5 +37,12 @@ public class HttpSessionUtils {
         }
 
         return (User) session.getAttribute(USER_SESSION_KEY);
+    }
+
+    public static void endSession(HttpSession session) {
+        if (!isLoginUser(session)) {
+            throw new UnAuthenticationException();
+        }
+        session.removeAttribute(USER_SESSION_KEY);
     }
 }

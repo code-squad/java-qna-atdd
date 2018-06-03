@@ -5,6 +5,10 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import codesquad.UnAuthenticationException;
+import codesquad.domain.*;
+import codesquad.dto.QuestionDto;
+import codesquad.security.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -31,24 +30,36 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
+    public Question create(User loginUser, QuestionDto questionDto) {
+        Question question = questionDto.toQuestion();
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
-        return questionRepository.findById(id);
-    }
-
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    public Question findById(long id, Question updated) {
+        return questionRepository.findById(id)
+                .filter(question -> question.equals(updated))
+                .orElseThrow(UnAuthenticationException::new);
     }
 
     @Transactional
+    public void update(User loginUser, long id, QuestionDto updatedQuestionDto) {
+        Question updated = updatedQuestionDto.toQuestion();
+        Question original = findById(id, updated);
+        original.updateQuestion(updated, loginUser);
+    }
+
+    @Transactional //TODO: questionId used in get request, is this a problem?
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        Question question = questionRepository.findById(questionId)
+                .filter(q -> !q.isDeleted())
+                .orElseThrow(CannotDeleteException::new);
+
+        DeleteHistory deletedQuestion = question.deleteQuestion(loginUser);
+        List<DeleteHistory> deleted = question.deleteAnswers(loginUser);
+        deleted.add(deletedQuestion);
+        deleteHistoryService.saveAll(deleted);
     }
 
     public Iterable<Question> findAll() {

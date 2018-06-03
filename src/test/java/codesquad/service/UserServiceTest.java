@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import codesquad.dto.UserDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,15 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Test
+    public void add() {
+        UserDto userDto = new UserDto("krapeaj", "password", "name", "hi@hi.com");
+
+        userService.add(userDto);
+        verify(userRepository, times(1))
+                .save(new User("krapeaj", "password", "name", "hi@hi.com"));
+    }
 
     @Test
     public void login_success() throws Exception {
