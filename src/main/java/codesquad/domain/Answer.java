@@ -75,4 +75,8 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
+
+    public void logicalDelete() {
+        this.deleted = true;
+    }
 }

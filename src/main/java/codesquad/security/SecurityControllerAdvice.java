@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.exceptions.UnAuthenticationException;
+import codesquad.exceptions.UnAuthorizedException;
 
 @ControllerAdvice
 public class SecurityControllerAdvice {

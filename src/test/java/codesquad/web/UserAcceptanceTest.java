@@ -50,7 +50,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
                 .addParameter("password", "password")
                 .addParameter("name", "자바지기")
                 .addParameter("email", "javajigi@slipp.net").build();
-
+        log.debug("request : {}", request);
         response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));

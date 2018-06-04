@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import codesquad.UnAuthenticationException;
+import codesquad.exceptions.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.mockito.junit.MockitoJUnitRunner;

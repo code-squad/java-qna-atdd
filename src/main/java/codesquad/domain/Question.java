@@ -1,19 +1,14 @@
 package codesquad.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import codesquad.exceptions.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -22,6 +17,7 @@ import support.domain.UrlGeneratable;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -78,6 +74,20 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public Question update(User loginUser, QuestionDto updatedQuestion) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("owner is not match. permission denied!");
+        }
+
+        this.title = updatedQuestion.toQuestion().title;
+        this.contents = updatedQuestion.toQuestion().contents;
+        return this;
+    }
+
+    public boolean isDeletable(User loginUser) {
+        return isOwner(loginUser) && answers.stream().allMatch(a -> a.isOwner(loginUser));
+    }
+
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
@@ -90,5 +100,19 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public void logicalDelete() {
+        this.deleted = true;
+    }
+
+    public List<DeleteHistory> toDeleteHistories(User loginUser) {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, this.getId(), loginUser));
+        deleteHistories.addAll(answers.stream().map(a -> {
+            a.logicalDelete();
+            return new DeleteHistory(ContentType.ANSWER, a.getId(), loginUser);
+        }).collect(Collectors.toList()));
+        return Collections.unmodifiableList(deleteHistories);
     }
 }

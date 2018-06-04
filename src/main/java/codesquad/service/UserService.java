@@ -1,14 +1,13 @@
 package codesquad.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.exceptions.UnAuthenticationException;
+import codesquad.exceptions.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import codesquad.dto.UserDto;

@@ -2,14 +2,7 @@ package codesquad.domain;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 public class DeleteHistory {
@@ -26,9 +19,13 @@ public class DeleteHistory {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_deletehistory_to_user"))
     private User deletedBy;
 
-    private LocalDateTime createDate = LocalDateTime.now();
+    private LocalDateTime createDate;
 
     public DeleteHistory() {
+    }
+
+    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy) {
+        this(contentType, contentId, deletedBy, LocalDateTime.now());
     }
 
     public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
@@ -36,6 +33,26 @@ public class DeleteHistory {
         this.contentId = contentId;
         this.deletedBy = deletedBy;
         this.createDate = createDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public Long getContentId() {
+        return contentId;
+    }
+
+    public User getDeletedBy() {
+        return deletedBy;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
     }
 
     @Override
