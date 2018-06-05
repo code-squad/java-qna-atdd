@@ -45,6 +45,10 @@ public class AbstractEntity {
         return getFormattedDate(modifiedDate, "yyyy.MM.dd HH:mm:ss");
     }
 
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
     private String getFormattedDate(LocalDateTime dateTime, String format) {
         if (dateTime == null) {
             return "";

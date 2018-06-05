@@ -1,15 +1,9 @@
 package codesquad.domain;
 
-import java.time.LocalDateTime;
+import support.domain.AbstractEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class DeleteHistory {
@@ -36,6 +30,10 @@ public class DeleteHistory {
         this.contentId = contentId;
         this.deletedBy = deletedBy;
         this.createDate = createDate;
+    }
+
+    public static DeleteHistory convert(ContentType contentType, User deletedBy, AbstractEntity entity) {
+        return new DeleteHistory(contentType, entity.getId(), deletedBy, entity.getCreateDate());
     }
 
     @Override
