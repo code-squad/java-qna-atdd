@@ -19,7 +19,7 @@ public class QuestionController {
     private QnaService qnaService;
 
     @GetMapping("/form")
-    public String form() {
+    public String form(@LoginUser User user) {
         return "/qna/form";
     }
 

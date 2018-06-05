@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import codesquad.domain.User;
@@ -39,5 +40,14 @@ public abstract class AcceptanceTest {
     
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
+    }
+
+    protected String createResource(String path, Object bodyPayload, TestRestTemplate restTemplate){
+        ResponseEntity<String > response = restTemplate.postForEntity(path, bodyPayload, String.class);
+        return response.getHeaders().getLocation().getPath();
+    }
+
+    protected <T> T getResource(String location, Class<T> responseType, User loginUser){
+        return basicAuthTemplate(loginUser).getForObject(location, responseType);
     }
 }

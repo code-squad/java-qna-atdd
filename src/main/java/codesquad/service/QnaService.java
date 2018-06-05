@@ -70,8 +70,20 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    public Answer findByIdAnswer(long id){
+        return answerRepository.findById(id).get();
+    }
+
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        answer.toQuestion(findById(questionId).get());
+        return answerRepository.save(answer);
+    }
+
+    @Transactional
+    public void updateAnswer(User loginUser, long id, String updateContents){
+        Answer answer = findByIdAnswer(id);
+        answer.update(loginUser, updateContents);
     }
 
     public Answer deleteAnswer(User loginUser, long id) {

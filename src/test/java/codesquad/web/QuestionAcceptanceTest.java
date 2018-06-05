@@ -32,8 +32,14 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void form() {
-        ResponseEntity<String> response = template().getForEntity("/questions/form", String.class);
+        ResponseEntity<String> response = basicAuthTemplate().getForEntity("/questions/form", String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    }
+
+    @Test
+    public void form_no_login() {
+        ResponseEntity<String> response = template().getForEntity("/questions/form", String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test

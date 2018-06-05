@@ -7,6 +7,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -40,6 +41,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
         this.contents = contents;
         this.deleted = false;
+    }
+
+    public void update(User loginUser, String contents){
+        if(!isOwner(loginUser)){
+            throw new UnAuthorizedException("자신의 답변만 수정할 수 있습니다.");
+        }
+        this.contents = contents;
     }
 
     public User getWriter() {
