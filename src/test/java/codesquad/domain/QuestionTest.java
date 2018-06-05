@@ -11,7 +11,7 @@ public class QuestionTest {
 
     @Before
     public void setUp() {
-        question = new Question("제목1", "내용1", JAVAJIGI);
+        question = new Question(3L,"제목1", "내용1", JAVAJIGI);
     }
 
     @Test

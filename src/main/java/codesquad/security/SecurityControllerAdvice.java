@@ -33,4 +33,5 @@ public class SecurityControllerAdvice {
     public void unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
     }
+
 }

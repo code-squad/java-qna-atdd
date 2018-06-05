@@ -5,7 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
 
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
@@ -40,4 +44,15 @@ public abstract class AcceptanceTest {
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
     }
+
+    protected String createResource(String path, Object bodyPayload, User loginUser) {
+        ResponseEntity<String> response = basicAuthTemplate(loginUser).postForEntity(path, bodyPayload, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        return response.getHeaders().getLocation().getPath();
+    }
+
+    protected <T> T getResource(String location, Class<T> responseType, User loginUser) {
+        return basicAuthTemplate(loginUser).getForObject(location, responseType);
+    }
+//    Answer answer = getResource("url", Answer.class, lo)
 }

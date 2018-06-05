@@ -7,11 +7,15 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log =  LoggerFactory.getLogger(Answer.class);
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -31,6 +35,12 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public Answer(User writer, String contents) {
         this.writer = writer;
+        this.contents = contents;
+    }
+
+    public Answer(User writer, Question question, String contents) {
+        this.writer = writer;
+        this.question = question;
         this.contents = contents;
     }
 
@@ -65,7 +75,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public boolean isDeleted() {
         return deleted;
     }
-
+    
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
