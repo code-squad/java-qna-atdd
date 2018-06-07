@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.annotation.Resource;
 
 import codesquad.UnAuthorizedException;
+import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -42,6 +38,10 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
+    public Question show(long id) {
+        return findById(id).filter(q -> !q.isDeleted()).orElseThrow(UnAuthorizedException::new);
+    }
+
     public Question checkOwner(User loginUser, long id) {
         return findById(id).filter(q -> q.isOwner(loginUser)).orElseThrow(UnAuthorizedException::new);
     }
@@ -53,13 +53,11 @@ public class QnaService {
         log.debug("update Success : {}", original);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = CannotDeleteException.class)
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = findById(questionId).get();
-        if (!question.isOwner(loginUser)) {
-            throw new CannotDeleteException("사용자가 작성한 글이 아닙니다.");
-        }
-        questionRepository.deleteById(questionId);
+        List<DeleteHistory> deleteHistories = question.delete(loginUser);
+        deleteHistoryService.saveAll(deleteHistories);
     }
 
     public Iterable<Question> findAll() {
@@ -70,8 +68,8 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer findByIdAnswer(long id){
-        return answerRepository.findById(id).get();
+    public Answer findByIdAnswer(long id) {
+        return answerRepository.findById(id).filter(a -> !a.isDeleted()).orElseThrow(UnAuthorizedException::new);
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
@@ -81,13 +79,15 @@ public class QnaService {
     }
 
     @Transactional
-    public void updateAnswer(User loginUser, long id, String updateContents){
+    public void updateAnswer(User loginUser, long id, String updateContents) {
         Answer answer = findByIdAnswer(id);
         answer.update(loginUser, updateContents);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        Answer answer = findByIdAnswer(id);
+        DeleteHistory deleteHistory = answer.delete(loginUser);
+        deleteHistoryService.saveDeleteHistoryOfAnswer(deleteHistory);
     }
 }

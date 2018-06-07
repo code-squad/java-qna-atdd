@@ -36,11 +36,7 @@ public class ApiQuestionController {
 
     @GetMapping("{id}")
     public QuestionDto show(@PathVariable long id) {
-        Optional<Question> question = qnaService.findById(id);
-        if (!question.isPresent()) {
-            return null;
-        }
-        return question.get().toQuestionDto();
+        return qnaService.show(id).toQuestionDto();
     }
 
     @PutMapping("{id}")
@@ -51,8 +47,8 @@ public class ApiQuestionController {
     @DeleteMapping("{id}")
     public void delete(@LoginUser User loginUser, @PathVariable long id) {
         try {
-            qnaService.deleteQuestion(loginUser, id);
-        } catch (CannotDeleteException e) {
+        qnaService.deleteQuestion(loginUser, id);
+        } catch (CannotDeleteException e){
             e.getMessage();
         }
     }

@@ -7,9 +7,12 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -43,11 +46,19 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
-    public void update(User loginUser, String contents){
-        if(!isOwner(loginUser)){
+    public void update(User loginUser, String contents) {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException("자신의 답변만 수정할 수 있습니다.");
         }
         this.contents = contents;
+    }
+
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if (!isOwner(loginUser)) {
+            throw new CannotDeleteException("자신의 답변만 삭제할 수 있습니다.");
+        }
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
     }
 
     public User getWriter() {

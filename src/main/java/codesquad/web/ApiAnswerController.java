@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.User;
 import codesquad.dto.AnswerDto;
@@ -24,7 +25,7 @@ public class ApiAnswerController {
     private QnaService qnaService;
 
     @PostMapping("")
-    public ResponseEntity<Void> create(@LoginUser User loginUser, @PathVariable long questionId, @RequestBody String contents){
+    public ResponseEntity<Void> create(@LoginUser User loginUser, @PathVariable long questionId, @RequestBody String contents) {
         Answer answer = qnaService.addAnswer(loginUser, questionId, contents);
         log.debug("contents : {}", contents);
 
@@ -34,12 +35,21 @@ public class ApiAnswerController {
     }
 
     @GetMapping("/{id}")
-    public Answer show(@PathVariable long questionId, @PathVariable long id){
+    public Answer show(@PathVariable long id) {
         return qnaService.findByIdAnswer(id);
     }
 
     @PutMapping("/{id}")
-    public void update(@LoginUser User loginUser, @PathVariable long id, @RequestBody String updateContents){
+    public void update(@LoginUser User loginUser, @PathVariable long id, @RequestBody String updateContents) {
         qnaService.updateAnswer(loginUser, id, updateContents);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@LoginUser User loginUser, @PathVariable long id) {
+        try {
+            qnaService.deleteAnswer(loginUser, id);
+        } catch (CannotDeleteException e) {
+            e.getMessage();
+        }
     }
 }
