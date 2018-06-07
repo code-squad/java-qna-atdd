@@ -24,7 +24,7 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
-        Question question = qnaService.findById(id);
+        Question question = qnaService.findQuestionById(id);
         model.addAttribute("question", question.toQuestionDto());
         return "qna/show";
     }
@@ -42,7 +42,7 @@ public class QuestionController {
 
     @GetMapping("/{id}/form")
     public String showUpdateForm(@LoginUser User loginUser, @PathVariable Long id, Model model) {
-        Question question = qnaService.findById(loginUser, id);
+        Question question = qnaService.findQuestionById(loginUser, id);
         model.addAttribute("question", question.toQuestionDto());
         return "qna/updateForm";
     }

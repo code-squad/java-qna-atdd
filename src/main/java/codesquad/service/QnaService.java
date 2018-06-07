@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 import codesquad.dto.QuestionDto;
 import codesquad.exceptions.UnAuthorizedException;
@@ -38,17 +39,29 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
+    public Question findQuestionById(long id) {
         return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
     public Question update(User loginUser, long id, QuestionDto updatedQuestion) {
-        Question original = findById(loginUser, id); // 여기서도 유저 매칭 확인,
+        Question original = findQuestionById(loginUser, id); // 여기서도 유저 매칭 확인,
         return original.update(loginUser, updatedQuestion); // 여기서도 유저 매칭 확인, 같은 확인절차를 반복해서 하는 이유? 더욱 안전하게?
     }
 
-    public Question findById(User loginUser, long id) {
+    @Transactional
+    public Answer update(User loginUser, long id, String contents) {
+        Answer original = findAnswerById(loginUser, id);
+        return original.update(loginUser, contents);
+    }
+
+    private Answer findAnswerById(User loginUser, long id) {
+        return answerRepository.findById(id)
+                .filter(q -> q.isOwner(loginUser))
+                .orElseThrow(() -> new UnAuthorizedException("owner is not matched!"));
+    }
+
+    public Question findQuestionById(User loginUser, long id) {
         return questionRepository.findById(id)
                 .filter(q -> q.isOwner(loginUser))
                 .orElseThrow(() -> new UnAuthorizedException("owner is not matched!"));
@@ -56,7 +69,7 @@ public class QnaService {
 
     @Transactional
     public Question deleteQuestion(User loginUser, long questionId) throws UnAuthorizedException{
-        Question original = findById(loginUser, questionId);
+        Question original = findQuestionById(loginUser, questionId);
         if (original.isDeletable(loginUser)) {
             log.debug("question {} will be deleted", questionId);
             original.logicalDelete();
@@ -75,12 +88,22 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+        Answer newAnswer = new Answer(loginUser, contents);
+        findQuestionById(questionId).addAnswer(newAnswer);
+        return answerRepository.save(newAnswer);
     }
 
+    @Transactional
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
+        Answer original = findAnswerById(loginUser, id);
+        return original.logicalDelete();
+    }
+
+    public Question addQuestion(@Valid QuestionDto questionDto) {
         return null;
     }
 
+    public Answer findAnswerById(Long id) {
+        return answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
 }

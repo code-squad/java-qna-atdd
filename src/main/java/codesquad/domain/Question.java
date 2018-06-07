@@ -109,10 +109,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public List<DeleteHistory> toDeleteHistories(User loginUser) {
         List<DeleteHistory> deleteHistories = new ArrayList<>();
         deleteHistories.add(new DeleteHistory(ContentType.QUESTION, this.getId(), loginUser));
-        deleteHistories.addAll(answers.stream().map(a -> {
+        deleteHistories.addAll(toAnswerHistories(loginUser));
+        return Collections.unmodifiableList(deleteHistories);
+    }
+
+    private List<DeleteHistory> toAnswerHistories(User loginUser) {
+        return answers.stream().map(a -> {
             a.logicalDelete();
             return new DeleteHistory(ContentType.ANSWER, a.getId(), loginUser);
-        }).collect(Collectors.toList()));
-        return Collections.unmodifiableList(deleteHistories);
+        }).collect(Collectors.toList());
     }
 }

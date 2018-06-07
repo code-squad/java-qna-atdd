@@ -1,6 +1,7 @@
 package codesquad.domain;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.persistence.*;
 
@@ -53,6 +54,23 @@ public class DeleteHistory {
 
     public LocalDateTime getCreateDate() {
         return createDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeleteHistory that = (DeleteHistory) o;
+        return Objects.equals(id, that.id) &&
+                contentType == that.contentType &&
+                Objects.equals(contentId, that.contentId) &&
+                Objects.equals(deletedBy, that.deletedBy);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, contentType, contentId, deletedBy);
     }
 
     @Override

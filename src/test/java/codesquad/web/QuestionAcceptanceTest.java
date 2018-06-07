@@ -58,7 +58,6 @@ public class QuestionAcceptanceTest extends AcceptanceTest{
         log.debug("body : {}", response.getBody());
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertTrue(response.getBody().contains("제목"));
-
     }
 
     @Test
@@ -129,6 +128,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest{
         request = updateQuestionReq();
 
         response = basicAuthTemplate(otherUser).exchange(defaultQuestion.generateUrl(), HttpMethod.PUT, request, String.class);
+        log.debug("response : {}", response);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
 
     }
@@ -179,23 +179,6 @@ public class QuestionAcceptanceTest extends AcceptanceTest{
 
         response = template().exchange(defaultQuestion.generateUrl(), HttpMethod.DELETE, entity, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
-    }
-
-    private HttpEntity getHttpEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        return new HttpEntity(headers);
-    }
-
-    private HttpEntity<MultiValueMap<String, Object>> createQuestionReq() {
-        return HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", "질문 있어요!")
-                .addParameter("contents", "글자 길이 3이상").build();
-    }
-
-    private HttpEntity<MultiValueMap<String, Object>> updateQuestionReq() {
-        return HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", "질문 수정했음")
-                .addParameter("contents", "내용 수정했음").build();
     }
 
 }
