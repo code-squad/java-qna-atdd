@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
@@ -45,6 +46,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     private List<Answer> answers = new ArrayList<>();
 
     private boolean deleted = false;
+
+    private boolean isAnsweredByOthers;
 
     public Question() {
     }
@@ -77,6 +80,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
         answers.add(answer);
+        if (!isAnsweredByOthers && !answer.isOwner(writer)) {
+            isAnsweredByOthers = true;
+        }
     }
 
     public boolean isOwner(User loginUser) {
@@ -102,6 +108,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
+        if (isAnsweredByOthers) {
+            throw new CannotDeleteException();
+        }
         deleted = true;
         return new DeleteHistory(ContentType.QUESTION, super.getId(), loginUser, LocalDateTime.now());
     }
@@ -116,6 +125,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
             deletedAnswers.add(deletedAnswer);
         }
         return deletedAnswers;
+    }
+
+    public boolean hasAnswers() {
+        return answers.size() != 0;
     }
 
     @Override

@@ -16,11 +16,11 @@ import static org.junit.Assert.assertThat;
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger logger = LoggerFactory.getLogger(QuestionAcceptanceTest.class);
     private static final String FORM_URL = "/questions/form";
-    private static final String SUBMIT_URL = "/questions/submit";
+    private static final String CREATE_URL = "/questions/create";
     private static final String VALID_SHOW_URL = "/questions/1";
     private static final String INVALID_SHOW_URL = "/questions/10";
-    private static final String UPDATE_URL = "/questions/1/update";
-    private static final String DELETE_URL = "/questions/1/delete";
+    private static final String UPDATE_FORM_URL = "/questions/1/update";
+    private static final String UPDATE_DELETE_URL = "/questions/1";
     private static final String DEFAULT_CONTENT = "content";
     private static final String DEFAULT_TITLE = "국내에서 Ruby on Rails와 Play가 활성화되기 힘든 이유는 뭘까?";
 
@@ -41,7 +41,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create_logged_in() throws Exception {
-        ResponseEntity<String> response = createPutResponse(basicAuthTemplate(), SUBMIT_URL);
+        ResponseEntity<String> response = createPutResponse(basicAuthTemplate(), CREATE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertThat(response.getHeaders().getLocation().getPath(), is("/"));
@@ -49,7 +49,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create_NOT_logged_in() throws Exception {
-        ResponseEntity<String> response = createPutResponse(template(), SUBMIT_URL);
+        ResponseEntity<String> response = createPutResponse(template(), CREATE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
@@ -71,14 +71,14 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void updateForm_logged_in() throws Exception {
         User loginUser = defaultUser();
-        ResponseEntity<String> response = createResponse(basicAuthTemplate(loginUser), UPDATE_URL);
+        ResponseEntity<String> response = createResponse(basicAuthTemplate(loginUser), UPDATE_FORM_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 
     @Test
     public void updateForm_NOT_logged_in() throws Exception {
-        ResponseEntity<String> response = createResponse(template(), UPDATE_URL);
+        ResponseEntity<String> response = createResponse(template(), UPDATE_FORM_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
@@ -86,7 +86,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void update_logged_in() throws Exception {
         User loginUser = defaultUser();
-        ResponseEntity<String> response = createPutResponse(basicAuthTemplate(loginUser), UPDATE_URL);
+        ResponseEntity<String> response = createPutResponse(basicAuthTemplate(loginUser), UPDATE_DELETE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertThat(response.getHeaders().getLocation().getPath(), is("/questions/1"));
@@ -94,7 +94,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void update_NOT_logged_in() throws Exception {
-        ResponseEntity<String> response = createPutResponse(template(), UPDATE_URL);
+        ResponseEntity<String> response = createPutResponse(template(), UPDATE_DELETE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
@@ -102,7 +102,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void delete_logged_in() throws Exception {
         User loginUser = defaultUser();
-        ResponseEntity<String> response = createDeleteResponse(basicAuthTemplate(loginUser), DELETE_URL);
+        ResponseEntity<String> response = createDeleteResponse(basicAuthTemplate(loginUser), UPDATE_DELETE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertThat(response.getHeaders().getLocation().getPath(), is("/"));
@@ -110,7 +110,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void delete_NOT_logged_in() throws Exception {
-        ResponseEntity<String> response = createDeleteResponse(template(), DELETE_URL);
+        ResponseEntity<String> response = createDeleteResponse(template(), UPDATE_DELETE_URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }

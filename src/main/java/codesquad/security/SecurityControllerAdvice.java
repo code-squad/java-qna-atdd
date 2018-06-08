@@ -2,6 +2,7 @@ package codesquad.security;
 
 import javax.persistence.EntityNotFoundException;
 
+import codesquad.CannotDeleteException;
 import codesquad.NoSuchEntityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,5 +40,11 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public void NoSuchEntity() {
         log.debug("NoSuchEntityException has occurred!");
+    }
+
+    @ExceptionHandler(CannotDeleteException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public void cannotDelete() {
+        log.debug("CannotDeleteException has occurred");
     }
 }
