@@ -7,6 +7,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -31,6 +33,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public Answer() {
     }
 
+    public Answer(String contents) {
+        this.contents = contents;
+    }
+
     public Answer(User writer, String contents) {
         this.writer = writer;
         this.contents = contents;
@@ -42,6 +48,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
         this.contents = contents;
         this.deleted = false;
+    }
+
+    public void writeBy(User user) {
+        this.writer = user;
     }
 
     public User getWriter() {
@@ -68,9 +78,16 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public DeleteHistory deleteAnswer(User user) {
-        //TODO: Authorization
-        this.deleted = true;
+    DeleteHistory deleteAnswerByDeletedQuestion(User user) {
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, super.getId(), user, LocalDateTime.now());
+    }
+
+    public DeleteHistory deleteAnswerByOwner(User user) {
+        if (!writer.equals(user)) {
+            throw new UnAuthorizedException();
+        }
+        deleted = true;
         return new DeleteHistory(ContentType.ANSWER, super.getId(), user, LocalDateTime.now());
     }
 
@@ -82,5 +99,9 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(contents);
     }
 }

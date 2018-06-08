@@ -2,6 +2,7 @@ package codesquad.security;
 
 import javax.persistence.EntityNotFoundException;
 
+import codesquad.NoSuchEntityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,11 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public void unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
+    }
+
+    @ExceptionHandler(NoSuchEntityException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public void NoSuchEntity() {
+        log.debug("NoSuchEntityException has occurred!");
     }
 }

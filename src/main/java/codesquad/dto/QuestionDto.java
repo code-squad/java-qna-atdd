@@ -3,6 +3,7 @@ package codesquad.dto;
 import codesquad.domain.Question;
 
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class QuestionDto {
     private long id;
@@ -54,5 +55,19 @@ public class QuestionDto {
 
     public Question toQuestion() {
         return new Question(title, contents);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QuestionDto)) return false;
+        QuestionDto that = (QuestionDto) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, title, contents);
     }
 }

@@ -33,7 +33,7 @@ public class ApiUserController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/users/" + savedUser.getId()));
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
     
     @GetMapping("{id}")
