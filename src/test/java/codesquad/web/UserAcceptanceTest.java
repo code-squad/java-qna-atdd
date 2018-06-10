@@ -37,7 +37,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         String userId = "testuser";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
-                .addParameter("password", "test")
+                .addParameter("password", "testtest")
                 .addParameter("name", "자바지기")
                 .addParameter("email", "javajigi@slipp.net")
                 .build();

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.persistence.EntityNotFoundException;
 
+// 컨트롤러에 추가적인 기능?
 @ControllerAdvice
 public class SecurityControllerAdvice {
     private static final Logger log = LoggerFactory.getLogger(SecurityControllerAdvice.class);
@@ -22,13 +23,13 @@ public class SecurityControllerAdvice {
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN) // 403 권한없음
     public void unAuthorized() {
         log.debug("UnAuthorizedException is happened!");
     }
 
     @ExceptionHandler(UnAuthenticationException.class)
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED) // 401 인증관련, 의미상 이게 더 맞다
     public void unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
     }

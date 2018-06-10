@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
@@ -52,7 +53,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public void writeBy(User loginUser) {
-        this.writer = loginUser;
+        writer = loginUser;
     }
 
     public void addAnswer(Answer answer) {
@@ -70,15 +71,24 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String generateUrl() {
-        return String.format("/questions/%d", getId());
+        return String.format("/qna/%d", getId());
     }
 
     public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
+        return new QuestionDto(getId(), title, contents);
     }
 
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public void update(Question target, User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("question writer not equal");
+        }
+
+        title = target.title;
+        contents = target.contents;
     }
 }

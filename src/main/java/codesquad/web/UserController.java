@@ -57,7 +57,6 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession httpSession) {
-        // TODO 이게 왜 동작하지?
         User newUser = null;
         try {
             newUser = userService.login(userId, password);

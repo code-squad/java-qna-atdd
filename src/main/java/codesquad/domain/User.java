@@ -8,6 +8,7 @@ import support.domain.AbstractEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @Entity
 public class User extends AbstractEntity {
@@ -69,6 +70,7 @@ public class User extends AbstractEntity {
             throw new UnAuthorizedException();
         }
 
+        // TODO 그냥 리턴은 뭐지?
         if (!matchPassword(target.getPassword())) {
             return;
         }
@@ -93,6 +95,21 @@ public class User extends AbstractEntity {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        User user = (User) o;
+        return Objects.equals(userId, user.userId) &&
+                Objects.equals(password, user.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), userId, password);
     }
 
     private static class GuestUser extends User {

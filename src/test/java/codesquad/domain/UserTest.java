@@ -26,9 +26,8 @@ public class UserTest {
     @Test
     public void update_owner() throws Exception {
         User origin = newUser("sanjigi");
-        User loginUser = origin;
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
-        origin.update(loginUser, target);
+        origin.update(origin, target);
         assertThat(origin.getName(), is(target.getName()));
         assertThat(origin.getEmail(), is(target.getEmail()));
     }
@@ -39,15 +38,6 @@ public class UserTest {
         User loginUser = newUser("javajigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(loginUser, target);
-    }
-
-    @Test
-    public void update_match_password() {
-        User origin = newUser("sanjigi");
-        User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
-        origin.update(origin, target);
-        assertThat(origin.getName(), is(target.getName()));
-        assertThat(origin.getEmail(), is(target.getEmail()));
     }
 
     @Test
