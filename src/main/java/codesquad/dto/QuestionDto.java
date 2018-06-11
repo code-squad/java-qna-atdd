@@ -1,11 +1,13 @@
 package codesquad.dto;
 
 import codesquad.domain.Question;
+import codesquad.domain.User;
 
 import javax.validation.constraints.Size;
 
 public class QuestionDto {
     private long id;
+    private User writer;
 
     @Size(min = 3, max = 100)
     private String title;
@@ -15,14 +17,22 @@ public class QuestionDto {
 
     public QuestionDto() {}
 
-    public QuestionDto(String title, String contents) {
-        this(0, title, contents);
-    }
-
-    public QuestionDto(long id, String title, String contents) {
+    public QuestionDto(long id, String title, String contents, User writer) {
         this.id = id;
         this.title = title;
         this.contents = contents;
+        this.writer = writer;
+    }
+
+    public QuestionDto(String title, String contents, User writer) {
+        super();
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
+    }
+
+    public Question toQuestion() {
+        return new Question(this.id, this.title, this.contents, this.writer);
     }
 
     public long getId() {
@@ -49,6 +59,15 @@ public class QuestionDto {
 
     public QuestionDto setContents(String contents) {
         this.contents = contents;
+        return this;
+    }
+
+    public User getWriter() {
+        return writer;
+    }
+
+    public QuestionDto setWriter(User writer) {
+        this.writer = writer;
         return this;
     }
 }

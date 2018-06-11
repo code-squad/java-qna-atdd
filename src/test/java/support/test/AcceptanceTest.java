@@ -1,5 +1,8 @@
 package support.test;
 
+import codesquad.CannotDeleteException;
+import codesquad.domain.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.is;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -53,6 +53,6 @@ public abstract class AcceptanceTest {
 
     protected <T> T getResource(String location, Class<T> responseType, User loginUser) {
         return basicAuthTemplate(loginUser).getForObject(location, responseType);
+        //    Answer answer = getResource("url", Answer.class, lo)
     }
-//    Answer answer = getResource("url", Answer.class, lo)
 }

@@ -34,11 +34,11 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
-        question.writeBy(loginUser);
+    public Question create(User loginUser, QuestionDto questionDto) {
+        questionDto.toQuestion().writeBy(loginUser);
         log.info("qnaservice create called, login user is {}", loginUser.toString());
-        log.debug("question : {}", question);
-        return questionRepository.save(question);
+        log.debug("question : {}", questionDto.toQuestion().toString());
+        return questionRepository.save(questionDto.toQuestion());
     }
 
     public Optional<Question> findById(long id) {
@@ -46,10 +46,10 @@ public class QnaService {
     }
 
     @Transactional
-    public void update(User loginUser, long id, Question updatedQuestion) {
+    public void update(User loginUser, long id, QuestionDto updatedQuestion) {
         log.info("qnaservice update method called");
         Question original = findById(id).get();
-        original.update(loginUser, updatedQuestion);
+        original.update(loginUser, updatedQuestion.toQuestion());
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class QnaService {
         Question question = questionRepository.findById(questionId).get();
         if (!question.isOwner(loginUser))
             throw new CannotDeleteException("자신이 쓴 글만 삭제할 수 있습니다.");
-        questionRepository.delete(question);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -82,6 +82,6 @@ public class QnaService {
         Answer answer = answerRepository.findById(id).get();
         if (!answer.isOwner(loginUser))
             throw new CannotDeleteException("자신이 쓴 댓글만 삭제할 수 있습니다.");
-        answerRepository.delete(answer);
+        deleteHistoryService.save(answer.delete(loginUser));
     }
 }

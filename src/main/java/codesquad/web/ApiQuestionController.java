@@ -26,9 +26,10 @@ public class ApiQuestionController {
 
     @Resource(name = "qnaService")
     private QnaService qnaService;
+
     @PostMapping("")
-    public ResponseEntity<Void> create(@LoginUser User loginUser, @Valid @RequestBody Question question) {
-        Question createQuestion = qnaService.create(loginUser, question);
+    public ResponseEntity<Void> create(@LoginUser User loginUser, @Valid @RequestBody QuestionDto questionDto) {
+        Question createQuestion = qnaService.create(loginUser, questionDto);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/questions/" + createQuestion.getId()));
@@ -47,12 +48,17 @@ public class ApiQuestionController {
     }
 
     @PutMapping("{id}")
-    public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody Question updateQuestion) {
+    public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody QuestionDto updateQuestion) {
         qnaService.update(loginUser, id, updateQuestion);
     }
 
     @DeleteMapping("{id}")
     public void delete(@LoginUser User loginUser, @PathVariable long id) throws CannotDeleteException {
-        qnaService.deleteQuestion(loginUser, id);
+        try {
+            qnaService.deleteQuestion(loginUser, id);
+        } catch (CannotDeleteException e) {
+            e.getMessage();
+            log.info("error message : {}", e.getMessage());
+        }
     }
 }

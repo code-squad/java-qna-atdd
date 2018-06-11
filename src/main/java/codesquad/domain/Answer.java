@@ -7,10 +7,14 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -52,6 +56,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if (getQuestion().isDeleted() == false)
+            throw new CannotDeleteException("댓글을 삭제할 수 없습니다.");
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
+    }
+
     public User getWriter() {
         return writer;
     }
@@ -62,6 +73,21 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public String getContents() {
         return contents;
+    }
+
+    public Answer setWriter(User writer) {
+        this.writer = writer;
+        return this;
+    }
+
+    public Answer setQuestion(Question question) {
+        this.question = question;
+        return this;
+    }
+
+    public Answer setContents(String contents) {
+        this.contents = contents;
+        return this;
     }
 
     public void toQuestion(Question question) {

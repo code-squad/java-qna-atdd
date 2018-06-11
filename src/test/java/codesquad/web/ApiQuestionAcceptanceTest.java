@@ -24,19 +24,20 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log =  LoggerFactory.getLogger(ApiQuestionAcceptanceTest.class);
     private User writer;
     private Question question;
+    private QuestionDto questionDto;
 
     @Before
     public void setUp() {
         writer = new User("jimmy", "12345", "jimmy", "jaeyeon93@naver.com");
-        question = new Question(3L,"제목11", "내용11", writer);
     }
 
     @Test
     public void create() throws Exception {
-        question = new Question(3L,"제목112", "내용119", writer);
-        String path = createResource("/api/questions", question, writer);
-        log.info("path is : {}", path);
-        assertThat(getResource(path, Question.class, writer), is(question));
+        writer = new User("jimmy", "12345", "hello", "jaeyeon93@naver.com");
+        questionDto = new QuestionDto(4L,"제목6856", "내용4528", defaultUser());
+        String path = createResource("/api/questions", questionDto, defaultUser());
+        Question question = getResource(path, Question.class, writer);
+        assertThat(getResource(path, Question.class, writer), is(questionDto.toQuestion()));
     }
 
     @Test
@@ -53,17 +54,17 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void update() throws Exception {
-        question = new Question(3L,"제목112", "내용119", writer);
-        String path = createResource("/api/questions", question, writer);
-        Question newQuestion = new Question(3L, "제목수정", "내용수정", writer);
+        questionDto = new QuestionDto(5L,"제목112", "내용119", defaultUser());
+        String path = createResource("/api/questions", questionDto, defaultUser());
+        QuestionDto newQuestion = new QuestionDto(5L, "제목수정", "내용수정", defaultUser());
         basicAuthTemplate(writer).put(path, newQuestion);
-        assertThat(getResource(path, Question.class, writer), is(newQuestion));
+        assertThat(getResource(path, Question.class, defaultUser()), is(newQuestion.toQuestion()));
     }
 
     @Test
     public void delete() throws Exception {
-        question = new Question(3L,"제목112", "내용119", writer);
-        String path = createResource("/api/questions", question, writer);
-        basicAuthTemplate(writer).delete(path);
+        question = new QuestionDto(4L,"제목112", "내용119", defaultUser()).toQuestion();
+        String path = createResource("/api/questions", question, defaultUser());
+        basicAuthTemplate(defaultUser()).delete(path);
     }
 }

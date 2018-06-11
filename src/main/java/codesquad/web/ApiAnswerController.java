@@ -32,6 +32,7 @@ public class ApiAnswerController {
         Answer createAnswer = qnaService.addAnswer(loginUser, questionId, contents);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(String.format("/api/questions/%d/answers/", questionId) + createAnswer.getId()));
+        log.info("댓글 생성");
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
 

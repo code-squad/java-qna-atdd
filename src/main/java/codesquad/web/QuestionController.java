@@ -32,8 +32,8 @@ public class QuestionController {
     }
 
     @PostMapping("")
-    public String create(@LoginUser User loginUser, Question question) {
-        qnaService.create(loginUser, question);
+    public String create(@LoginUser User loginUser, QuestionDto questionDto) {
+        qnaService.create(loginUser, questionDto);
         return "redirect:/questions";
     }
 
@@ -58,7 +58,7 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-    public String updateQnA(@LoginUser User loginUser, @PathVariable long id, Question target) {
+    public String updateQnA(@LoginUser User loginUser, @PathVariable long id, QuestionDto target) {
         qnaService.update(loginUser, id, target);
         return "redirect:/questions";
     }

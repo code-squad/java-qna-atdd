@@ -1,19 +1,14 @@
 package codesquad.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import codesquad.CannotDeleteException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
 
 import codesquad.dto.QuestionDto;
@@ -38,9 +33,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
+    @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
 
     private boolean deleted = false;
@@ -51,6 +47,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public Question(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public Question(String title, String contents, User writer) {
+        this(0L,title, contents, writer);
     }
 
     public Question(long id, String title, String contents, User writer) {
@@ -68,12 +68,20 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         log.info("update success");
     }
 
+    public QuestionDto toQuestionDto() {
+        return new QuestionDto(this.title, this.contents, this.writer);
+    }
+
     public String getTitle() {
         return title;
     }
 
     public String getContents() {
         return contents;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
     }
 
     public User getWriter() {
@@ -94,6 +102,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public boolean isDeleted() {
+        log.info("isDeleted 호출");
         return deleted;
     }
 
@@ -102,20 +111,36 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return String.format("/questions/%d", getId());
     }
 
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
-    }
-
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        if (!isOwner(loginUser) || answerWriterCheck())
+            throw new CannotDeleteException("자신이 쓴 글만 삭제할 수 있습니다.");
+        log.info("삭제성공");
+        deleted = true;
+        List<DeleteHistory> histories = deleteAnswer(loginUser);
+//        List<DeleteHistory> histories = new ArrayList<>();
+        histories.add(new DeleteHistory(ContentType.QUESTION ,getId(), loginUser, LocalDateTime.now()));
+        return histories;
     }
 
-    public void setContents(String contents) {
-        this.contents = contents;
+    public List<DeleteHistory> deleteAnswer(User loginUser) throws CannotDeleteException {
+        List<DeleteHistory> histories = new ArrayList<>();
+        log.info("getAnswers : {}", getAnswers());
+        for (Answer answer : getAnswers()) {
+            log.info("for문호출");
+            histories.add(answer.delete(loginUser));
+        }
+        return histories;
+    }
+
+    public boolean answerWriterCheck() {
+        for (Answer answer : answers)
+            if (!answer.isOwner(this.writer))
+                return true;
+        return false;
     }
 }
