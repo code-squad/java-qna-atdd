@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import static support.domain.EntityName.QUESTION;
 import static support.domain.EntityName.getModelName;
@@ -33,26 +34,26 @@ public class QuestionController {
     }
 
     @PostMapping
-    public String create(@LoginUser User loginUser, QuestionDto questionDto) {
+    public String create(@LoginUser User loginUser, @Valid QuestionDto questionDto) {
         return qnaService.create(loginUser, questionDto).generateRedirectUrl();
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
-        Question question = qnaService.findById(id);
+        Question question = qnaService.findQuestionById(id);
         model.addAttribute(getModelName(QUESTION), question);
         return getViewPath(QNA_SHOW);
     }
 
     @GetMapping("/{id}/form")
     public String edit(@LoginUser User loginUser, @PathVariable Long id, Model model) {
-        model.addAttribute(getModelName(QUESTION), qnaService.findById(loginUser, id));
+        model.addAttribute(getModelName(QUESTION), qnaService.findQuestionById(loginUser, id));
         return getViewPath(QNA_EDIT);
     }
 
     @PutMapping("/{id}")
     public String update(@LoginUser User loginUser, @PathVariable Long id, QuestionDto updateQuestionDto) {
-        QuestionDto updatedQuestionDto = qnaService.update(loginUser, id, updateQuestionDto);
+        QuestionDto updatedQuestionDto = qnaService.updateQuestion(loginUser, id, updateQuestionDto);
         return updatedQuestionDto.toQuestion().generateRedirectUrl();
     }
 

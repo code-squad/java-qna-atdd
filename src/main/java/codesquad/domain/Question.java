@@ -105,8 +105,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         if (isDeleted()) {
             throw new CannotDeleteException("not exist question");
         }
-        ArrayList<DeleteHistory> histories = new ArrayList<>();
         validateAuthorize(loginUser);
+
+        ArrayList<DeleteHistory> histories = new ArrayList<>();
         deleted = true;
         histories.add(DeleteHistory.convert(QUESTION, loginUser, this));
         deleteAnswers(loginUser, histories);

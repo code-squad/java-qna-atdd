@@ -18,9 +18,13 @@ public class QnaAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
     private ResponseEntity<String> create(TestRestTemplate template) throws Exception {
+        return create(template, "test title", "test content");
+    }
+
+    private ResponseEntity<String> create(TestRestTemplate template, String title, String content) throws Exception {
         HtmlFormDataBuilder builder = HtmlFormDataBuilder.encodeform();
-        builder.addParameter("title", "test title");
-        builder.addParameter("contents", "test content");
+        builder.addParameter("title", title);
+        builder.addParameter("contents", content);
         HttpEntity<MultiValueMap<String, Object>> request = builder.build();
         return template.postForEntity("/questions", request, String.class);
     }
@@ -30,6 +34,12 @@ public class QnaAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = create(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         log.debug("question created body : {}", response.getBody());
+    }
+
+    @Test
+    public void create_fail_invalid_Question() throws Exception {
+        ResponseEntity<String> response = create(basicAuthTemplate(), "", "");
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
     @Test

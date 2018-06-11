@@ -2,10 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
-import codesquad.domain.Answer;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import codesquad.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -27,6 +23,12 @@ public class QnaServiceTest {
 
     @Mock
     private QuestionRepository questionRepo;
+
+    @Mock
+    private AnswerRepository answerRepo;
+
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
 
     @InjectMocks
     private QnaService qnaService;
@@ -57,12 +59,12 @@ public class QnaServiceTest {
     @Test(expected = EntityNotFoundException.class)
     public void read_not_exist() {
         when(questionRepo.findById(anyLong())).thenReturn(Optional.empty());
-        qnaService.findById(anyLong());
+        qnaService.findQuestionById(anyLong());
     }
 
     @Test(expected = EntityNotFoundException.class)
     public void read_fail_not_exist() {
-        qnaService.findById(10000L);
+        qnaService.findQuestionById(10000L);
     }
 
     @Test
@@ -75,13 +77,13 @@ public class QnaServiceTest {
     public void update() {
         updateQuestion.writeBy(user);
         when(questionRepo.findById(anyLong())).thenReturn(Optional.of(question));
-        qnaService.update(user, anyLong(), updateQuestion.toQuestionDto());
+        qnaService.updateQuestion(user, anyLong(), updateQuestion.toQuestionDto());
     }
 
     @Test(expected = UnAuthorizedException.class)
     public void update_fail_not_math_writer() {
         when(questionRepo.findById(anyLong())).thenReturn(Optional.of(question));
-        qnaService.update(otherUser, anyLong(), updateQuestion.toQuestionDto());
+        qnaService.updateQuestion(otherUser, anyLong(), updateQuestion.toQuestionDto());
     }
 
     @Test

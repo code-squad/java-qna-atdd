@@ -1,6 +1,8 @@
 package codesquad.domain;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
+import codesquad.dto.AnswerDto;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -28,6 +30,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public Answer() {
     }
 
+    public Answer(String contents) {
+        this.contents = contents;
+    }
+
     public Answer(User writer, String contents) {
         this.writer = writer;
         this.contents = contents;
@@ -41,6 +47,20 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
+    public Answer writeBy(User writer) {
+        if (this.writer == null) {
+            this.writer = writer;
+        }
+        return this;
+    }
+
+    public Answer toQuestion(Question question) {
+        if (this.question == null) {
+            this.question = question;
+        }
+        return this;
+    }
+
     public User getWriter() {
         return writer;
     }
@@ -51,10 +71,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public String getContents() {
         return contents;
-    }
-
-    public void toQuestion(Question question) {
-        this.question = question;
     }
 
     public boolean isOwner(User loginUser) {
@@ -70,9 +86,8 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
     }
 
-    @Override
-    public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    public String questionPath() {
+        return question.generateApiUrl();
     }
 
     public DeleteHistory delete(User loginUser) throws CannotDeleteException {
@@ -81,5 +96,26 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         }
         deleted = true;
         return DeleteHistory.convert(ANSWER, loginUser, this);
+    }
+
+    public AnswerDto update(User loginUser, AnswerDto updatedAnswer) {
+        checkAuthority(loginUser);
+        this.contents = updatedAnswer.getContents();
+        return toAnswerDto();
+    }
+
+    private void checkAuthority(User loginUser) {
+        if (!writer.equals(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+    }
+
+    public AnswerDto toAnswerDto() {
+        return new AnswerDto(getId(), contents);
+    }
+
+    @Override
+    public String toString() {
+        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
 }
