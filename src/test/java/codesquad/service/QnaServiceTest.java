@@ -27,11 +27,11 @@ public class QnaServiceTest {
     @Mock
     private AnswerRepository answerRepository;
 
-    @InjectMocks
-    private QnaService qnaService;
-
     @Mock
     private DeleteHistoryService deleteHistoryService;
+
+    @InjectMocks
+    private QnaService qnaService;
 
     private User javajigi;
     private User sanjigi;
@@ -49,7 +49,6 @@ public class QnaServiceTest {
     @Test(expected = EntityNotFoundException.class)
     public void read_fail_question_not_found() {
         when(questionRepository.findById(anyLong())).thenReturn(Optional.empty());
-
         qnaService.findQuestionById(DEFAULT_QUESTION_ID);
     }
 
@@ -63,8 +62,6 @@ public class QnaServiceTest {
     public void update_fail_owner_not_match() {
         question.writeBy(javajigi);
         when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
-        when(questionRepository.findById(anyLong()).filter(q -> q.isOwner(sanjigi))).thenReturn(Optional.empty());
-
         qnaService.update(sanjigi, DEFAULT_QUESTION_ID, question.toQuestionDto());
     }
 
@@ -73,15 +70,28 @@ public class QnaServiceTest {
         question.writeBy(javajigi);
         when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
         when(questionRepository.findById(anyLong()).filter(q -> q.isOwner(javajigi))).thenReturn(Optional.of(question));
-
         qnaService.update(javajigi, DEFAULT_QUESTION_ID, question.toQuestionDto());
     }
 
-    @Test(expected = UnAuthorizedException.class)
-    public void delete_fail_owner_not_match() {
+    @Test(expected = EntityNotFoundException.class)
+    public void delete_false_no_question() {
         question.writeBy(javajigi);
         when(questionRepository.findById(anyLong())).thenReturn(Optional.empty());
+        qnaService.deleteQuestion(javajigi, DEFAULT_QUESTION_ID);
+    }
 
+    @Test
+    public void delete_success_owner_match_no_answer() {
+        question.writeBy(javajigi);
+        when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
+        qnaService.deleteQuestion(javajigi, DEFAULT_QUESTION_ID);
+        assertTrue(question.isDeleted());
+    }
+
+    @Test(expected = UnAuthorizedException.class)
+    public void delete_fail_owner_not_match_no_answer() {
+        question.writeBy(javajigi);
+        when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
         qnaService.deleteQuestion(sanjigi, DEFAULT_QUESTION_ID);
     }
 
@@ -90,21 +100,20 @@ public class QnaServiceTest {
         question.writeBy(javajigi);
         question.addAnswer(new Answer(sanjigi, "hello"));
         when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
-
         qnaService.deleteQuestion(javajigi, DEFAULT_QUESTION_ID);
-
     }
 
     @Test
-    public void delete_success() {
+    public void delete_success_answer_writer_match() {
         question.writeBy(javajigi);
         question.addAnswer(new Answer(javajigi, "hello"));
         when(questionRepository.findById(anyLong())).thenReturn(Optional.of(question));
-        doNothing().when(deleteHistoryService).registerHistory(javajigi, question);
         when(questionRepository.save(question)).thenReturn(question);
 
         Question returned = qnaService.deleteQuestion(javajigi, DEFAULT_QUESTION_ID);
         assertThat(returned.isDeleted(), is(true));
+        assertThat(returned.toDeleteHistories(javajigi).size(), is(2));
+        verify(deleteHistoryService, times(1)).registerHistory(any(User.class), any(Question.class));
     }
 
     @Test

@@ -118,5 +118,5 @@ public class Question extends AbstractEntity implements UrlGeneratable {
             a.logicalDelete();
             return new DeleteHistory(ContentType.ANSWER, a.getId(), loginUser);
         }).collect(Collectors.toList());
-    }
+    }           
 }

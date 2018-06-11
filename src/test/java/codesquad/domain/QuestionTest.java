@@ -28,14 +28,19 @@ public class QuestionTest {
     }
 
     @Test
-    public void deletable_true() {
-        question.addAnswer(new Answer(javajigi, "hello"));
+    public void deletable_true_no_answer() {
         assertTrue(question.isDeletable(javajigi));
     }
 
     @Test
     public void deletable_false_owner_not_match() {
         assertFalse(question.isDeletable(sanjigi));
+    }
+
+    @Test
+    public void deletable_true_owner_answer() {
+        question.addAnswer(new Answer(javajigi, "hello"));
+        assertTrue(question.isDeletable(javajigi));
     }
 
     @Test

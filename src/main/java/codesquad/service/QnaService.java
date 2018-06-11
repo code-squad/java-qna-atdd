@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
@@ -56,13 +57,13 @@ public class QnaService {
     }
 
     private Answer findAnswerById(User loginUser, long id) {
-        return answerRepository.findById(id)
+        return Optional.ofNullable(findAnswerById(id))
                 .filter(q -> q.isOwner(loginUser))
                 .orElseThrow(() -> new UnAuthorizedException("owner is not matched!"));
     }
 
     public Question findQuestionById(User loginUser, long id) {
-        return questionRepository.findById(id)
+        return Optional.ofNullable(findQuestionById(id))
                 .filter(q -> q.isOwner(loginUser))
                 .orElseThrow(() -> new UnAuthorizedException("owner is not matched!"));
     }
@@ -106,4 +107,5 @@ public class QnaService {
     public Answer findAnswerById(Long id) {
         return answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
+
 }
