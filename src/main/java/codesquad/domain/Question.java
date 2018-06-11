@@ -108,9 +108,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         validateAuthorize(loginUser);
 
         ArrayList<DeleteHistory> histories = new ArrayList<>();
+        deleteAnswers(loginUser, histories);
         deleted = true;
         histories.add(DeleteHistory.convert(QUESTION, loginUser, this));
-        deleteAnswers(loginUser, histories);
         return histories;
     }
 

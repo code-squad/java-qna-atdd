@@ -18,8 +18,6 @@ import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
-    private static final Logger log = LoggerFactory.getLogger(QnaService.class);
-
     @Resource(name = "questionRepository")
     private QuestionRepository questionRepo;
 
@@ -78,7 +76,10 @@ public class QnaService {
 
     @Transactional
     public Answer addAnswer(User loginUser, long questionId, AnswerDto answerDto) {
-        return answerDto.toAnswer().writeBy(loginUser).toQuestion(questionRepo.findById(questionId).orElseThrow(EntityNotFoundException::new));
+        Question question = questionRepo.findById(questionId).orElseThrow(EntityNotFoundException::new);
+        Answer answer = answerDto.toAnswer().writeBy(loginUser).toQuestion(question);
+        question.addAnswer(answerDto.toAnswer());
+        return answer;
     }
 
     @Transactional(rollbackFor = CannotDeleteException.class)
