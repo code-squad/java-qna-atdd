@@ -3,9 +3,14 @@ package codesquad.web;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
+import codesquad.UnAuthenticationException;
+import codesquad.domain.UserRepository;
+import codesquad.security.HttpSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +35,18 @@ public class UserController {
     @GetMapping("/form")
     public String form() {
         return "/user/form";
+    }
+
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession httpSession) {
+        // TODO 로그인 기능 구현 및 세션에 User 정보 저장
+        try {
+            User user = userService.login(userId, password);
+            httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
+            return "redirect:/users";
+        } catch (UnAuthenticationException e) {
+            return "/user/login_failed";
+        }
     }
 
     @PostMapping("")
