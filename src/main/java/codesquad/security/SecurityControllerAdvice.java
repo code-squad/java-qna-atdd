@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
+import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice
 public class SecurityControllerAdvice {
@@ -32,5 +33,6 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public void unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
+//        return "/user/login_failed";
     }
 }

@@ -1,23 +1,22 @@
 package codesquad.web;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.UnAuthenticationException;
+import codesquad.domain.User;
+import codesquad.dto.UserDto;
+import codesquad.security.HttpSessionUtils;
+import codesquad.security.LoginUser;
+import codesquad.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import codesquad.domain.User;
-import codesquad.dto.UserDto;
-import codesquad.security.LoginUser;
-import codesquad.service.UserService;
+import javax.annotation.Resource;
+import javax.naming.AuthenticationException;
+import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
@@ -58,4 +57,15 @@ public class UserController {
         return "redirect:/users";
     }
 
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession session) {
+        try {
+            Optional<User> maybeLoginedUser = Optional.ofNullable(userService.login(userId, password));
+            session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, maybeLoginedUser);
+        } catch (UnAuthenticationException e) {
+            log.debug(e.getMessage());
+            return "/user/login_failed";
+        }
+        return "redirect:/users";
+    }
 }

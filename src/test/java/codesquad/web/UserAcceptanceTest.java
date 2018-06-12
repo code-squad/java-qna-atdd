@@ -54,7 +54,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertThat(userRepository.findByUserId(userId).isPresent(), is(true));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
     }
 
