@@ -1,27 +1,23 @@
 package codesquad.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.Where;
-
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
+import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log =  LoggerFactory.getLogger(Question.class);
+    
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -45,6 +41,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public Question(String title, String contents) {
+        this(0L, title, contents);
+    }
+
+    public Question(long id, String title, String contents) {
+        super(id);
         this.title = title;
         this.contents = contents;
     }
@@ -76,6 +77,26 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void delete(User loginedUser) {
+        if (!isOwner(loginedUser)) {
+            try {
+                throw new CannotDeleteException("Mismatch owner");
+            } catch (CannotDeleteException e) {
+                log.debug(e.getMessage());
+            }
+        }
+        deleted = true;
+    }
+
+    public Question update(User loginedUser, Question question) throws UnAuthorizedException {
+        if (!this.isOwner(loginedUser)) {
+            throw new UnAuthorizedException();
+        }
+        title = question.getTitle();
+        contents = question.getContents();
+        return this;
     }
 
     @Override

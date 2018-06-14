@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Null;
 
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -41,14 +43,19 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    @Transactional
+    public Question update(User loginUser, long id, QuestionDto updateQuestionDto) {
+        Optional<Question> question = questionRepository.findById(id);
+        if (!question.isPresent()) {
+            throw new NullPointerException("Question Update Error");
+        }
+        return question.get().update(loginUser, updateQuestionDto.toQuestion());
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+    public void deleteQuestion(User loginUser, long questionId) {
+        Optional<Question> question = questionRepository.findById(questionId);
+        question.ifPresent( q -> q.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
