@@ -5,5 +5,5 @@
             <pattern>%fullRequest%n%n%fullResponse</pattern>
         </encoder>
     </appender>
-    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="CONSOLE"/>
 </configuration>

@@ -1,10 +1,5 @@
 package codesquad.validate;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -15,6 +10,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
 
 @RestControllerAdvice
 public class ValidationExceptionControllerAdvice {

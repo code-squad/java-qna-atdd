@@ -1,12 +1,11 @@
 package codesquad.domain;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
+import codesquad.UnAuthorizedException;
 import org.junit.Test;
 
-import codesquad.UnAuthorizedException;
-import codesquad.domain.User;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 
 public class UserTest {
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
