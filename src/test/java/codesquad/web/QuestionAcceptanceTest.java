@@ -3,6 +3,7 @@ package codesquad.web;
 import codesquad.Util.HtmlFormDataBuilder;
 import codesquad.domain.Question;
 import codesquad.domain.User;
+import codesquad.dto.QuestionDto;
 import codesquad.service.QnaService;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void update() {
         int questionId = 3;
-        Question question = new Question("1 수정 전 제목", "1 수정 전 내용");
+        QuestionDto question = new QuestionDto("1 수정 전 제목", "1 수정 전 내용");
         qnaService.create(loginedUser, question);
         builder.addParameter("title", "2 수정 후 제목");
         builder.addParameter("contents", "2 수정 후 내용");

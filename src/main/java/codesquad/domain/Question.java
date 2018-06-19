@@ -90,7 +90,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         deleted = true;
     }
 
-    public Question update(User loginedUser, Question question) throws UnAuthorizedException {
+    public Question update(User loginedUser, Question question) throws UnAuthorizedException{
         if (!this.isOwner(loginedUser)) {
             throw new UnAuthorizedException();
         }

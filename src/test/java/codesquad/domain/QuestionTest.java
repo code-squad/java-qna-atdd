@@ -9,8 +9,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class QuestionTest {
-    public static final User LEARNER = new User(1L, "learner", "9229", "TAEWON", "htw@gmail.com");
-    public static final User POBI = new User(2L, "pobi", "1234", "jaesung", "pjs@gmail.com");
+    private static final User LEARNER = new User(1L, "learner", "9229", "TAEWON", "htw@gmail.com");
+    private static final User POBI = new User(2L, "pobi", "1234", "jaesung", "pjs@gmail.com");
     private Question firstQuestion;
     private Question secondQuestion;
     private Question updateQuestion;

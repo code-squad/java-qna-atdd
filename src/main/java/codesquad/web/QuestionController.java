@@ -1,6 +1,5 @@
 package codesquad.web;
 
-import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
 import codesquad.security.LoginUser;
@@ -30,8 +29,7 @@ public class QuestionController {
     @PostMapping()
     public String create(@LoginUser User loginUser, String writer, QuestionDto questionDto) {
         // TODO question title, contens가 비었을 때 처리 로직
-        Question question = questionDto.toQuestion();
-        qnaService.create(loginUser, question);
+        qnaService.create(loginUser, questionDto);
         return "redirect:/";
     }
 
@@ -57,7 +55,7 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     public String delete(@LoginUser User loginedUser, @PathVariable Long id) {
-        qnaService.deleteQuestion(loginedUser, id);
+        qnaService.delete(loginedUser, id);
         return "redirect:/questions";
     }
 }

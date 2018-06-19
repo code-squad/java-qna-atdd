@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.constraints.Null;
 
+import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,8 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
+    public Question create(User loginUser, QuestionDto newQuestion) {
+        Question question = newQuestion.toQuestion();
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
@@ -44,7 +46,7 @@ public class QnaService {
     }
 
     @Transactional
-    public Question update(User loginUser, long id, QuestionDto updateQuestionDto) {
+    public Question update(User loginUser, long id, QuestionDto updateQuestionDto) throws UnAuthorizedException {
         Optional<Question> question = questionRepository.findById(id);
         if (!question.isPresent()) {
             throw new NullPointerException("Question Update Error");
@@ -53,7 +55,7 @@ public class QnaService {
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) {
+    public void delete(User loginUser, long questionId) {
         Optional<Question> question = questionRepository.findById(questionId);
         question.ifPresent( q -> q.delete(loginUser));
     }

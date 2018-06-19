@@ -3,6 +3,7 @@ package codesquad.dto;
 import codesquad.domain.Question;
 
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class QuestionDto {
     private long id;
@@ -53,6 +54,34 @@ public class QuestionDto {
     }
 
     public Question toQuestion() {
-        return new Question(this.title, this.contents);
+        if (id == 0L) {
+            return new Question(title, contents);
+        }
+        return new Question(id, title, contents);
+    }
+
+    @Override
+    public String toString() {
+        return "QuestionDto{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", contents='" + contents + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QuestionDto that = (QuestionDto) o;
+        return id == that.id &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, title, contents);
     }
 }
