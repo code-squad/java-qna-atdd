@@ -24,6 +24,11 @@ public class UserController {
     @Resource(name = "userService")
     private UserService userService;
 
+    @GetMapping("/login")
+    public String loginForm() {
+        return "/user/login";
+    }
+
     @GetMapping("/form")
     public String form() {
         return "/user/form";

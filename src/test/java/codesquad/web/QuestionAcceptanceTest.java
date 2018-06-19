@@ -4,21 +4,18 @@ import codesquad.HtmlFormDataBuilder;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
+import codesquad.dto.QuestionDto;
 import codesquad.service.QnaService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 
-import java.util.Objects;
-
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(QuestionAcceptanceTest.class);
@@ -73,35 +70,47 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
     }
 
-    // TODO testRestTemplate
-    private ResponseEntity<String> updateAsist(TestRestTemplate template) {
-        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("_method", "put")
-                .addParameter("title", "testtitle")
-                .addParameter("contents", "testcontents")
-                .build();
-
-        return template.exchange(String.format("/qna/%d", defaultUser().getId()), HttpMethod.PUT, request, String.class);
-    }
-
     @Test
     public void update_no_login() {
-        ResponseEntity<String> response = updateAsist(template());
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        QuestionDto newQuestion = new QuestionDto("test title", "test content");
+        ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        String location = response.getHeaders().getLocation().getPath();
+
+        QuestionDto updateQuestion = new QuestionDto("hey", "wow");
+        template().put(location, updateQuestion);
+
+        QuestionDto dbQuestion = basicAuthTemplate().getForObject(location, QuestionDto.class);
+        assertFalse(dbQuestion.equalsTitleAndContent(updateQuestion));
     }
 
     @Test
     public void update_other_user() {
-        User testUser = new User("newtestuser", "newtestpass", "newtestname", "newtest@email.com");
-        ResponseEntity<String> response = updateAsist(basicAuthTemplate(testUser));
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        QuestionDto newQuestion = new QuestionDto("test title", "test content");
+        ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        String location = response.getHeaders().getLocation().getPath();
+
+        QuestionDto updateQuestion = new QuestionDto("hey", "wow");
+        basicAuthTemplate(new User("test", "test", "test", "test"))
+                .put(location, updateQuestion);
+
+        QuestionDto dbQuestion = basicAuthTemplate().getForObject(location, QuestionDto.class);
+        assertFalse(dbQuestion.equalsTitleAndContent(updateQuestion));
     }
 
     @Test
     public void update() {
-        ResponseEntity<String> response = updateAsist(basicAuthTemplate());
-        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertTrue(Objects.requireNonNull(response.getHeaders().getLocation()).getPath().startsWith("/qna"));
+        QuestionDto newQuestion = new QuestionDto("test title", "test content");
+        ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        String location = response.getHeaders().getLocation().getPath();
+
+        QuestionDto updateQuestion = new QuestionDto("hey", "wow");
+        basicAuthTemplate().put(location, updateQuestion);
+
+        QuestionDto dbQuestion = basicAuthTemplate().getForObject(location, QuestionDto.class);
+        assertTrue(dbQuestion.equalsTitleAndContent(updateQuestion));
     }
 
     @Test

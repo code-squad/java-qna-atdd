@@ -13,13 +13,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
+    private static final String USER_URL = "/api/users";
 
     @Test
     public void create() throws Exception {
         UserDto newUser = createUserDto("testuser1");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
+        ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = getResponseLocation(response);
 
         UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
         assertThat(dbUser, is(newUser));
@@ -28,24 +29,20 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     @Test
     public void show_다른_사람() throws Exception {
         UserDto newUser = createUserDto("testuser2");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
+        ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = getResponseLocation(response);
 
         response = basicAuthTemplate(defaultUser()).getForEntity(location, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
-    private UserDto createUserDto(String userId) {
-        return new UserDto(userId, "password", "name", "javajigi@slipp.net");
-    }
-
     @Test
     public void update() throws Exception {
         UserDto newUser = createUserDto("testuser3");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
+        ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = getResponseLocation(response);
 
         User loginUser = findByUserId(newUser.getUserId());
         UserDto updateUser = new UserDto(newUser.getUserId(), "password", "name2", "javajigi@slipp.net2");
@@ -58,7 +55,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     @Test
     public void update_다른_사람() throws Exception {
         UserDto newUser = createUserDto("testuser4");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
+        ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
         String location = Objects.requireNonNull(response.getHeaders().getLocation()).getPath();
 

@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/qna")
@@ -31,42 +33,38 @@ public class QuestionController {
     public String create(QuestionDto questionDto, @LoginUser User loginUser) {
         log.debug("QuestionDto : {}", questionDto);
 
-        Question question = qnaService.create(loginUser, questionDto.toQuestion());
+        Question question = qnaService.addQuestion(loginUser, questionDto);
 
         return "redirect:" + question.generateUrl();
     }
 
     @GetMapping("/{id}")
     public String read(@PathVariable Long id, Model model) {
-        qnaService.findById(id).ifPresent(question -> {
-            model.addAttribute("question", question);
-        });
+        Question foundQuestion = qnaService.findQuestionById(id).orElseThrow(EntityNotFoundException::new);
+        model.addAttribute("question", foundQuestion);
 
         return "/qna/show";
     }
 
     @GetMapping("/{id}/form")
     public String updateForm(@PathVariable Long id, Model model, @LoginUser User loginUser) {
-        Question foundQuestion = qnaService.findQuestion(id, loginUser);
+        Question foundQuestion = qnaService.findByLoginUser(id, loginUser);
         model.addAttribute("question", foundQuestion);
 
-        return "/qna/form";
+        return "/qna/updateForm";
     }
 
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id, QuestionDto question, @LoginUser User loginUser) {
-        qnaService.update(loginUser, id, question.toQuestion());
+    public String update(@PathVariable Long id,
+                         @Valid @RequestBody QuestionDto updatedQuestion, @LoginUser User loginUser) {
+        qnaService.update(loginUser, id, updatedQuestion);
 
         return String.format("redirect:/qna/%d", id);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id, @LoginUser User loginUser) {
-        try {
-            qnaService.deleteQuestion(loginUser, id);
-        } catch (CannotDeleteException e) {
-            log.debug(e.getMessage());
-        }
+    public String delete(@PathVariable Long id, @LoginUser User loginUser) throws CannotDeleteException {
+        qnaService.deleteQuestion(loginUser, id);
 
         return "redirect:/";
     }

@@ -28,7 +28,7 @@ public class ValidationExceptionControllerAdvice {
     public ValidationErrorsResponse handleValidationException(MethodArgumentNotValidException exception) {
         List<ObjectError> errors = exception.getBindingResult().getAllErrors();
         ValidationErrorsResponse response = new ValidationErrorsResponse();
-        for (ObjectError objectError : errors) {
+        for (ObjectError objectError: errors) {
             log.debug("object error : {}", objectError);
             FieldError fieldError = (FieldError) objectError;
             response.addValidationError(new ValidationError(fieldError.getField(), getErrorMessage(fieldError)));

@@ -14,7 +14,7 @@ public class HtmlFormDataBuilder {
 
     private HtmlFormDataBuilder(HttpHeaders headers) {
         this.headers = headers;
-        this.params = new LinkedMultiValueMap<>();
+        params = new LinkedMultiValueMap<>();
     }
 
     // ...
@@ -27,7 +27,7 @@ public class HtmlFormDataBuilder {
     }
 
     public HtmlFormDataBuilder addParameter(String key, Object value) {
-        this.params.add(key, value);
+        params.add(key, value);
         return this;
     }
 

@@ -3,6 +3,7 @@ package codesquad.domain;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import support.domain.AbstractEntity;
 
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ public class User extends AbstractEntity {
 
     @Size(min = 3, max = 20)
     @Column(unique = true, nullable = false, length = 20)
+    @JsonProperty
     private String userId;
 
     @Size(min = 6, max = 20)
@@ -25,9 +27,11 @@ public class User extends AbstractEntity {
 
     @Size(min = 3, max = 20)
     @Column(nullable = false, length = 20)
+    @JsonProperty
     private String name;
 
     @Column(length = 50)
+    @JsonProperty
     private String email;
 
     public User() {
@@ -75,8 +79,8 @@ public class User extends AbstractEntity {
             return;
         }
 
-        this.name = target.name;
-        this.email = target.email;
+        name = target.name;
+        email = target.email;
     }
 
     public boolean matchPassword(String password) {
@@ -84,7 +88,7 @@ public class User extends AbstractEntity {
     }
 
     public UserDto toUserDto() {
-        return new UserDto(this.userId, this.password, this.name, this.email);
+        return new UserDto(userId, password, name, email);
     }
 
     @JsonIgnore

@@ -31,7 +31,7 @@ public class UserValidationTest {
         Set<ConstraintViolation<User>> constraintViolcations = validator.validate(user);
         assertThat(constraintViolcations.size(), is(1));
 
-        for (ConstraintViolation<User> constraintViolation : constraintViolcations) {
+        for (ConstraintViolation<User> constraintViolation: constraintViolcations) {
             log.debug("violation error message : {}", constraintViolation.getMessage());
         }
     }
