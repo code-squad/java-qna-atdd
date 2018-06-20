@@ -35,6 +35,7 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
+    @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
         // TODO 수정 기능 구현
         return null;
@@ -54,6 +55,7 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
+        // TODO 답변 추가 기능 구현
         return null;
     }
 

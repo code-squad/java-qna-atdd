@@ -5,6 +5,7 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -18,10 +19,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User update(User loginUser, long id, User updatedUser) {
         User original = findById(loginUser, id);
         original.update(loginUser, updatedUser);
-        return userRepository.save(original);
+        return original;
     }
 
     public User findById(User loginUser, long id) {
@@ -36,7 +38,6 @@ public class UserService {
 
     public User login(String userId, String password) throws UnAuthenticationException {
         // TODO 로그인 기능 구현
-
         return null;
     }
 }
