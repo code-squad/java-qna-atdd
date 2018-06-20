@@ -16,7 +16,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     private static final String USER_URL = "/api/users";
 
     @Test
-    public void create() throws Exception {
+    public void create() {
         UserDto newUser = createUserDto("testuser1");
         ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
@@ -27,7 +27,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void show_다른_사람() throws Exception {
+    public void show_다른_사람() {
         UserDto newUser = createUserDto("testuser2");
         ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
@@ -38,7 +38,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void update() throws Exception {
+    public void update() {
         UserDto newUser = createUserDto("testuser3");
         ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
@@ -53,7 +53,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void update_다른_사람() throws Exception {
+    public void update_다른_사람() {
         UserDto newUser = createUserDto("testuser4");
         ResponseEntity<String> response = template().postForEntity(USER_URL, newUser, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));

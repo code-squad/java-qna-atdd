@@ -24,7 +24,7 @@ public class UserTest {
     }
 
     @Test
-    public void update_owner() throws Exception {
+    public void update_owner() {
         User origin = newUser("sanjigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
@@ -33,7 +33,7 @@ public class UserTest {
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void update_not_owner() throws Exception {
+    public void update_not_owner() {
         User origin = newUser("sanjigi");
         User loginUser = newUser("javajigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");

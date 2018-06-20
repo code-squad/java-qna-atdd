@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class LoggingAspect {
     @Pointcut("within(codesquad.web..*) || within(codesquad.service..*)")
     public void loggingPointcut() {
+        // empty
     }
 
     @Around("loggingPointcut()")

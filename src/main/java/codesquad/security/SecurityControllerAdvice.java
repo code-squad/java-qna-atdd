@@ -1,5 +1,6 @@
 package codesquad.security;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import org.slf4j.Logger;
@@ -26,6 +27,12 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.FORBIDDEN) // 403 권한없음
     public void unAuthorized() {
         log.debug("UnAuthorizedException is happened!");
+    }
+
+    @ExceptionHandler(CannotDeleteException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public void canNotDelete() {
+        log.debug("CannotDeleteException is happened!");
     }
 
     @ExceptionHandler(UnAuthenticationException.class)

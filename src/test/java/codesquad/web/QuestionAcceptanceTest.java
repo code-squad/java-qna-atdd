@@ -1,7 +1,6 @@
 package codesquad.web;
 
 import codesquad.HtmlFormDataBuilder;
-import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
@@ -10,9 +9,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
+
+import java.util.Objects;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -45,7 +49,6 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void list() {
-        Iterable<Question> questions = qnaService.findAll();
         ResponseEntity<String> responseEntity = template().getForEntity("/", String.class);
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
     }
@@ -75,7 +78,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         QuestionDto newQuestion = new QuestionDto("test title", "test content");
         ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = Objects.requireNonNull(response.getHeaders().getLocation()).getPath();
 
         QuestionDto updateQuestion = new QuestionDto("hey", "wow");
         template().put(location, updateQuestion);
@@ -89,7 +92,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         QuestionDto newQuestion = new QuestionDto("test title", "test content");
         ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = Objects.requireNonNull(response.getHeaders().getLocation()).getPath();
 
         QuestionDto updateQuestion = new QuestionDto("hey", "wow");
         basicAuthTemplate(new User("test", "test", "test", "test"))
@@ -104,7 +107,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         QuestionDto newQuestion = new QuestionDto("test title", "test content");
         ResponseEntity<String> response = basicAuthTemplate().postForEntity("/api/qna", newQuestion, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        String location = response.getHeaders().getLocation().getPath();
+        String location = Objects.requireNonNull(response.getHeaders().getLocation()).getPath();
 
         QuestionDto updateQuestion = new QuestionDto("hey", "wow");
         basicAuthTemplate().put(location, updateQuestion);
@@ -117,8 +120,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void delete_no_login() {
         Long questionCount = qnaService.questionCount();
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity entity = makeHttpEntity();
 
         ResponseEntity<String> response = template().exchange(String.format("/qna/%d", questionCount),
                 HttpMethod.DELETE, entity, String.class);
@@ -131,8 +133,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         User testUser = new User("newtestuser", "newtestpass", "newtestname", "newtest@email.com");
         Long questionCount = qnaService.questionCount();
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity entity = makeHttpEntity();
 
         ResponseEntity<String> response = basicAuthTemplate(testUser).exchange(String.format("/qna/%d", questionCount),
                 HttpMethod.DELETE, entity, String.class);
@@ -144,8 +145,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void delete() {
         Long questionCount = qnaService.questionCount();
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity entity = makeHttpEntity();
 
         ResponseEntity<String> response = basicAuthTemplate().exchange(String.format("/qna/%d", questionCount),
                 HttpMethod.DELETE, entity, String.class);

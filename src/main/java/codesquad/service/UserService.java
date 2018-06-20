@@ -27,7 +27,7 @@ public class UserService {
 
     public User findById(User loginUser, long id) {
         return userRepository.findById(id)
-                .filter(user -> user.equals(loginUser))
+                .filter(user -> user.matchUser(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
     }
 

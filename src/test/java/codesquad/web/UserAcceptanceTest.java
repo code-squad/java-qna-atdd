@@ -26,14 +26,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
     private UserRepository userRepository;
 
     @Test
-    public void createForm() throws Exception {
+    public void createForm() {
         ResponseEntity<String> response = template().getForEntity("/users/form", String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         log.debug("body : {}", response.getBody());
     }
 
     @Test
-    public void create() throws Exception {
+    public void create() {
         String userId = "testuser";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
@@ -50,7 +50,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void list() throws Exception {
+    public void list() {
         ResponseEntity<String> response = template().getForEntity("/users", String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         log.debug("body : {}", response.getBody());
@@ -58,14 +58,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void updateForm_no_login() throws Exception {
+    public void updateForm_no_login() {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
                 String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
     @Test
-    public void updateForm_login() throws Exception {
+    public void updateForm_login() {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
                 .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
@@ -74,12 +74,12 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void update_no_login() throws Exception {
+    public void update_no_login() {
         ResponseEntity<String> response = update(template());
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
-    private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
+    private ResponseEntity<String> update(TestRestTemplate template) {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("_method", "put")
                 .addParameter("password", "password2")
@@ -91,7 +91,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void update() throws Exception {
+    public void update() {
         ResponseEntity<String> response = update(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertTrue(Objects.requireNonNull(response.getHeaders().getLocation()).getPath().startsWith("/users"));

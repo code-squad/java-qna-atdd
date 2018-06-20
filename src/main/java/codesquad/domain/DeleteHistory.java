@@ -2,6 +2,7 @@ package codesquad.domain;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class DeleteHistory {
@@ -23,11 +24,25 @@ public class DeleteHistory {
     public DeleteHistory() {
     }
 
-    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
+    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy) {
         this.contentType = contentType;
         this.contentId = contentId;
         this.deletedBy = deletedBy;
-        this.createDate = createDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeleteHistory that = (DeleteHistory) o;
+        return contentType == that.contentType &&
+                Objects.equals(contentId, that.contentId) &&
+                Objects.equals(deletedBy, that.deletedBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contentType, contentId, deletedBy);
     }
 
     @Override

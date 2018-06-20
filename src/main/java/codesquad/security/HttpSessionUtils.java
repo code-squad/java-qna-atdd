@@ -9,6 +9,9 @@ import javax.servlet.http.HttpSession;
 public class HttpSessionUtils {
     public static final String USER_SESSION_KEY = "loginedUser";
 
+    private HttpSessionUtils() {
+    }
+
     public static boolean isLoginUser(NativeWebRequest webRequest) {
         Object loginedUser = webRequest.getAttribute(USER_SESSION_KEY, WebRequest.SCOPE_SESSION);
         return loginedUser != null;

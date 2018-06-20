@@ -20,6 +20,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final String REDIRECT_USERS = "redirect:/users";
 
     @Resource(name = "userService")
     private UserService userService;
@@ -37,7 +38,7 @@ public class UserController {
     @PostMapping("")
     public String create(UserDto userDto) {
         userService.add(userDto);
-        return "redirect:/users";
+        return REDIRECT_USERS;
     }
 
     @GetMapping("")
@@ -57,7 +58,7 @@ public class UserController {
     @PutMapping("/{id}")
     public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
         userService.update(loginUser, id, target);
-        return "redirect:/users";
+        return REDIRECT_USERS;
     }
 
     @PostMapping("/login")
@@ -72,6 +73,6 @@ public class UserController {
 
         httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, newUser);
 
-        return "redirect:/users";
+        return REDIRECT_USERS;
     }
 }

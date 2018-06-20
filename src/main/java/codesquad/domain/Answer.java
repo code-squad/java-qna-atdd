@@ -1,5 +1,7 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.dto.AnswerDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import support.domain.AbstractEntity;
@@ -26,6 +28,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @JsonProperty
     private String contents;
 
+    @JsonProperty
     private boolean deleted = false;
 
     public Answer() {
@@ -76,6 +79,23 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
     }
 
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        checkAnswerDelete(loginUser);
+
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), writer);
+    }
+
+    private void checkAnswerDelete(User loginUser) throws CannotDeleteException {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("답변 작성자와 로그인 유저가 다름");
+        }
+
+        if (isDeleted()) {
+            throw new CannotDeleteException("이미 삭제한 답변입니다.");
+        }
+    }
+
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
@@ -87,14 +107,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Answer answer = (Answer) o;
-        return deleted == answer.deleted &&
-                Objects.equals(writer, answer.writer) &&
+        return Objects.equals(writer, answer.writer) &&
                 Objects.equals(question, answer.question) &&
                 Objects.equals(contents, answer.contents);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), writer, question, contents, deleted);
+        return Objects.hash(super.hashCode(), writer, question, contents);
     }
 }

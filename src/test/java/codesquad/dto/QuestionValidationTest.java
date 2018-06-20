@@ -22,7 +22,7 @@ public class QuestionValidationTest {
     }
 
     @Test
-    public void titleWhenIsEmpty() throws Exception {
+    public void titleWhenIsEmpty() {
         QuestionDto question = new QuestionDto("", "당근 엄청 의미있는 활동이고 말고..");
         Set<ConstraintViolation<QuestionDto>> constraintViolcations = validator.validate(question);
         assertThat(constraintViolcations.size(), is(1));

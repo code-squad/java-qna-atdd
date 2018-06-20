@@ -1,10 +1,10 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import codesquad.dto.QuestionDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -12,7 +12,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -31,12 +30,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JsonProperty
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
     @JsonIgnore
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
+    @JsonProperty
     private boolean deleted = false;
 
     public Question() {
@@ -69,7 +67,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public boolean isOwner(User loginUser) {
-        return writer.equals(loginUser);
+        return writer.matchUser(loginUser);
     }
 
     public boolean isDeleted() {
@@ -101,21 +99,41 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        if (!super.equals(o)) return false;
-//        Question question = (Question) o;
-//        return deleted == question.deleted &&
-//                Objects.equals(title, question.title) &&
-//                Objects.equals(contents, question.contents) &&
-//                Objects.equals(writer, question.writer) &&
-//                Objects.equals(answers, question.answers);
-//    }
+    public boolean checkAnswerExist() {
+        return !answers.isEmpty();
+    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), title, contents, writer, answers, deleted);
+    public boolean checkAllAnswerWriterIsSameWithWriter() {
+        return answers.checkAllWriterSameWith(writer);
+    }
+
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        checkLoginUser(loginUser);
+
+        List<DeleteHistory> toReturnList = new ArrayList<>();
+        if (checkAnswerExist()) {
+            toReturnList = deleteAllAnswers(toReturnList);
+        }
+
+        deleted = true;
+        toReturnList.add(new DeleteHistory(ContentType.QUESTION, getId(), writer));
+
+        return toReturnList;
+    }
+
+    private void checkLoginUser(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+    }
+
+    public List<DeleteHistory> deleteAllAnswers(List<DeleteHistory> toReturnList) throws CannotDeleteException {
+        if (!checkAllAnswerWriterIsSameWithWriter()) {
+            throw new CannotDeleteException("모든 답변자와 작성자가 같지 않음");
+        }
+
+        answers.delete(toReturnList, writer);
+
+        return toReturnList;
     }
 }

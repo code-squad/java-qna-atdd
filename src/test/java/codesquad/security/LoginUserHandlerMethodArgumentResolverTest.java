@@ -34,7 +34,7 @@ public class LoginUserHandlerMethodArgumentResolverTest {
     }
 
     @Test
-    public void loginUser_normal() throws Exception {
+    public void loginUser_normal() {
         User sessionUser = new User("sanjigi", "password", "name", "javajigi@slipp.net");
         when(request.getAttribute(HttpSessionUtils.USER_SESSION_KEY, WebRequest.SCOPE_SESSION)).thenReturn(sessionUser);
 
@@ -44,7 +44,7 @@ public class LoginUserHandlerMethodArgumentResolverTest {
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void loginUser_required_guest() throws Exception {
+    public void loginUser_required_guest() {
         when(annotedLoginUser.required()).thenReturn(true);
         when(parameter.getParameterAnnotation(LoginUser.class)).thenReturn(annotedLoginUser);
         when(request.getAttribute(HttpSessionUtils.USER_SESSION_KEY, WebRequest.SCOPE_SESSION))
@@ -54,7 +54,7 @@ public class LoginUserHandlerMethodArgumentResolverTest {
     }
 
     @Test
-    public void loginUser_not_required_guest() throws Exception {
+    public void loginUser_not_required_guest() {
         when(annotedLoginUser.required()).thenReturn(false);
         when(parameter.getParameterAnnotation(LoginUser.class)).thenReturn(annotedLoginUser);
         when(request.getAttribute(HttpSessionUtils.USER_SESSION_KEY, WebRequest.SCOPE_SESSION))

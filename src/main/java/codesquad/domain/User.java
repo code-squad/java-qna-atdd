@@ -74,13 +74,16 @@ public class User extends AbstractEntity {
             throw new UnAuthorizedException();
         }
 
-        // TODO 그냥 리턴은 뭐지?
         if (!matchPassword(target.getPassword())) {
             return;
         }
 
         name = target.name;
         email = target.email;
+    }
+
+    public boolean matchUser(User user) {
+        return user.equals(this);
     }
 
     public boolean matchPassword(String password) {

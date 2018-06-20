@@ -38,12 +38,19 @@ public class ApiQuestionController {
     }
 
     @PutMapping("/{id}")
-    public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody QuestionDto updateQuestion) {
+    public ResponseEntity<Void> update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody QuestionDto updateQuestion) {
         qnaService.update(loginUser, id, updateQuestion);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/api/qna/" + updateQuestion.getId()));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@LoginUser User loginUser, @PathVariable long id) throws CannotDeleteException {
+    public ResponseEntity<Void> delete(@LoginUser User loginUser, @PathVariable long id) throws CannotDeleteException {
         qnaService.deleteQuestion(loginUser, id);
+
+        HttpHeaders headers = new HttpHeaders();
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 }

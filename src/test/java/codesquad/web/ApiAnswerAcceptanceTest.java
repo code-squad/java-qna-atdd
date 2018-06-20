@@ -3,6 +3,7 @@ package codesquad.web;
 import codesquad.domain.User;
 import codesquad.dto.AnswerDto;
 import codesquad.dto.QuestionDto;
+import codesquad.dto.UserDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -71,9 +72,12 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
         String answerLocation = createResource(location + ANSWERS_URL, newAnswer);
 
         HttpEntity httpEntity = makeHttpEntity();
-        User anotherUser = makeAnotherTestUser();
 
-        ResponseEntity<String> response = basicAuthTemplate(anotherUser)
+        UserDto anotherUser = createUserDto("testuser200");
+        ResponseEntity<String> response = template().postForEntity("/api/users", anotherUser, String.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+
+        response = basicAuthTemplate(anotherUser.toUser())
                 .exchange(answerLocation, HttpMethod.DELETE, httpEntity, String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }

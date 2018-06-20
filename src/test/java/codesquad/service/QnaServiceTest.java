@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.UnAuthorizedException;
+import codesquad.domain.DeleteHistoryRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
@@ -22,6 +23,9 @@ public class QnaServiceTest {
 
     @Mock
     private QuestionRepository questionRepository;
+
+    @Mock
+    private DeleteHistoryRepository historyRepository;
 
     @InjectMocks
     private QnaService qnaService;

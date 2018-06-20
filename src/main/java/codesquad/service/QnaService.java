@@ -62,11 +62,11 @@ public class QnaService {
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question originalQuestion = questionRepository.findById(questionId).orElseThrow(EntityNotFoundException::new);
 
-        if (!originalQuestion.isOwner(loginUser)) {
-            throw new UnAuthorizedException();
-        }
+//        questionRepository.delete(originalQuestion);
 
-        questionRepository.delete(originalQuestion);
+        List<DeleteHistory> toSaveHistories = originalQuestion.delete(loginUser);
+        deleteHistoryService.saveAll(toSaveHistories);
+
     }
 
     public Iterable<Question> findAll() {
@@ -78,17 +78,15 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
         Question question = questionRepository.findById(questionId).orElseThrow(EntityNotFoundException::new);
         Answer answer = new Answer(loginUser, question, contents);
         return answerRepository.save(answer);
     }
 
     @Transactional
-    public void deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현
+    public void deleteAnswer(User loginUser, long id) throws CannotDeleteException {
         Answer savedAnswer = answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        answerRepository.delete(savedAnswer);
+        savedAnswer.delete(loginUser);
     }
 
     public Long questionCount() {
