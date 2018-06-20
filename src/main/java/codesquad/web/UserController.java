@@ -1,7 +1,6 @@
 package codesquad.web;
 
 import codesquad.domain.User;
-import codesquad.dto.UserDto;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
 import org.slf4j.Logger;
@@ -27,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("")
-    public String create(UserDto userDto) {
-        userService.add(userDto);
+    public String create(User user) {
+        userService.add(user);
         return "redirect:/users";
     }
 
@@ -47,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String update(@LoginUser User loginUser, @PathVariable long id, UserDto target) {
+    public String update(@LoginUser User loginUser, @PathVariable long id, User target) {
         userService.update(loginUser, id, target);
         return "redirect:/users";
     }

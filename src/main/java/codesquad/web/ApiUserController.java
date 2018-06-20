@@ -1,7 +1,6 @@
 package codesquad.web;
 
 import codesquad.domain.User;
-import codesquad.dto.UserDto;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,7 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Void> create(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<Void> create(@Valid @RequestBody User user) {
         User savedUser = userService.add(user);
 
         HttpHeaders headers = new HttpHeaders();
@@ -29,13 +28,12 @@ public class ApiUserController {
     }
 
     @GetMapping("{id}")
-    public UserDto show(@LoginUser User loginUser, @PathVariable long id) {
-        User user = userService.findById(loginUser, id);
-        return user.toUserDto();
+    public User show(@LoginUser User loginUser, @PathVariable long id) {
+        return userService.findById(loginUser, id);
     }
 
     @PutMapping("{id}")
-    public void update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody UserDto updatedUser) {
-        userService.update(loginUser, id, updatedUser);
+    public User update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody User updatedUser) {
+        return userService.update(loginUser, id, updatedUser);
     }
 }

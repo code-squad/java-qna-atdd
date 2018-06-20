@@ -1,69 +1,73 @@
 package codesquad.web;
 
 import codesquad.domain.User;
-import codesquad.dto.UserDto;
 import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import support.test.AcceptanceTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static codesquad.domain.UserTest.newUser;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        UserDto newUser = createUserDto("testuser1");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        User newUser = newUser("testuser1");
+        ResponseEntity<Void> response = template().postForEntity("/api/users", newUser, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String location = response.getHeaders().getLocation().getPath();
 
-        UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
-        assertThat(dbUser, is(newUser));
+        User dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, User.class);
+        assertThat(dbUser).isNotNull();
     }
 
     @Test
     public void show_다른_사람() throws Exception {
-        UserDto newUser = createUserDto("testuser2");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        User newUser = newUser("testuser2");
+        ResponseEntity<Void> response = template().postForEntity("/api/users", newUser, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String location = response.getHeaders().getLocation().getPath();
 
-        response = basicAuthTemplate(defaultUser()).getForEntity(location, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
-    }
-
-    private UserDto createUserDto(String userId) {
-        return new UserDto(userId, "password", "name", "javajigi@slipp.net");
+        response = basicAuthTemplate(defaultUser()).getForEntity(location, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     public void update() throws Exception {
-        UserDto newUser = createUserDto("testuser3");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        User newUser = newUser("testuser3");
+        ResponseEntity<Void> response = template().postForEntity("/api/users", newUser, Void.class);
         String location = response.getHeaders().getLocation().getPath();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        User original = basicAuthTemplate(newUser).getForObject(location, User.class);
 
-        User loginUser = findByUserId(newUser.getUserId());
-        UserDto updateUser = new UserDto(newUser.getUserId(), "password", "name2", "javajigi@slipp.net2");
-        basicAuthTemplate(loginUser).put(location, updateUser);
+        User updateUser = new User
+                (original.getId(), original.getUserId(), original.getPassword(),
+                        "javajigi2", "javajigi2@slipp.net");
 
-        UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
-        assertThat(dbUser, is(updateUser));
+        ResponseEntity<User> responseEntity =
+                basicAuthTemplate(newUser).exchange(location, HttpMethod.PUT, createHttpEntity(updateUser), User.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(updateUser.equalsNameAndEmail(responseEntity.getBody())).isTrue();
     }
 
     @Test
     public void update_다른_사람() throws Exception {
-        UserDto newUser = createUserDto("testuser4");
-        ResponseEntity<String> response = template().postForEntity("/api/users", newUser, String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        User newUser = newUser("testuser4");
+        ResponseEntity<Void> response = template().postForEntity("/api/users", newUser, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String location = response.getHeaders().getLocation().getPath();
 
-        UserDto updateUser = new UserDto(newUser.getUserId(), "password", "name2", "javajigi@slipp.net2");
-        basicAuthTemplate(defaultUser()).put(location, updateUser);
+        User updateUser = new User(newUser.getUserId(), "password", "name2", "javajigi@slipp.net2");
 
-        UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
-        assertThat(dbUser, is(newUser));
+        ResponseEntity<Void> responseEntity =
+                basicAuthTemplate(defaultUser()).exchange(location, HttpMethod.PUT, createHttpEntity(updateUser), Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    private HttpEntity createHttpEntity(Object body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity(body, headers);
     }
 }

@@ -14,9 +14,7 @@ import support.test.AcceptanceTest;
 
 import java.util.Arrays;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -27,7 +25,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void createForm() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users/form", String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
 
@@ -47,24 +45,24 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertThat(userRepository.findByUserId(userId).isPresent(), is(true));
-        assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(userRepository.findByUserId(userId).isPresent()).isTrue();
+        assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
 
     @Test
     public void list() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users", String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
-        assertThat(response.getBody().contains(defaultUser().getEmail()), is(true));
+        assertThat(response.getBody()).contains(defaultUser().getEmail());
     }
 
     @Test
     public void updateForm_no_login() throws Exception {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
                 String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -72,14 +70,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
                 .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(response.getBody().contains(loginUser.getEmail()), is(true));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains(defaultUser().getEmail());
     }
 
     @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template());
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
@@ -89,7 +87,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("_method", "put");
-        params.add("password", "password2");
+        params.add("password", "test");
         params.add("name", "자바지기2");
         params.add("email", "javajigi@slipp.net");
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
@@ -100,7 +98,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void update() throws Exception {
         ResponseEntity<String> response = update(basicAuthTemplate());
-        assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
 }

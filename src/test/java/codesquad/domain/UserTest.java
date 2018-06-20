@@ -3,9 +3,7 @@ package codesquad.domain;
 import codesquad.UnAuthorizedException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserTest {
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
@@ -20,7 +18,7 @@ public class UserTest {
     }
 
     public static User newUser(String userId, String password) {
-        return new User(1L, userId, password, "name", "javajigi@slipp.net");
+        return new User(0L, userId, password, "name", "javajigi@slipp.net");
     }
 
     @Test
@@ -29,8 +27,8 @@ public class UserTest {
         User loginUser = origin;
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(loginUser, target);
-        assertThat(origin.getName(), is(target.getName()));
-        assertThat(origin.getEmail(), is(target.getEmail()));
+        assertThat(origin.getName()).isEqualTo(target.getName());
+        assertThat(origin.getEmail()).isEqualTo(target.getEmail());
     }
 
     @Test(expected = UnAuthorizedException.class)
@@ -46,16 +44,14 @@ public class UserTest {
         User origin = newUser("sanjigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
-        assertThat(origin.getName(), is(target.getName()));
-        assertThat(origin.getEmail(), is(target.getEmail()));
+        assertThat(origin.getName()).isEqualTo(target.getName());
+        assertThat(origin.getEmail()).isEqualTo(target.getEmail());
     }
 
-    @Test
+    @Test(expected = UnAuthorizedException.class)
     public void update_mismatch_password() {
         User origin = newUser("sanjigi", "password");
         User target = new User("sanjigi", "password2", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
-        assertThat(origin.getName(), is(not(target.getName())));
-        assertThat(origin.getEmail(), is(not(target.getEmail())));
     }
 }

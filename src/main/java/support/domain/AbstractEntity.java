@@ -16,11 +16,12 @@ public class AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false, updatable = false)
     @CreatedDate
-    private LocalDateTime createDate;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime modifiedDate;
+    private LocalDateTime updatedAt;
 
     public AbstractEntity() {
     }
@@ -33,14 +34,19 @@ public class AbstractEntity {
         return id;
     }
 
+    public AbstractEntity setId(long id) {
+        this.id = id;
+        return this;
+    }
+
     @JsonIgnore
     public String getFormattedCreateDate() {
-        return getFormattedDate(createDate, "yyyy.MM.dd HH:mm:ss");
+        return getFormattedDate(createdAt, "yyyy.MM.dd HH:mm:ss");
     }
 
     @JsonIgnore
     public String getFormattedModifiedDate() {
-        return getFormattedDate(modifiedDate, "yyyy.MM.dd HH:mm:ss");
+        return getFormattedDate(updatedAt, "yyyy.MM.dd HH:mm:ss");
     }
 
     private String getFormattedDate(LocalDateTime dateTime, String format) {
@@ -74,6 +80,10 @@ public class AbstractEntity {
 
     @Override
     public String toString() {
-        return "AbstractEntity [id=" + id + ", createDate=" + createDate + ", modifiedDate=" + modifiedDate + "]";
+        return "AbstractEntity{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

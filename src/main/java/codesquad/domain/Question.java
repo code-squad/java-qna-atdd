@@ -1,6 +1,5 @@
 package codesquad.domain;
 
-import codesquad.dto.QuestionDto;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -43,8 +42,18 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return title;
     }
 
+    public Question setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
     public String getContents() {
         return contents;
+    }
+
+    public Question setContents(String contents) {
+        this.contents = contents;
+        return this;
     }
 
     public User getWriter() {
@@ -71,10 +80,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
-    }
-
-    public QuestionDto toQuestionDto() {
-        return new QuestionDto(getId(), this.title, this.contents);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package support.aspect;
 
 import codesquad.QnaApplication;
-import codesquad.dto.UserDto;
+import codesquad.domain.User;
 import codesquad.web.UserController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +17,7 @@ public class LoggingAspectTest {
 
     @Test
     public void logging() {
-        UserDto user = new UserDto("aspectuser", "password", "name2", "javajigi@slipp.net2");
+        User user = new User("aspectuser", "password", "name2", "javajigi@slipp.net2");
         userController.create(user);
     }
 }

@@ -1,28 +1,31 @@
 package codesquad.domain;
 
 import codesquad.UnAuthorizedException;
-import codesquad.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import support.domain.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @Entity
 public class User extends AbstractEntity {
     public static final GuestUser GUEST_USER = new GuestUser();
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Size(min = 3, max = 20)
+    @Column(unique = true, nullable = false)
     private String userId;
 
-    @Column(nullable = false, length = 20)
-    @JsonIgnore
+    @Size(min = 3, max = 20)
+    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 20)
+    @Size(min = 3, max = 20)
+    @Column(nullable = false)
     private String name;
 
-    @Column(length = 50)
+    @Size(max = 50)
     private String email;
 
     public User() {
@@ -44,20 +47,36 @@ public class User extends AbstractEntity {
         return userId;
     }
 
+    public User setUserId(String userId) {
+        this.userId = userId;
+        return this;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public User setPassword(String password) {
+        this.password = password;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
+    public User setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    private boolean matchUserId(String userId) {
-        return this.userId.equals(userId);
+    public User setEmail(String email) {
+        this.email = email;
+        return this;
     }
 
     public void update(User loginUser, User target) {
@@ -66,19 +85,28 @@ public class User extends AbstractEntity {
         }
 
         if (!matchPassword(target.getPassword())) {
-            return;
+            throw new UnAuthorizedException();
         }
 
         this.name = target.name;
         this.email = target.email;
     }
 
-    public boolean matchPassword(String password) {
-        return this.password.equals(password);
+    private boolean matchUserId(String userId) {
+        return this.userId.equals(userId);
     }
 
-    public UserDto toUserDto() {
-        return new UserDto(this.userId, this.password, this.name, this.email);
+    public boolean matchPassword(String targetPassword) {
+        return password.equals(targetPassword);
+    }
+
+    public boolean equalsNameAndEmail(User target) {
+        if (Objects.isNull(target)) {
+            return false;
+        }
+
+        return name.equals(target.name) &&
+                email.equals(target.email);
     }
 
     @JsonIgnore
