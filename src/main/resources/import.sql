@@ -2,7 +2,7 @@ INSERT INTO user (id, user_id, password, name, email) values (1, 'javajigi', 'te
 INSERT INTO user (id, user_id, password, name, email) values (2, 'sanjigi', 'test', '산지기', 'sanjigi@slipp.net');
 INSERT INTO user (id, user_id, password, name, email) values (3, 'dino', 'test', '천공룡', 'dino@naver.com');
 
-INSERT INTO question (id, writer_id, title, contents, create_date, deleted) VALUES (1, 1, '국내에서 Ruby on Rails와 Play가 활성화되기 힘든 이유는 뭘까?', 'Ruby on Rails(이하 RoR)는 2006년 즈음에 정말 뜨겁게 달아올랐다가 금방 가라 앉았다. Play 프레임워크는 정말 한 순간 잠시 눈에 뜨이다가 사라져 버렸다. RoR과 Play 기반으로 개발을 해보면 정말 생산성이 높으며, 웹 프로그래밍이 재미있기까지 하다. Spring MVC + JPA(Hibernate) 기반으로 진행하면 설정할 부분도 많고, 기본으로 지원하지 않는 기능도 많아 RoR과 Play에서 기본적으로 지원하는 기능을 서비스하려면 추가적인 개발이 필요하다.', CURRENT_TIMESTAMP(), false);
+INSERT INTO question (id, writer_id, title, contents, create_date, deleted) VALUES (1, 1, 'dino title', 'dino contents', CURRENT_TIMESTAMP(), false);
 
 INSERT INTO answer (writer_id, contents, create_date, question_id, deleted) VALUES (1, 'http://underscorejs.org/docs/underscore.html Underscore.js 강추합니다! 쓸일도 많고, 코드도 길지 않고, 자바스크립트의 언어나 기본 API를 보완하는 기능들이라 자바스크립트 이해에 도움이 됩니다. 무엇보다 라이브러리 자체가 아주 유용합니다.', CURRENT_TIMESTAMP(), 1, false);
 

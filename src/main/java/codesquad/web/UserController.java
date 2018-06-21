@@ -39,7 +39,6 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession httpSession) {
-        // TODO 로그인 기능 구현 및 세션에 User 정보 저장
         try {
             User user = userService.login(userId, password);
             httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);

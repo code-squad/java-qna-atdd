@@ -39,6 +39,18 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @OrderBy("id ASC")
     private List<Answer> answers = new ArrayList<>();
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+
+    public void setWriter(User writer) {
+        this.writer = writer;
+    }
+
     private boolean deleted = false;
 
     public Question() {
@@ -49,6 +61,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = contents;
     }
 
+    public void update(String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
     public String getTitle() {
         return title;
     }
