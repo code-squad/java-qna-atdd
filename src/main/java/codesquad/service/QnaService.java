@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 
 import codesquad.UnAuthorizedException;
+import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -37,14 +39,20 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
-        return questionRepository.findById(id);
+    public Question findById(long id) {
+        return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public Question userCheck(User loginUser, long id) {
         log.debug("Login User : {}", loginUser);
         return questionRepository.findById(id)
                 .filter(question ->  question.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
+    }
+
+    public Answer savedUserCheck(User loginUser, long id) {
+        return answerRepository.findById(id)
+                .filter(answer -> answer.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
     }
 
@@ -58,6 +66,7 @@ public class QnaService {
     @Transactional
     public void delete(User loginUser, long questionId) {
         Question question = userCheck(loginUser, questionId);
+        log.debug("q : {}", question.toString());
         questionRepository.deleteById(questionId);
     }
 
@@ -69,12 +78,18 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        return null;
+    public Answer findByAnswer(long id) {
+        return answerRepository.findById(id).get();
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public Answer addAnswer(User loginUser, long questionId, String contents) {
+        Answer answer = new Answer(loginUser, contents);
+        answer.toQuestion(findById(questionId));
+        return answerRepository.save(answer);
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) {
+        answerRepository.delete(savedUserCheck(loginUser, id));
     }
 }
