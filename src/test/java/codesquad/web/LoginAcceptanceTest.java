@@ -1,6 +1,6 @@
 package codesquad.web;
 
-import codesquad.Util.HtmlFormDataBuilder;
+import codesquad.util.HtmlFormDataBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;

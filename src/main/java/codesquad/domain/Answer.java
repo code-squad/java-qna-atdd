@@ -1,14 +1,12 @@
 package codesquad.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
-
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -66,6 +64,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    public DeleteHistory delete() {
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), writer, LocalDateTime.now());
+    }
+
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
@@ -74,5 +77,28 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Answer answer = (Answer) o;
+        return getId() == answer.getId();
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), writer, question, contents, deleted);
+    }
+
+    public Answer update(User user, Answer updateAnswer) {
+        if (!isOwner(user)) {
+            throw new IllegalArgumentException("Not matched owner.");
+        }
+        this.contents = updateAnswer.getContents();
+        return this;
     }
 }

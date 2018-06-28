@@ -1,15 +1,14 @@
 package codesquad.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
+import codesquad.domain.User;
+import codesquad.dto.UserDto;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import codesquad.domain.User;
-import codesquad.dto.UserDto;
 import support.test.AcceptanceTest;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
 
@@ -22,7 +21,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
         UserDto dbUser = basicAuthTemplate(findByUserId(newUser.getUserId())).getForObject(location, UserDto.class);
         assertThat(dbUser, is(newUser));
     }
-    
+
     @Test
     public void show_다른_사람() throws Exception {
         UserDto newUser = createUserDto("testuser2");
@@ -49,7 +48,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
         UserDto dbUser = getResource(location, UserDto.class, findByUserId(newUser.getUserId()));
         assertThat(dbUser, is(updateUser));
     }
-    
+
     @Test
     public void update_다른_사람() throws Exception {
         UserDto newUser = createUserDto("testuser4");

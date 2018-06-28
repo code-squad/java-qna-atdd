@@ -1,10 +1,10 @@
 package codesquad.web;
 
-import codesquad.Util.HtmlFormDataBuilder;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
 import codesquad.service.QnaService;
+import codesquad.util.HtmlFormDataBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
+    private static final User LEARNER = new User(1L, "learner", "9229", "TAEWON", "htw@gmail.com");
     private static final Logger log = LoggerFactory.getLogger(QuestionAcceptanceTest.class);
     private static final String TITLE = "국내에서 Ruby on";
     private static final int ID = 1;
@@ -92,19 +93,20 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void update() {
-        int questionId = 3;
-        QuestionDto question = new QuestionDto("1 수정 전 제목", "1 수정 전 내용");
-        qnaService.create(loginedUser, question);
+        QuestionDto questionDto = new QuestionDto("1 수정 전 제목", "1 수정 전 내용");
+        Question question = qnaService.create(loginedUser, questionDto);
+        long questionId = question.getId();
+
         builder.addParameter("title", "2 수정 후 제목");
         builder.addParameter("contents", "2 수정 후 내용");
-
         ResponseEntity<String> response =
                 basicAuthTemplate(loginedUser).exchange("/questions/{id}",
                         HttpMethod.PUT, builder.build(), String.class, questionId);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        ResponseEntity<String> questionShowResponse = template().getForEntity(String.format("/questions/%d", questionId), String.class);
-        log.debug("response body is {}", questionShowResponse.getBody());
-        assertThat(questionShowResponse.getBody().contains("2 수정 후 제목"), is(true));
+
+        response = template().getForEntity(String.format("/questions/%d", questionId), String.class);
+        log.debug("response body is {}", response.getBody());
+        assertThat(response.getBody().contains("2 수정 후 제목"), is(true));
     }
 
     @Test

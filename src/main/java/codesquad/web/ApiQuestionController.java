@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.dto.QuestionDto;
@@ -20,14 +21,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/questions")
 public class ApiQuestionController {
-    private static final Logger log =  LoggerFactory.getLogger(ApiQuestionController.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiQuestionController.class);
 
     @Resource(name = "qnaService")
-    QnaService qnaService;
+    private QnaService qnaService;
 
     @PostMapping
     public ResponseEntity<Void> create(@LoginUser User loginUser, @Valid @RequestBody QuestionDto newQuestion) {
-        log.debug("api question : {}", newQuestion.toString());
         Question question = qnaService.create(loginUser, newQuestion);
 
         HttpHeaders headers = new HttpHeaders();
@@ -53,7 +53,12 @@ public class ApiQuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@LoginUser User loginUser, @PathVariable long id) {
-        qnaService.delete(loginUser, id);
+    public ResponseEntity<Void> delete(@LoginUser User loginUser, @PathVariable long id) {
+        try {
+            qnaService.delete(loginUser, id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (CannotDeleteException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

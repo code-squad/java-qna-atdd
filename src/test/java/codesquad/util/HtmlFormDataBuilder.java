@@ -1,4 +1,4 @@
-package codesquad.Util;
+package codesquad.util;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
