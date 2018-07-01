@@ -3,9 +3,11 @@ package codesquad.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import codesquad.domain.Answer;
 import codesquad.domain.QuestionRepository;
 import codesquad.dto.QuestionDto;
 import org.junit.Test;
@@ -45,7 +47,7 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void update_login() {
         QuestionDto newQuestion = createQuestionDto(EXIST_ID);
         String location = createResource("/api/questions", newQuestion, basicAuthTemplate());
-        QuestionDto updatedQuestion = new QuestionDto(EXIST_ID, "title Test", "contents Test");
+        QuestionDto updatedQuestion = new QuestionDto("title Test", "contents Test");
         basicAuthTemplate().put(location, updatedQuestion);
 
         QuestionDto dbQuestion = getResource(location, QuestionDto.class, defaultUser());
@@ -56,7 +58,7 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void update_no_login() {
         QuestionDto newQuestion = createQuestionDto(EXIST_ID);
         String location = createResource("/api/questions", newQuestion, basicAuthTemplate());
-        QuestionDto updatedQuestion = new QuestionDto(EXIST_ID, "title Test2", "contents Test2");
+        QuestionDto updatedQuestion = new QuestionDto(EXIST_ID,"title Test2", "contents Test2");
         template().put(location, updatedQuestion);
 
         QuestionDto dbQuestion = getResource(location, QuestionDto.class, defaultUser());
@@ -78,10 +80,45 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void delete_no_login() {
         QuestionDto newQuestion = createQuestionDto(EXIST_ID);
         String location = createResource("/api/questions", newQuestion, basicAuthTemplate());
-        QuestionDto deletedQuestion = new QuestionDto(EXIST_ID, "title Test4", "contents Test4");
+        QuestionDto deletedQuestion = new QuestionDto(EXIST_ID,"title Test4", "contents Test4");
         template().delete(location, deletedQuestion);
 
         QuestionDto dbQuestion = getResource(location, QuestionDto.class, defaultUser());
+        assertThat(dbQuestion, is(newQuestion));
+    }
+
+    @Test
+    public void delete_with_answer_on_same_user() {
+        QuestionDto newQuestion = createQuestionDto(EXIST_ID);
+        String questionLocation = createResource("/api/questions", newQuestion, basicAuthTemplate());
+        log.debug("questionsLocationn: {}", questionLocation);
+
+        String contents = "test1";
+        String answerLocation = createResource(questionLocation + "/answers", contents, basicAuthTemplate());
+        log.debug("answerLocationn: {}", answerLocation);
+        basicAuthTemplate().delete(questionLocation);
+
+        assertNull(getResource(questionLocation, QuestionDto.class, defaultUser()));
+        assertNull(getResource(answerLocation, Answer.class, defaultUser()));
+    }
+
+    @Test
+    public void delete_with_answer_on_another_user() {
+        QuestionDto newQuestion = createQuestionDto(EXIST_ID);
+        String questionLocation = createResource("/api/questions", newQuestion, basicAuthTemplate());
+
+        String answer = "test1";
+        String answerLocation = createResource(questionLocation + "/answers", answer, basicAuthTemplate(findByUserId("dino")));
+        basicAuthTemplate().delete(questionLocation);
+        log.debug("answerLocationn: {}", answerLocation);
+        log.debug("questionLocationn: {}", questionLocation);
+
+        QuestionDto dbQuestion = getResource(questionLocation, QuestionDto.class, defaultUser());
+        log.debug("dbQuestionn: {}", dbQuestion);
+
+        Answer dbAnswer = getResource(answerLocation, Answer.class, defaultUser());
+        log.debug("dbAnswerr: {}", dbAnswer);
+
         assertThat(dbQuestion, is(newQuestion));
     }
 

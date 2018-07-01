@@ -7,13 +7,20 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import codesquad.UnAuthorizedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = LoggerFactory.getLogger(Answer.class);
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -26,6 +33,8 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     @Lob
     private String contents;
 
+
+    // 댓글을 생성했으니까 기존 deleted 상태는 false, 그런데 나중에 지울때 true로 사용해라
     private boolean deleted = false;
 
     public Answer() {
@@ -50,6 +59,14 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
+    public DeleteHistory delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException("삭제 할 수 없습니다.");
+        }
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
+    }
+
     public User getWriter() {
         return writer;
     }
@@ -70,6 +87,7 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
+    //찾을때 쓰기!!
     public boolean isDeleted() {
         return deleted;
     }
@@ -111,6 +129,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer{" +
+                "writer=" + writer +
+                ", question=" + question +
+                ", contents='" + contents + '\'' +
+                ", deleted=" + deleted +
+                '}';
     }
 }

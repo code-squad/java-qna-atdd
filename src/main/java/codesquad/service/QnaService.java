@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
 
 import codesquad.UnAuthorizedException;
+import codesquad.domain.*;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
 
 @Service("qnaService")
 public class QnaService {
@@ -40,7 +36,7 @@ public class QnaService {
     }
 
     public Question findById(long id) {
-        return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return questionRepository.findById(id).filter(question -> !question.isDeleted()).orElseThrow(EntityNotFoundException::new);
     }
 
     public Question userCheck(User loginUser, long id) {
@@ -64,10 +60,10 @@ public class QnaService {
     }
 
     @Transactional
-    public void delete(User loginUser, long questionId) {
-        Question question = userCheck(loginUser, questionId);
-        log.debug("q : {}", question.toString());
-        questionRepository.deleteById(questionId);
+    public void deleteQuestion(User loginUser, long questionId) {
+        Question question = findById(questionId);
+        List<DeleteHistory> deleteHistory = question.delete(loginUser);
+        deleteHistoryService.saveAll(deleteHistory);
     }
 
     public Iterable<Question> findAll() {
@@ -79,7 +75,7 @@ public class QnaService {
     }
 
     public Answer findByAnswer(long id) {
-        return answerRepository.findById(id).get();
+        return answerRepository.findById(id).filter(answer -> !answer.isDeleted()).orElseThrow(UnAuthorizedException::new);
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
@@ -90,6 +86,8 @@ public class QnaService {
 
     @Transactional
     public void deleteAnswer(User loginUser, long id) {
-        answerRepository.delete(savedUserCheck(loginUser, id));
+        Answer answer = findByAnswer(id);
+        DeleteHistory deleteHistory = answer.delete(loginUser);
+        deleteHistoryService.saveDeleteHistory(deleteHistory);
     }
 }

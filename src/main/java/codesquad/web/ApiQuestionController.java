@@ -43,6 +43,6 @@ public class ApiQuestionController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id, @LoginUser User loginUser) {
-        qnaService.delete(loginUser, id);
+        qnaService.deleteQuestion(loginUser, id);
     }
 }

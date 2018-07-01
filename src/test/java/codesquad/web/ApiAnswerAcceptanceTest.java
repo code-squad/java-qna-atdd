@@ -2,6 +2,7 @@ package codesquad.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
@@ -41,9 +42,8 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
         log.debug("locationn: {}", location);
 
         basicAuthTemplate().delete(location);
-
-        Answer dbAnswer = getResource(location, Answer.class, defaultUser());
-        assertNull(dbAnswer.getContents());
+        log.debug("location2: {}", location);
+        assertNull(getResource(location, Answer.class, defaultUser()));
     }
 
     @Test
@@ -53,8 +53,7 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
 
         template().delete(location);
 
-        Answer dbAnswer = getResource(location, Answer.class, defaultUser());
-        assertThat(dbAnswer.getContents(), is(contents));
+        assertNotNull(getResource(location, Answer.class, defaultUser()));
     }
 
 }

@@ -120,7 +120,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     private ResponseEntity<String> delete(TestRestTemplate template) {
         HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-        htmlFormDataBuilder.addParameter("_method", "delete");
+        htmlFormDataBuilder.addParameter("_method", "deleteQuestion");
 
         HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
         return template.postForEntity(String.format("/questions/%d", LOGIN_TEST), request, String.class);

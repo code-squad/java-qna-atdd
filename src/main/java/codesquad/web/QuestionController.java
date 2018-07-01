@@ -58,7 +58,7 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, @LoginUser User loginUser) {
-        qnaService.delete(loginUser, id);
+        qnaService.deleteQuestion(loginUser, id);
         return "redirect:/";
     }
 }
