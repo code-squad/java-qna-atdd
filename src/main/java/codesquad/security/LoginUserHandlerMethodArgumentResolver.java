@@ -1,5 +1,6 @@
 package codesquad.security;
 
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import org.springframework.core.MethodParameter;
@@ -24,7 +25,7 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
 
         LoginUser loginUser = parameter.getParameterAnnotation(LoginUser.class);
         if (loginUser.required()) {
-            throw new UnAuthorizedException("You're required Login!");
+            throw new UnAuthenticationException("You're required Login!");
         }
         return user;
     }

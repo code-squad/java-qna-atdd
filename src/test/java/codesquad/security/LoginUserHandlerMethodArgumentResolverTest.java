@@ -1,5 +1,6 @@
 package codesquad.security;
 
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import org.junit.Before;
@@ -43,7 +44,7 @@ public class LoginUserHandlerMethodArgumentResolverTest {
         assertThat(loginUser, is(sessionUser));
     }
 
-    @Test(expected = UnAuthorizedException.class)
+    @Test(expected = UnAuthenticationException.class)
     public void loginUser_required_guest() throws Exception {
         when(annotedLoginUser.required()).thenReturn(true);
         when(parameter.getParameterAnnotation(LoginUser.class)).thenReturn(annotedLoginUser);

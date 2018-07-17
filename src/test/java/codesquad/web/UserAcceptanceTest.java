@@ -62,7 +62,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void updateForm_no_login() throws Exception {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
                 String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -77,7 +77,8 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template());
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        log.debug("body : {}", response.getBody());
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
