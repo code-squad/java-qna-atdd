@@ -1,21 +1,19 @@
 package codesquad.service;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Optional;
-
+import codesquad.UnAuthenticationException;
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import codesquad.UnAuthenticationException;
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
-import codesquad.service.UserService;
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {

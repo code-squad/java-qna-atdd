@@ -1,32 +1,18 @@
 package codesquad.domain;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 import codesquad.UnAuthorizedException;
-import codesquad.domain.User;
+import org.junit.Test;
+import support.domain.UserGenerator;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 
 public class UserTest {
-    public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
-    public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
-
-    public static User newUser(Long id) {
-        return new User(id, "userId", "pass", "name", "javajigi@slipp.net");
-    }
-
-    public static User newUser(String userId) {
-        return newUser(userId, "password");
-    }
-
-    public static User newUser(String userId, String password) {
-        return new User(1L, userId, password, "name", "javajigi@slipp.net");
-    }
 
     @Test
     public void update_owner() throws Exception {
-        User origin = newUser("sanjigi");
+        User origin = UserGenerator.newUser("sanjigi");
         User loginUser = origin;
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(loginUser, target);
@@ -36,15 +22,15 @@ public class UserTest {
 
     @Test(expected = UnAuthorizedException.class)
     public void update_not_owner() throws Exception {
-        User origin = newUser("sanjigi");
-        User loginUser = newUser("javajigi");
+        User origin = UserGenerator.newUser("sanjigi");
+        User loginUser = UserGenerator.newUser("javajigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(loginUser, target);
     }
 
     @Test
     public void update_match_password() {
-        User origin = newUser("sanjigi");
+        User origin = UserGenerator.newUser("sanjigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
         assertThat(origin.getName(), is(target.getName()));
@@ -53,7 +39,7 @@ public class UserTest {
 
     @Test
     public void update_mismatch_password() {
-        User origin = newUser("sanjigi", "password");
+        User origin = UserGenerator.newUser("sanjigi", "password");
         User target = new User("sanjigi", "password2", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
         assertThat(origin.getName(), is(not(target.getName())));

@@ -1,21 +1,15 @@
 package codesquad.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import codesquad.CannotDeleteException;
+import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquad.CannotDeleteException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service("qnaService")
 public class QnaService {
@@ -41,13 +35,19 @@ public class QnaService {
     }
 
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+        Question origin = questionRepository.findOne(id);
+        log.debug("question : {}", origin);
+        origin.update(loginUser, updatedQuestion);
+        return questionRepository.save(origin);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        Question origin = questionRepository.findOne(questionId);
+        if (!origin.isOwner(loginUser)) {
+            throw new CannotDeleteException("실행권한이 없습니다.");
+        }
+        questionRepository.delete(questionId);
     }
 
     public Iterable<Question> findAll() {

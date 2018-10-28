@@ -1,28 +1,20 @@
 package codesquad.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-
+import codesquad.domain.User;
+import codesquad.domain.UserRepository;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import support.test.AcceptanceTest;
+import support.test.HtmlFormDataBuilder;
+import support.test.Method;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
@@ -39,19 +31,23 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-        String userId = "testuser";
-        htmlFormDataBuilder.addParameter("userId", userId);
-        htmlFormDataBuilder.addParameter("password", "password");
-        htmlFormDataBuilder.addParameter("name", "자바지기");
-        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
-        
-        ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
+        ResponseEntity<String> response = create(template());
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNotNull(userRepository.findByUserId(userId));
+        assertNotNull(userRepository.findByUserId("testuser"));
         assertThat(response.getHeaders().getLocation().getPath(), is("/users"));
+    }
+
+    public ResponseEntity<String> create(TestRestTemplate template) throws Exception {
+        return htmlFormDataBuilderTemplate.executePostForEntity(template, "/users", Method.POST,
+                (HtmlFormDataBuilder htmlFormDataBuilder) -> {
+
+                    htmlFormDataBuilder.addParameter("userId", "testuser");
+                    htmlFormDataBuilder.addParameter("password", "password");
+                    htmlFormDataBuilder.addParameter("name", "자바지기");
+                    htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
+                    return htmlFormDataBuilder.build();
+                });
     }
 
     @Test
@@ -84,22 +80,23 @@ public class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
-    private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HtmlFormDataBuilder htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
-
-        htmlFormDataBuilder.addParameter("_method", "put");
-        htmlFormDataBuilder.addParameter("password", "password2");
-        htmlFormDataBuilder.addParameter("name", "자바지기2");
-        htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = htmlFormDataBuilder.build();
-
-        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
-    }
-
     @Test
     public void update() throws Exception {
         ResponseEntity<String> response = update(basicAuthTemplate());
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
         assertTrue(response.getHeaders().getLocation().getPath().startsWith("/users"));
     }
+
+    private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
+        String targetUrl = String.format("/users/%d", defaultUser().getId());
+        return htmlFormDataBuilderTemplate.executePostForEntity(template, targetUrl, Method.PUT,
+                (HtmlFormDataBuilder htmlFormDataBuilder) -> {
+
+                    htmlFormDataBuilder.addParameter("password", "password2");
+                    htmlFormDataBuilder.addParameter("name", "자바지기2");
+                    htmlFormDataBuilder.addParameter("email", "javajigi@slipp.net");
+                    return htmlFormDataBuilder.build();
+                });
+    }
+
 }

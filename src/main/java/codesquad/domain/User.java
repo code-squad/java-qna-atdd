@@ -1,16 +1,14 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import codesquad.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Email;
+import support.domain.AbstractEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import codesquad.UnAuthorizedException;
-import codesquad.dto.UserDto;
-import support.domain.AbstractEntity;
 
 @Entity
 public class User extends AbstractEntity {
@@ -73,10 +71,7 @@ public class User extends AbstractEntity {
             throw new UnAuthorizedException();
         }
 
-        if (!matchPassword(target.getPassword())) {
-            return;
-        }
-
+        this.password = target.password;
         this.name = target.name;
         this.email = target.email;
     }
@@ -88,12 +83,12 @@ public class User extends AbstractEntity {
     public UserDto toUserDto() {
         return new UserDto(this.userId, this.password, this.name, this.email);
     }
-    
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;
     }
-    
+
     private static class GuestUser extends User {
         @Override
         public boolean isGuestUser() {
