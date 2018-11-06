@@ -8,15 +8,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import support.test.BaseTest;
 
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UserServiceTest {
+public class UserServiceTest extends BaseTest {
     @Mock
     private UserRepository userRepository;
 
@@ -29,7 +28,7 @@ public class UserServiceTest {
         when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
         User loginUser = userService.login(user.getUserId(), user.getPassword());
-        assertThat(loginUser, is(user));
+        softly.assertThat(loginUser).isEqualTo(user);
     }
 
     @Test(expected = UnAuthenticationException.class)

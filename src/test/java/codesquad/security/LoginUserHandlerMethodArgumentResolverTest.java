@@ -1,7 +1,6 @@
 package codesquad.security;
 
 import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,13 +10,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import support.test.BaseTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LoginUserHandlerMethodArgumentResolverTest {
+public class LoginUserHandlerMethodArgumentResolverTest extends BaseTest {
     @Mock
     private MethodParameter parameter;
 
@@ -41,7 +39,7 @@ public class LoginUserHandlerMethodArgumentResolverTest {
 
         User loginUser = (User) loginUserHandlerMethodArgumentResolver.resolveArgument(parameter, null, request, null);
 
-        assertThat(loginUser, is(sessionUser));
+        softly.assertThat(loginUser).isEqualTo(sessionUser);
     }
 
     @Test(expected = UnAuthenticationException.class)
@@ -62,20 +60,20 @@ public class LoginUserHandlerMethodArgumentResolverTest {
                 .thenReturn(User.GUEST_USER);
 
         User guestUser = (User) loginUserHandlerMethodArgumentResolver.resolveArgument(parameter, null, request, null);
-        assertThat(guestUser, is(User.GUEST_USER));
+        softly.assertThat(guestUser).isEqualTo(User.GUEST_USER);
     }
 
     @Test
     public void supportsParameter_false() {
         when(parameter.hasParameterAnnotation(LoginUser.class)).thenReturn(false);
 
-        assertThat(loginUserHandlerMethodArgumentResolver.supportsParameter(parameter), is(false));
+        softly.assertThat(loginUserHandlerMethodArgumentResolver.supportsParameter(parameter)).isFalse();
     }
 
     @Test
     public void supportsParameter_true() {
         when(parameter.hasParameterAnnotation(LoginUser.class)).thenReturn(true);
 
-        assertThat(loginUserHandlerMethodArgumentResolver.supportsParameter(parameter), is(true));
+        softly.assertThat(loginUserHandlerMethodArgumentResolver.supportsParameter(parameter)).isTrue();
     }
 }

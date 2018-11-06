@@ -2,10 +2,9 @@ package codesquad.domain;
 
 import codesquad.UnAuthorizedException;
 import org.junit.Test;
+import support.test.BaseTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class UserTest {
+public class UserTest extends BaseTest {
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
     public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
 
@@ -27,8 +26,8 @@ public class UserTest {
         User loginUser = origin;
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(loginUser, target);
-        assertThat(origin.getName()).isEqualTo(target.getName());
-        assertThat(origin.getEmail()).isEqualTo(target.getEmail());
+        softly.assertThat(origin.getName()).isEqualTo(target.getName());
+        softly.assertThat(origin.getEmail()).isEqualTo(target.getEmail());
     }
 
     @Test(expected = UnAuthorizedException.class)
@@ -44,8 +43,8 @@ public class UserTest {
         User origin = newUser("sanjigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
-        assertThat(origin.getName()).isEqualTo(target.getName());
-        assertThat(origin.getEmail()).isEqualTo(target.getEmail());
+        softly.assertThat(origin.getName()).isEqualTo(target.getName());
+        softly.assertThat(origin.getEmail()).isEqualTo(target.getEmail());
     }
 
     @Test(expected = UnAuthorizedException.class)

@@ -8,15 +8,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
+import support.test.BaseTest;
 
 import java.util.Base64;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BasicAuthInterceptorTest {
+public class BasicAuthInterceptorTest extends BaseTest {
     @Mock
     private UserService userService;
 
@@ -32,7 +31,7 @@ public class BasicAuthInterceptorTest {
         when(userService.login(userId, password)).thenReturn(loginUser);
 
         basicAuthInterceptor.preHandle(request, null, null);
-        assertThat(request.getSession().getAttribute(HttpSessionUtils.USER_SESSION_KEY), is(loginUser));
+        softly.assertThat(request.getSession().getAttribute(HttpSessionUtils.USER_SESSION_KEY)).isEqualTo(loginUser);
     }
 
     private MockHttpServletRequest basicAuthHttpRequest(String userId, String password) {

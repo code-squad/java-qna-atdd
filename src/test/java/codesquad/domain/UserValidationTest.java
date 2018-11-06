@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import support.test.BaseTest;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -11,9 +12,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class UserValidationTest {
+public class UserValidationTest extends BaseTest {
     private static final Logger log = LoggerFactory.getLogger(UserValidationTest.class);
 
     private static Validator validator;
@@ -28,7 +27,7 @@ public class UserValidationTest {
     public void userIdWhenIsEmpty() throws Exception {
         User user = new User("", "password", "name", "javajigi@slipp.net");
         Set<ConstraintViolation<User>> constraintViolcations = validator.validate(user);
-        assertThat(constraintViolcations.size()).isEqualTo(1);
+        softly.assertThat(constraintViolcations).hasSize(1);
 
         for (ConstraintViolation<User> constraintViolation : constraintViolcations) {
             log.debug("violation error message : {}", constraintViolation.getMessage());

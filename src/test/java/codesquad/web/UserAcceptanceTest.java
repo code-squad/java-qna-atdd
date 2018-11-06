@@ -14,8 +14,6 @@ import support.test.AcceptanceTest;
 
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
@@ -25,7 +23,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void createForm() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users/form", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
 
@@ -45,24 +43,24 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
         ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        assertThat(userRepository.findByUserId(userId).isPresent()).isTrue();
-        assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(userRepository.findByUserId(userId).isPresent()).isTrue();
+        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
 
     @Test
     public void list() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
-        assertThat(response.getBody()).contains(defaultUser().getEmail());
+        softly.assertThat(response.getBody()).contains(defaultUser().getEmail());
     }
 
     @Test
     public void updateForm_no_login() throws Exception {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
                 String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -70,14 +68,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
                 .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains(defaultUser().getEmail());
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        softly.assertThat(response.getBody()).contains(defaultUser().getEmail());
     }
 
     @Test
     public void update_no_login() throws Exception {
         ResponseEntity<String> response = update(template());
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         log.debug("body : {}", response.getBody());
     }
 
@@ -99,7 +97,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     @Test
     public void update() throws Exception {
         ResponseEntity<String> response = update(basicAuthTemplate());
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
 }
