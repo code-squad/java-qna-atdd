@@ -85,7 +85,7 @@ public class QuestionAcceptanceTest extends BasicAuthAcceptanceTest {
                 String.class);
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
 
-        Question updatedQuestion = questionRepository.findOne(savedQuestion.getId());
+        Question updatedQuestion = questionRepository.findById(savedQuestion.getId()).get();
         assertThat(updatedQuestion.getTitle(), is(title));
         assertThat(updatedQuestion.getContents(), is(contents));
     }

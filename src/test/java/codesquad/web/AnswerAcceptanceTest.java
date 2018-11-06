@@ -2,9 +2,7 @@ package codesquad.web;
 
 import static codesquad.domain.QuestionTest.createByLoginUser;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,8 @@ import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import support.test.BasicAuthAcceptanceTest;
 import support.test.HtmlFormDataBuilder;
+
+import java.util.Optional;
 
 public class AnswerAcceptanceTest extends BasicAuthAcceptanceTest {
     @Autowired
@@ -53,7 +53,7 @@ public class AnswerAcceptanceTest extends BasicAuthAcceptanceTest {
                 String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FOUND));
-        assertNull(answerRepository.findOne(savedAnswer.getId()));
+        assertFalse(findAnswerById(savedAnswer).isPresent());
     }
 
     @Test
@@ -70,6 +70,10 @@ public class AnswerAcceptanceTest extends BasicAuthAcceptanceTest {
                 String.class);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
-        assertNotNull(answerRepository.findOne(savedAnswer.getId()));
+        assertTrue(findAnswerById(savedAnswer).isPresent());
+    }
+
+    private Optional<Answer> findAnswerById(Answer savedAnswer) {
+        return answerRepository.findById(savedAnswer.getId());
     }
 }

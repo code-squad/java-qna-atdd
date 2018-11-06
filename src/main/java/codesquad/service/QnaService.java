@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import codesquad.ResourceNotFoundException;
 import codesquad.dto.QuestionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,18 +41,18 @@ public class QnaService {
     }
 
     public Question findById(long id) {
-        return questionRepository.findOne(id);
+        return questionRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     public Question update(User loginUser, long id, QuestionDto updatedQuestion) {
-        Question question = questionRepository.findOne(id);
+        Question question = findById(id);
         question.update(loginUser, updatedQuestion.toQuestion());
         return questionRepository.save(question);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        Question question = questionRepository.getOne(questionId);
+        Question question = findById(questionId);
         List<DeleteHistory> histories = question.delete(loginUser);
         deleteHistoryService.saveAll(histories);
     }
@@ -65,7 +66,7 @@ public class QnaService {
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        Question question = questionRepository.findOne(questionId);
+        Question question = findById(questionId);
         Answer answer = new Answer(loginUser, contents);
         question.addAnswer(answer);
         questionRepository.save(question);
@@ -73,7 +74,7 @@ public class QnaService {
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        Answer answer = answerRepository.findOne(id);
+        Answer answer = answerRepository.findById(id).get();
         answer.deletedBy(loginUser);
         answerRepository.delete(answer);
         return answer;

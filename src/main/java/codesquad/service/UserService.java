@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import codesquad.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import codesquad.UnAuthenticationException;
@@ -37,13 +38,17 @@ public class UserService {
     }
 
     public User update(User loginUser, long id, UserDto updatedUser) {
-        User original = userRepository.findOne(id);
+        User original = findById(id);
         original.update(loginUser, updatedUser._toUser());
         return userRepository.save(original);
     }
 
+    private User findById(long id) {
+        return userRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    }
+
     public User findById(User loginUser, long id) {
-        User user = userRepository.findOne(id);
+        User user = findById(id);
         if (!user.equals(loginUser)) {
             throw new UnAuthorizedException();
         }
