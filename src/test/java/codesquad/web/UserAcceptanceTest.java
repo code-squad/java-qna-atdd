@@ -11,11 +11,14 @@ import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
+import support.test.HtmlFormDataBuilder;
 
 import java.util.Arrays;
 
 public class UserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
+
+    private HtmlFormDataBuilder htmlFormDataBuilde;
 
     @Autowired
     private UserRepository userRepository;
@@ -29,19 +32,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm();
 
         String userId = "testuser";
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", userId);
-        params.add("password", "password");
-        params.add("name", "자바지기");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        htmlFormDataBuilde.addParameter("userId", userId);
+        htmlFormDataBuilde.addParameter("password", "password");
+        htmlFormDataBuilde.addParameter("name", "자바지기");
+        htmlFormDataBuilde.addParameter("email", "javajigi@slipp.net");
 
-        ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/users", htmlFormDataBuilde.build(), String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(userRepository.findByUserId(userId).isPresent()).isTrue();
@@ -80,18 +79,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm();
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("_method", "put");
-        params.add("password", "test");
-        params.add("name", "자바지기2");
-        params.add("email", "javajigi@slipp.net");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
 
-        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
+        htmlFormDataBuilde.addParameter("_method", "put");
+        htmlFormDataBuilde.addParameter("password", "test");
+        htmlFormDataBuilde.addParameter("name", "자바지기2");
+        htmlFormDataBuilde.addParameter("email", "javajigi@slipp.net");
+
+        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), htmlFormDataBuilde.build(), String.class);
     }
 
     @Test
