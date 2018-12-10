@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
-    private static final Logger log = LoggerFactory.getLogger(QnaService.class);
+    private static final Logger logger = LoggerFactory.getLogger(QnaService.class);
 
     @Resource(name = "questionRepository")
     private QuestionRepository questionRepository;
@@ -27,7 +28,7 @@ public class QnaService {
 
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
-        log.debug("question : {}", question);
+        logger.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
@@ -38,12 +39,29 @@ public class QnaService {
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
         // TODO 수정 기능 구현
-        return null;
+        Question original = findById(loginUser, id);
+        original.update(updatedQuestion, loginUser);
+        return questionRepository.save(original);
+    }
+
+    public Question findById(User loginUser, long id) {
+        return questionRepository.findById(id)
+                .filter(q -> q.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         // TODO 삭제 기능 구현
+        try {
+            Question question = findById(loginUser, questionId);
+            logger.debug("question is deleted? : {}", question.isDeleted());
+            question.delete();
+            logger.debug("question is deleted? : {}", question.isDeleted());
+            questionRepository.save(question);
+        } catch (UnAuthorizedException e) {
+            throw new CannotDeleteException("user id do not match");
+        }
     }
 
     public Iterable<Question> findAll() {

@@ -79,10 +79,8 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm();
+        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm().put();
 
-
-        htmlFormDataBuilde.addParameter("_method", "put");
         htmlFormDataBuilde.addParameter("password", "test");
         htmlFormDataBuilde.addParameter("name", "자바지기2");
         htmlFormDataBuilde.addParameter("email", "javajigi@slipp.net");
