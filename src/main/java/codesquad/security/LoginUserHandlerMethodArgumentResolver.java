@@ -14,6 +14,9 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
         return parameter.hasParameterAnnotation(LoginUser.class);
     }
 
+    /*
+    * supportsParameter 트루일 경우 실행 --> LoginUser 어노태이션이 매개변수로 주어진다면 트루!
+    * */
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
