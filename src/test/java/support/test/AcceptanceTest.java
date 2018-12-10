@@ -9,8 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@RunWith(SpringRunner.class)        //SpringRunner로 실행하라.
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)    //서버테스트를 위해서 서버를 실행하게끔 한다.
 public abstract class AcceptanceTest extends BaseTest {
     private static final String DEFAULT_LOGIN_USER = "javajigi";
 

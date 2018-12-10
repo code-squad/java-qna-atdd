@@ -16,11 +16,7 @@ public class UnAuthenticationException extends Exception {
         super(message, cause);
     }
 
-    public UnAuthenticationException(String message) {
-        super(message);
-    }
-
-    public UnAuthenticationException(Throwable cause) {
+    public UnAuthenticationException(String cause) {
         super(cause);
     }
 }
