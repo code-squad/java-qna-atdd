@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.naming.AuthenticationException;
 import java.util.List;
 
 @Service("userService")
@@ -37,7 +38,9 @@ public class UserService {
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        // TODO 로그인 기능 구현;
+        return userRepository.findByUserId(userId)
+                .filter(user->user.matchPassword(password))
+                .orElseThrow(UnAuthenticationException::new);
     }
 }
