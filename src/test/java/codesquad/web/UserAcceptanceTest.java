@@ -32,13 +32,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void create() throws Exception {
         String userId = "testuser";
 
-        HtmlFormDataBuilder request = HtmlFormDataBuilder.urlEncodedForm()
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
                 .addParameter("password", "password")
                 .addParameter("name", "자바지기")
-                .addParameter("email", "javajigi@slipp.net");
+                .addParameter("email", "javajigi@slipp.net")
+                .build();
 
-        ResponseEntity<String> response = template().postForEntity("/users", request.build(), String.class);
+        ResponseEntity<String> response = template().postForEntity("/users", request, String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(userRepository.findByUserId(userId).isPresent()).isTrue();
@@ -77,13 +78,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
-        HtmlFormDataBuilder request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("_method", "put")
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm().put()
                 .addParameter("password", "1234")
                 .addParameter("name", "브래드")
-                .addParameter("email", "brad903@naver.com");
+                .addParameter("email", "brad903@naver.com")
+                .build();
 
-        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request.build(), String.class);
+        return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
     }
 
     @Test

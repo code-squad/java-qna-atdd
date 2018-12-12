@@ -3,6 +3,7 @@ package codesquad.web;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.springframework.http.*;
+import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
@@ -20,11 +21,12 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login() throws Exception {
-        HtmlFormDataBuilder request = HtmlFormDataBuilder.urlEncodedForm()
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", "brad903")
-                .addParameter("password", "1234");
+                .addParameter("password", "1234")
+                .build();
 
-        ResponseEntity<String> response = template().postForEntity("/users/login", request.build(), String.class);
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/users");
@@ -32,11 +34,12 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login_failed() throws Exception {
-        HtmlFormDataBuilder request = HtmlFormDataBuilder.urlEncodedForm()
+        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", "javajigi")
-                .addParameter("password", "test2");
+                .addParameter("password", "test2")
+                .build();
 
-        ResponseEntity<String> response = template().postForEntity("/users/login", request.build(), String.class);
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         softly.assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다")).isTrue();
