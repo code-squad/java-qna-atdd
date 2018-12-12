@@ -62,9 +62,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     public void updateForm_login() throws Exception {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
-                .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(response.getBody()).contains(defaultUser().getEmail());
+                .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class); softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); softly.assertThat(response.getBody()).contains(defaultUser().getEmail());
     }
 
     @Test
