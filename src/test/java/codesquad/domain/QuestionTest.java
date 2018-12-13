@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import support.test.BaseTest;
 
-import static org.junit.Assert.*;
-
 public class QuestionTest extends BaseTest {
     private static final Logger logger = LoggerFactory.getLogger(QuestionTest.class);
 
-    public static User onwer = new User(1, "sehun", "test", "sehun", "test@test.com");
+    public static User owner = new User(1, "sehun", "test", "sehun", "test@test.com");
     public static User other = new User(2, "sechun", "test", "sechun", "test@test.com");
 
     public static Question question = new Question("title", "contents");
@@ -20,13 +18,13 @@ public class QuestionTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        question.writeBy(onwer);
+        question.writeBy(owner);
         question.setId(1);
     }
 
     @Test
     public void update_owner() {
-        question.update(updateQuestion, onwer);
+        question.update(updateQuestion, owner);
         softly.assertThat(question.getTitle()).isEqualTo("title2");
     }
 
@@ -42,4 +40,5 @@ public class QuestionTest extends BaseTest {
         question.delete();
         logger.debug("question : {}", question.isDeleted());
     }
+
 }

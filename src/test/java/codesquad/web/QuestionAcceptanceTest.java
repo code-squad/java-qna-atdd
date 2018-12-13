@@ -16,7 +16,7 @@ import support.test.HtmlFormDataBuilder;
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger logger = LoggerFactory.getLogger(QuestionAcceptanceTest.class);
 
-    private HtmlFormDataBuilder htmlFormDataBuilde;
+    private HtmlFormDataBuilder htmlFormDataBuilder;
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -37,13 +37,13 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create() throws Exception {
-        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm();
+        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm();
 
         User user = defaultUser();
-        htmlFormDataBuilde.addParameter("title", "test");
-        htmlFormDataBuilde.addParameter("contents", "contents");
+        htmlFormDataBuilder.addParameter("title", "test");
+        htmlFormDataBuilder.addParameter("contents", "contents");
 
-        ResponseEntity<String> response = basicAuthTemplate(user).postForEntity("/questions", htmlFormDataBuilde.build(), String.class);
+        ResponseEntity<String> response = basicAuthTemplate(user).postForEntity("/questions", htmlFormDataBuilder.build(), String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(questionRepository.findByWriterId(user.getId())).isNotEmpty();
@@ -87,12 +87,12 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> update(TestRestTemplate template) throws UnAuthorizedException {
-        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm().put();
+        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm().put();
 
-        htmlFormDataBuilde.addParameter("title", "title2");
-        htmlFormDataBuilde.addParameter("contents", "contents2");
+        htmlFormDataBuilder.addParameter("title", "title2");
+        htmlFormDataBuilder.addParameter("contents", "contents2");
 
-        return template.postForEntity(String.format("/questions/%d", 1), htmlFormDataBuilde.build(), String.class);
+        return template.postForEntity(String.format("/questions/%d", 1), htmlFormDataBuilder.build(), String.class);
     }
 
     @Test
@@ -117,9 +117,9 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     }
 
     private ResponseEntity<String> delete(TestRestTemplate template) {
-        htmlFormDataBuilde = HtmlFormDataBuilder.urlEncodedForm().delete();
+        htmlFormDataBuilder = HtmlFormDataBuilder.urlEncodedForm().delete();
 
-        return template.postForEntity(String.format("/questions/%d", 1), htmlFormDataBuilde.build(), String.class);
+        return template.postForEntity(String.format("/questions/%d", 1), htmlFormDataBuilder.build(), String.class);
     }
 
     @Test

@@ -18,7 +18,7 @@ public class ApiUserController {
     @Resource(name = "userService")
     private UserService userService;
 
-    @PostMapping("")
+    @PostMapping()
     public ResponseEntity<Void> create(@Valid @RequestBody User user) {
         User savedUser = userService.add(user);
 
