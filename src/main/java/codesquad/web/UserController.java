@@ -1,15 +1,18 @@
 package codesquad.web;
 
 import codesquad.domain.User;
+import codesquad.security.HttpSessionUtils;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -51,4 +54,18 @@ public class UserController {
         return "redirect:/users";
     }
 
+    @GetMapping("/login/form")
+    public String login(){
+        return "user/login";
+    }
+
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession httpSession){
+        try{
+            httpSession.setAttribute(HttpSessionUtils.USER_SESSION_KEY, userService.login(userId, password));
+            return "redirect:/";
+        } catch(Exception e){
+            return "user/login_failed";
+        }
+    }
 }

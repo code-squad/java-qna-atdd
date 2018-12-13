@@ -32,12 +32,17 @@ public class UserService {
                 .orElseThrow(UnAuthorizedException::new);
     }
 
+    public User findByUserId(String userId){
+        return userRepository.findByUserId(userId).orElseThrow(UnAuthorizedException::new);
+    }
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        return userRepository.findByUserId(userId)
+                .filter(user -> user.matchPassword(password))
+                .orElseThrow(UnAuthenticationException::new);
     }
 }
