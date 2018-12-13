@@ -31,6 +31,8 @@ public class UserController {
         return "redirect:/users";
     }
 
+
+
     @GetMapping("")
     public String list(Model model) {
         List<User> users = userService.findAll();
@@ -50,5 +52,7 @@ public class UserController {
         userService.update(loginUser, id, target);
         return "redirect:/users";
     }
+
+
 
 }
