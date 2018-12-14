@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.CannotDeleteException;
 import codesquad.domain.Answer;
 import codesquad.domain.User;
 import codesquad.security.LoginUser;
@@ -29,6 +30,16 @@ public class ApiAnswerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/api/questions/" + questionId + "/answers/" + answer.getId()));
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{answerId}")
+    public ResponseEntity<Void> delete(@PathVariable("answerId") long answerId, @LoginUser User loginUser) {
+        try {
+            qnaService.deleteAnswer(loginUser, answerId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
+        } catch (CannotDeleteException e) {
+            return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
+        }
     }
 
 }

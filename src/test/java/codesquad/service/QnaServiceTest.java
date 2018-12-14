@@ -30,10 +30,14 @@ public class QnaServiceTest extends BaseTest {
     @InjectMocks
     private QnaService qnaService;
 
-    public static User testUser = new User(1, "tester", "test", "tester", "test@test.com");
-    public static User secondUser = new User(2, "tester2", "test2", "tester2", "test@test.com");
-    public static Question original = new Question("title", "contents");
-    public static Question updateQuestion = new Question("title2", "contents2");
+    static User testUser = new User(1, "tester", "test", "tester", "test@test.com");
+    static User secondUser = new User(2, "tester2", "test2", "tester2", "test@test.com");
+
+    static Question original = new Question("title", "contents");
+    static Question updateQuestion = new Question("title2", "contents2");
+
+    static Answer answer1 = new Answer(1L, testUser, original, "contents1");
+    static Answer answer2 = new Answer(2L, secondUser, original, "content2");
 
     @Before
     public void setUp() throws Exception {
@@ -63,23 +67,41 @@ public class QnaServiceTest extends BaseTest {
     @Test
     public void update_by_owner() {
         when(questionRepository.findById(Long.valueOf(1))).thenReturn(Optional.of(original));
-        when(qnaService.update(testUser, 1, new Question("title2", "contents"))).thenReturn(updateQuestion);
 
         Question update = qnaService.update(testUser, 1, new Question("title2", "contents2"));
         softly.assertThat(update.getWriter()).isEqualTo(testUser);
     }
 
-    @Test(expected = CannotDeleteException.class)
-    public void delete_not_match_user_id() throws CannotDeleteException {
-        when(questionRepository.findById(Long.valueOf(1))).thenReturn(Optional.of(original));
+    @Test
+    public void q_delete_success() throws CannotDeleteException {
+        when(questionRepository.findById(1L)).thenReturn(Optional.of(original));
+        original.addAnswer(answer1);
 
-        qnaService.deleteQuestion(secondUser, 1);
+        qnaService.deleteQuestion(testUser, 1L);
     }
 
-    @Test
-    public void delete_by_owner() throws CannotDeleteException {
-        when(questionRepository.findById(Long.valueOf(1))).thenReturn(Optional.of(original));
-        qnaService.deleteQuestion(testUser, 1);
+    @Test(expected = CannotDeleteException.class)
+    public void q_delete_by_other() throws CannotDeleteException {
+        when(questionRepository.findById(1L)).thenReturn(Optional.of(original));
+        original.addAnswer(answer1);
+
+        qnaService.deleteQuestion(secondUser, 1L);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void q_delete_cannot_delete_answer() throws CannotDeleteException {
+        when(questionRepository.findById(1L)).thenReturn(Optional.of(original));
+        original.addAnswer(answer2);
+
+        qnaService.deleteQuestion(testUser, 1L);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void q_delete_not_exist() throws CannotDeleteException {
+//        when(questionRepository.findById(1L)).thenReturn(Optional.of(original));
+        original.addAnswer(answer1);
+
+        qnaService.deleteQuestion(testUser, 3L);
     }
 
     @Test
@@ -91,5 +113,27 @@ public class QnaServiceTest extends BaseTest {
 
         Answer result = qnaService.addAnswer(testUser, 1L, "contents");
         softly.assertThat(result.getWriter()).isEqualTo(testUser);
+    }
+
+    @Test
+    public void delete_answer_success() throws CannotDeleteException {
+        when(answerRepository.findById(1L)).thenReturn(Optional.of(answer1));
+
+        Answer result = qnaService.deleteAnswer(testUser, 1L);
+        softly.assertThat(result.isDeleted()).isTrue();
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_answer_by_other() throws CannotDeleteException {
+        when(answerRepository.findById(1L)).thenReturn(Optional.of(answer1));
+
+        qnaService.deleteAnswer(secondUser, 1L);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_answer_not_exist() throws CannotDeleteException {
+//        when(answerRepository.findById(1L)).thenReturn(Optional.of(answer1));
+
+        qnaService.deleteAnswer(testUser, 3L);
     }
 }

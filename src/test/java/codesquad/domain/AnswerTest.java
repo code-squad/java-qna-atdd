@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,5 +23,20 @@ public class AnswerTest extends BaseTest {
         question.addAnswer(newAnswer);
         logger.debug("newAnswer question : {}", newAnswer.getQuestion());
         softly.assertThat(newAnswer.getQuestion()).isEqualTo(question);
+    }
+
+    @Test
+    public void delete() throws CannotDeleteException {
+        Answer newAnswer = new Answer(owner, "contents");
+        newAnswer.setId(1L);
+        DeleteHistory deleteHistory = newAnswer.delete(owner);
+        logger.debug("deleteHistory : {}", deleteHistory);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_by_other() throws CannotDeleteException {
+        Answer newAnswer = new Answer(owner, "contents");
+        newAnswer.setId(1L);
+        newAnswer.delete(other);
     }
 }

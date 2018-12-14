@@ -1,10 +1,13 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -65,6 +68,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser)) throw new CannotDeleteException("You do not have permission to delete.");
+
+        this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
     }
 
     @Override

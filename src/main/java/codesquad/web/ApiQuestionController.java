@@ -31,7 +31,7 @@ public class ApiQuestionController {
 
     @GetMapping("/{id}")
     public Question show(@PathVariable long id) {
-        return qnaService.findById(id).get();
+        return qnaService.findQuestionById(id).get();
     }
 
     @PutMapping("/{id}")

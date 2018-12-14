@@ -23,7 +23,7 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable long id, Model model) {
-        model.addAttribute("question", qnaService.findById(id).orElseThrow(UnAuthorizedException::new));
+        model.addAttribute("question", qnaService.findQuestionById(id).orElseThrow(UnAuthorizedException::new));
         return "qna/show";
     }
 
@@ -41,7 +41,7 @@ public class QuestionController {
     @GetMapping("/{id}/form")
     public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
         try {
-            model.addAttribute("question", qnaService.findById(id)
+            model.addAttribute("question", qnaService.findQuestionById(id)
                     .filter(q -> q.isOwner(loginUser))
                     .orElseThrow(UnAuthenticationException::new));
             return "qna/updateForm";

@@ -31,33 +31,36 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
+    public Optional<Question> findQuestionById(long id) {
         return questionRepository.findById(id);
     }
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        Question original = findOriginalById(loginUser, id);
+        Question original = findQuestionByIdWithLoginUser(loginUser, id);
         original.update(updatedQuestion, loginUser);
-        return questionRepository.save(original);
+        return original;
     }
 
-    public Question findOriginalById(User loginUser, long id) {
+    public Question findQuestionByIdWithLoginUser(User loginUser, long id) {
         return questionRepository.findById(id)
                 .filter(q -> q.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
     }
 
+    public Answer findAnswerByIdWithLoginUser(User loginUser, long id) {
+        return answerRepository.findById(id)
+                .filter(answer -> answer.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
+    }
+
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
         try {
-            Question question = findOriginalById(loginUser, questionId);
-            question.delete();
-            questionRepository.save(question);
+            Question question = findQuestionByIdWithLoginUser(loginUser, questionId);
+            deleteHistoryService.saveAll(question.delete(loginUser));
         } catch (UnAuthorizedException e) {
-            throw new CannotDeleteException("user id do not match");
+            throw new CannotDeleteException("You do not have permission to delete.");
         }
     }
 
@@ -72,7 +75,7 @@ public class QnaService {
     @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
         Answer addAnswer = new Answer(loginUser, contents);
-        findById(questionId).map(question -> {
+        findQuestionById(questionId).map(question -> {
             question.addAnswer(addAnswer);
             return question;
         }).orElseThrow(IllegalArgumentException::new);
@@ -80,8 +83,15 @@ public class QnaService {
         return addAnswer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public Answer deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        Answer deleteAnswer;
+        try {
+            deleteAnswer = findAnswerByIdWithLoginUser(loginUser, id);
+        } catch (UnAuthorizedException e) {
+            throw new CannotDeleteException("You do not have permission to delete.");
+        }
+        deleteHistoryService.save(deleteAnswer.delete(loginUser));
+        return deleteAnswer;
     }
 }
