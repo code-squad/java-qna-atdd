@@ -4,6 +4,7 @@ import codesquad.converter.LocalDateConverter;
 import codesquad.converter.LocalDateTimeConverter;
 import codesquad.security.BasicAuthInterceptor;
 import codesquad.security.LoginUserHandlerMethodArgumentResolver;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Bean
     public LoginUserHandlerMethodArgumentResolver loginUserArgumentResolver() {
+        /* <bean id="loginUserArgumentResolver" class="security.LoginUserHandlerMethodArgumentResolver.class" /> */
         return new LoginUserHandlerMethodArgumentResolver();
     }
 

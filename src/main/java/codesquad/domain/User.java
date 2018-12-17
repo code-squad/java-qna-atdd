@@ -109,6 +109,10 @@ public class User extends AbstractEntity {
                 email.equals(target.email);
     }
 
+    public boolean isIdentity(User user) {
+        return this == user;
+    }
+
     @JsonIgnore
     public boolean isGuestUser() {
         return false;

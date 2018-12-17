@@ -8,8 +8,13 @@ import org.mockito.InjectMocks;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import support.test.AcceptanceTest;
+
+import java.util.Arrays;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class LoginAcceptanceTest extends AcceptanceTest {
@@ -37,7 +42,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
              * 통합 자원 지시자(uniform resource locator, URL) : 특정 서버의 리소스의 구체적인 위치, 리소스의 위치와 접근방법에 대한 방법 제공
               > uri가 url을 포함하는 상위 개념
         */
-        ResponseEntity<String> response = template().getForEntity("/login/form", String.class);
+        ResponseEntity<String> response = template().getForEntity("/login", String.class);
         /*
             getStatusCode() : 응답에 대한 상태코드를 반환
         */

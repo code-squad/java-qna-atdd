@@ -100,4 +100,13 @@ public class UserAcceptanceTest extends AcceptanceTest {
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
+
+    @Test
+    public void logout() {
+        ResponseEntity<String> response = template().withBasicAuth("javajigi", "test")
+                .getForEntity("/users/logout", String.class);
+
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/");
+    }
 }

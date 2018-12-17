@@ -26,6 +26,7 @@
                     </div>
                     <div class="article-util">
                         <ul class="article-util-list">
+                            {{# owner }}
                             <li>
                                 <a class="link-modify-article" href="/questions/{{id}}/form">수정</a>
                             </li>
@@ -35,8 +36,9 @@
                                     <button class="link-delete-article" type="submit">삭제</button>
                                 </form>
                             </li>
+                            {{/ owner }}
                             <li>
-                                <a class="link-modify-article" href="/index.html">목록</a>
+                                <a class="link-modify-article" href="/">목록</a>
                             </li>
                         </ul>
                     </div>
