@@ -17,7 +17,6 @@ public class LoginAcceptanceTest extends AcceptanceTest {
     private static final Logger log = getLogger(LoginAcceptanceTest.class);
     private UserRepository userRepository;
 
-
     @Test
     public void createForm() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/login", String.class);
@@ -27,15 +26,6 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login() throws Exception {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-//        params.add("userId", "javajigi");
-//        params.add("password", "test");
-//        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", "javajigi")
                 .addParameter("password", "test")
@@ -48,15 +38,6 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void login_failed() throws Exception {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-//        params.add("userId", "javajigi");
-//        params.add("password", "test2");
-//        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", "kuro")
                 .addParameter("password", "test")

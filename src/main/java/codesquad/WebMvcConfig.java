@@ -4,6 +4,7 @@ import codesquad.converter.LocalDateConverter;
 import codesquad.converter.LocalDateTimeConverter;
 import codesquad.security.BasicAuthInterceptor;
 import codesquad.security.LoginUserHandlerMethodArgumentResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new LocalDateConverter("yyyy-MM-dd"));
@@ -38,14 +40,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return new MessageSourceAccessor(messageSource);
     }
 
-    @Bean
-    public BasicAuthInterceptor basicAuthInterceptor() {
-        return new BasicAuthInterceptor();
-    }
+//    @Bean
+//    public BasicAuthInterceptor basicAuthInterceptor() {
+//        return new BasicAuthInterceptor();
+//    }
+
+    @Autowired
+    private BasicAuthInterceptor basicAuthInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(basicAuthInterceptor());
+        registry.addInterceptor(basicAuthInterceptor);
     }
 
     @Bean

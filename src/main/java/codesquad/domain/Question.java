@@ -1,5 +1,7 @@
 package codesquad.domain;
 
+import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -75,6 +77,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void update(Question updateQuestion, User loginUser) throws UnAuthorizedException {
+        if (!this.writer.equals(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = updateQuestion.contents;
+        this.title = updateQuestion.title;
     }
 
     @Override
