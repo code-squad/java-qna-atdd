@@ -1,6 +1,6 @@
 package codesquad.web;
 
-import codesquad.UnAuthenticationException;
+import codesquad.exception.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.security.HttpSessionUtils;
 import codesquad.service.UserService;
@@ -22,7 +22,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/form")
+    @GetMapping("")
     public String form() {
         return "/user/login";
     }
@@ -43,4 +43,6 @@ public class LoginController {
             return "/user/login_failed";
         }
     }
+
+    //TODO : 로그아웃 구현 및 관련 기능 User로 이관
 }

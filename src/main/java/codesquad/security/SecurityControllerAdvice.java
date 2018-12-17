@@ -1,7 +1,8 @@
 package codesquad.security;
 
-import codesquad.UnAuthenticationException;
-import codesquad.UnAuthorizedException;
+import codesquad.exception.CannotDeleteException;
+import codesquad.exception.UnAuthenticationException;
+import codesquad.exception.UnAuthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,13 @@ public class SecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public String unAuthentication() {
         log.debug("UnAuthenticationException is happened!");
-        return "/user/login";
+        return "/user/relogin";
+    }
+
+    @ExceptionHandler(CannotDeleteException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    public String cannotDelete() {
+        log.debug("CannotDeleteException is happened!");
+        return "/user/relogin";
     }
 }

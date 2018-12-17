@@ -1,5 +1,7 @@
 package support.test;
 
+import codesquad.domain.Question;
+import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.junit.runner.RunWith;
@@ -19,6 +21,9 @@ public abstract class AcceptanceTest extends BaseTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     public TestRestTemplate template() {
         return template;

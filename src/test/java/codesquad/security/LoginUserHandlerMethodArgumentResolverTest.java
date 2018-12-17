@@ -1,6 +1,6 @@
 package codesquad.security;
 
-import codesquad.UnAuthenticationException;
+import codesquad.exception.UnAuthenticationException;
 import codesquad.domain.User;
 import org.junit.Before;
 import org.junit.Test;

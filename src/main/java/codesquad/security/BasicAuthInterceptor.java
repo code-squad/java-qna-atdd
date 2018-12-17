@@ -1,6 +1,6 @@
 package codesquad.security;
 
-import codesquad.UnAuthenticationException;
+import codesquad.exception.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.service.UserService;
 import org.slf4j.Logger;

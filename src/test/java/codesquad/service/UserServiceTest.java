@@ -1,6 +1,6 @@
 package codesquad.service;
 
-import codesquad.UnAuthenticationException;
+import codesquad.exception.UnAuthenticationException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.junit.Test;
