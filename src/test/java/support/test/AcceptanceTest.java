@@ -1,5 +1,7 @@
 package support.test;
 
+import codesquad.domain.Question;
+import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.junit.runner.RunWith;
@@ -20,6 +22,9 @@ public abstract class AcceptanceTest extends BaseTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
     public TestRestTemplate template() {
         return template;
     }
@@ -38,5 +43,13 @@ public abstract class AcceptanceTest extends BaseTest {
 
     protected User findByUserId(String userId) {
         return userRepository.findByUserId(userId).get();
+    }
+
+    protected Question defaltQuestion() {
+        return findByQuestion(1L);
+    }
+
+    protected Question findByQuestion(Long id) {
+        return questionRepository.findById(id).get();
     }
 }
