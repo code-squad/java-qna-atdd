@@ -5,6 +5,7 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -26,6 +27,8 @@ public class UserService {
         original.update(loginUser, updatedUser);
         return original;
     }
+
+
 
     public User findById(User loginUser, long id) {
         return userRepository.findById(id)
