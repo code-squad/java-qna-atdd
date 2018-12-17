@@ -29,7 +29,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-        public void create() throws Exception {
+    public void create() throws Exception {
         String userId = "testuser";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodingForm()
                 .addParameter("userId", userId)
@@ -78,7 +78,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodingForm()
-                .addParameter("_method", "put")
+                .put()
                 .addParameter("password", "test")
                 .addParameter("name", "자바지기2")
                 .addParameter("email", "javajigi@slipp.net")

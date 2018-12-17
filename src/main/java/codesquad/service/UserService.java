@@ -27,6 +27,7 @@ public class UserService {
         return original;
     }
 
+    @Transactional(readOnly = true) // 데이터의 수정을 못함
     public User findById(User loginUser, long id) {
         return userRepository.findById(id)
                 .filter(user -> user.equals(loginUser))

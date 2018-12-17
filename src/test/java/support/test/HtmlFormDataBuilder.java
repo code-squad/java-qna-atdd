@@ -32,4 +32,14 @@ public class HtmlFormDataBuilder {
     public HttpEntity<MultiValueMap<String, Object>> build() {
         return new HttpEntity<MultiValueMap<String, Object>>(params, headers);
     }
+
+    public HtmlFormDataBuilder put() {
+        params.add("_method", "put");
+        return this;
+    }
+
+    public HtmlFormDataBuilder delete() {
+        params.add("_method", "delete");
+        return this;
+    }
 }
