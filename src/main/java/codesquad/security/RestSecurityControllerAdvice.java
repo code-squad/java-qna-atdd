@@ -13,6 +13,7 @@ import support.domain.ErrorMessage;
 
 import javax.persistence.EntityNotFoundException;
 
+//aop 기능 예외처리 기능
 @RestControllerAdvice(annotations = RestController.class)
 public class RestSecurityControllerAdvice {
     private static final Logger log = LoggerFactory.getLogger(RestSecurityControllerAdvice.class);

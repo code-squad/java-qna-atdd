@@ -28,9 +28,9 @@ public class UserService {
     }
 
     public User findById(User loginUser, long id) {
-        return userRepository.findById(id)
-                .filter(user -> user.equals(loginUser))
-                .orElseThrow(UnAuthorizedException::new);
+        return userRepository.findById(id).get();
+//                .filter(user -> user.equals(loginUser))
+//                .orElseThrow(UnAuthorizedException::new);
     }
 
     public List<User> findAll() {

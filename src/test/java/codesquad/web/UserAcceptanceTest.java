@@ -20,14 +20,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
     private UserRepository userRepository;
 
     @Test
-    public void createForm() throws Exception {
+    public void 회원가입_버튼_클릭() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users/form", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
 
     @Test
-    public void create() throws Exception {
+    public void 회원가입_작성() throws Exception {
         String userId = "testuser";
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", userId)
@@ -44,7 +44,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void list() throws Exception {
+    public void 회원목록() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/users", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
@@ -52,14 +52,14 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void updateForm_no_login() throws Exception {
+    public void 회원수정_버튼_클릭_로그인X() throws Exception {
         ResponseEntity<String> response = template().getForEntity(String.format("/users/%d/form", defaultUser().getId()),
                 String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void updateForm_login() throws Exception {
+    public void 회원수정_버튼_클릭_로그인O() throws Exception {
         User loginUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(loginUser)
                 .getForEntity(String.format("/users/%d/form", loginUser.getId()), String.class);
@@ -68,27 +68,27 @@ public class UserAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void update_no_login() throws Exception {
+    public void 회원수정_작성_로그인X() throws Exception {
         ResponseEntity<String> response = update(template());
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         log.debug("body : {}", response.getBody());
     }
 
+    @Test
+    public void 회원수정_작성_로그인O() throws Exception {
+        ResponseEntity<String> response = update(basicAuthTemplate());
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
+    }
+
     private ResponseEntity<String> update(TestRestTemplate template) throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("_method", "put")
+                .put()
                 .addParameter("password", "test")
                 .addParameter("name", "자바지기2")
                 .addParameter("email", "javajigi@slipp.net")
                 .build();
 
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
-    }
-
-    @Test
-    public void update() throws Exception {
-        ResponseEntity<String> response = update(basicAuthTemplate());
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/users");
     }
 }

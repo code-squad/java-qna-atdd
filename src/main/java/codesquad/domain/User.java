@@ -49,7 +49,7 @@ public class User extends AbstractEntity {
 
     public User setUserId(String userId) {
         this.userId = userId;
-        return this;
+        return this;    //세터에 왜 객체 반환을 하는거임?
     }
 
     public String getPassword() {
@@ -80,7 +80,7 @@ public class User extends AbstractEntity {
     }
 
     public void update(User loginUser, User target) {
-        if (!matchUserId(loginUser.getUserId())) {
+        if (!matchUserId(loginUser.getUserId())) {      //loginUser.userId로 안하고 게터쓴 이유는?
             throw new UnAuthorizedException();
         }
 

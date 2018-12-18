@@ -2,7 +2,7 @@ package codesquad.web;
 
 import codesquad.UnAuthenticationException;
 import codesquad.domain.User;
-import codesquad.domain.UserRepository;
+import codesquad.security.HttpSessionUtils;
 import codesquad.security.LoginUser;
 import codesquad.service.UserService;
 import org.slf4j.Logger;
@@ -14,15 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-    @Resource(name = "userRepository")
-    private UserRepository userRepository;
 
     @Resource(name = "userService")
     private UserService userService;
@@ -47,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
+    public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {   //401에러 뜸 (unauthorized)
         model.addAttribute("user", userService.findById(loginUser, id));
         return "/user/updateForm";
     }
@@ -67,10 +63,16 @@ public class UserController {
     public String login(String userId, String password, HttpSession session) {
         try {
             User user = userService.login(userId, password);
-            session.setAttribute("loginUser", user);
+            session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
             return "redirect:/";
         } catch (UnAuthenticationException e) {
             return "user/login_failed";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute(HttpSessionUtils.USER_SESSION_KEY);
+        return "redirect:/";
     }
 }
