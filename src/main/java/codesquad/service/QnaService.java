@@ -1,6 +1,6 @@
 package codesquad.service;
 
-import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
-@Service("qnaService")
+@Service("qnaService")  //서비스에서는 비즈니스 로직을 구현하는 곳이 아니다!! , thin layer - 가볍게 구현해야 한다.
+//상태값을 가지는 곳은 domain이다.
 public class QnaService {
     private static final Logger log = LoggerFactory.getLogger(QnaService.class);
 
@@ -31,19 +31,18 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
-        return questionRepository.findById(id);
+    public Question findById(long id) {
+        return questionRepository.findById(id).orElseThrow(UnAuthorizedException::new);
     }
 
     @Transactional
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+    public void update(User loginUser, long id, Question updatedQuestion) {
+        findById(id).modify(updatedQuestion, loginUser);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+    public void delete(User loginUser, long id) {
+        findById(id).delete(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -62,5 +61,9 @@ public class QnaService {
     public Answer deleteAnswer(User loginUser, long id) {
         // TODO 답변 삭제 기능 구현 
         return null;
+    }
+
+    public void add(Question question) {
+        questionRepository.save(question);
     }
 }

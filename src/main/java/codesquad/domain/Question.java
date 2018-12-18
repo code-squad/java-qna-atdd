@@ -1,6 +1,9 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import codesquad.security.LoginUser;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -9,8 +12,12 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -69,12 +76,28 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         answers.add(answer);
     }
 
-    public boolean isOwner(User loginUser) {
+    public boolean
+    isOwner(User loginUser) {
         return writer.equals(loginUser);
     }
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        deleted = true;
+    }
+
+    public void modify(Question updateQuestion, User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        contents = updateQuestion.contents;
+        title = updateQuestion.title;
     }
 
     @Override

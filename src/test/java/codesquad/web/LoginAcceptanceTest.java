@@ -39,7 +39,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
     public void login_failed() throws Exception {
         HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder.urlEncodedForm()
                 .addParameter("userId", "javajigi")
-                .addParameter("password", "test")
+                .addParameter("password", "test2")
                 .build();
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);

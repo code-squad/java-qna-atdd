@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("")
-    public String list(Model model) {
+    public String list(Model model, @LoginUser User loginUser) {
         List<User> users = userService.findAll();
         log.debug("user size : {}", users.size());
         model.addAttribute("users", users);
@@ -50,5 +50,4 @@ public class UserController {
         userService.update(loginUser, id, target);
         return "redirect:/users";
     }
-
 }

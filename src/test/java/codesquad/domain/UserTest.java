@@ -35,7 +35,7 @@ public class UserTest extends BaseTest {
         User origin = newUser("sanjigi");
         User loginUser = newUser("javajigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
-        origin.update(loginUser, target);
+        origin.update(loginUser, target);       //sanjigi가 javajigi의 개인정보를 sanjigi로 바꾸려고 한다.
     }
 
     @Test

@@ -4,6 +4,7 @@ import codesquad.converter.LocalDateConverter;
 import codesquad.converter.LocalDateTimeConverter;
 import codesquad.security.BasicAuthInterceptor;
 import codesquad.security.LoginUserHandlerMethodArgumentResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

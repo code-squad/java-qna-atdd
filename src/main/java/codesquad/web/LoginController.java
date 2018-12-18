@@ -18,18 +18,23 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginForm() {
-
         return "user/login";
     }
 
     @PostMapping("/login")
-    public String loginForm(String userId, String password,HttpSession session) {
+    public String loginForm(String userId, String password, HttpSession session) {
         try {
-            User loginUser = userService.login(userId,password);
-            session.setAttribute("loginedUser",loginUser);
+            User loginUser = userService.login(userId, password);
+            session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
         } catch (UnAuthenticationException e) {
             return "user/login_failed";
         }
+        return "redirect:/";
+    }
+
+    @GetMapping("/logout")
+    public String logoutForm(HttpSession session) {
+        session.removeAttribute(HttpSessionUtils.USER_SESSION_KEY);
         return "redirect:/";
     }
 }
