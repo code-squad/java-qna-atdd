@@ -1,13 +1,19 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = getLogger(Answer.class);
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
     private User writer;
@@ -65,6 +71,16 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public Answer update(User loginUser, String updatedContents) {
+        if(!isOwner(loginUser)) throw new UnAuthorizedException();
+        this.contents = updatedContents;
+        return this;
+    }
+
+    public boolean isSameContents(String targetContents) {
+        return this.contents.equals(targetContents);
     }
 
     @Override

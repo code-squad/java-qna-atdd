@@ -6,14 +6,12 @@ import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.security.LoginUser;
 import codesquad.service.QnaService;
-import org.hibernate.annotations.GeneratorType;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityNotFoundException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -39,14 +37,14 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
-        Question question = qnaService.findById(id).orElseThrow(EntityNotFoundException::new);
+        Question question = qnaService.findQuestionById(id);
         model.addAttribute("question", question);
         return "qna/show";
     }
 
     @GetMapping("/{id}/form")
     public String updateForm(@LoginUser User loginUser, @PathVariable Long id, Model model) {
-        Question question = qnaService.findById(id).orElseThrow(EntityNotFoundException::new);
+        Question question = qnaService.findQuestionById(id);
         if(!question.isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
@@ -56,7 +54,7 @@ public class QuestionController {
 
     @PutMapping("/{id}")
     public String udpate(@LoginUser User loginUser, @PathVariable Long id, Question updatedQuestion, Model model) {
-        Question question = qnaService.update(loginUser, id,updatedQuestion);
+        Question question = qnaService.updateQuestion(loginUser, id,updatedQuestion);
         model.addAttribute("question", question);
         return "qna/show";
     }

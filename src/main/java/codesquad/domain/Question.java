@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -33,6 +34,13 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     private boolean deleted = false;
 
     public Question() {
+    }
+
+    public Question(long id, @Size(min = 3, max = 100) String title, @Size(min = 3) String contents, User writer) {
+        super(id);
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
     }
 
     public Question(String title, String contents) {
@@ -93,6 +101,13 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
+    public boolean equalsTitleAndContents(Question target) {
+        if(Objects.isNull(target)) {
+            return false;
+        }
+        return title.equals(target.title) && contents.equals(target.contents);
+    }
+
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
@@ -102,5 +117,4 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
-
 }

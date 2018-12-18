@@ -1,6 +1,5 @@
 package codesquad.web;
 
-import codesquad.domain.Question;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -11,29 +10,26 @@ import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
+import static codesquad.domain.QuestionTest.QUESTION;
+import static codesquad.domain.QuestionTest.UPDATED_QUESTION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log = getLogger(QuestionAcceptanceTest.class);
-    Question testQuestion;
-    Question updatedQuestion;
     HttpEntity<MultiValueMap<String, Object>> testRequest;
     HttpEntity<MultiValueMap<String, Object>> updateRequest;
     HttpEntity<MultiValueMap<String, Object>> deleteRequest;
 
     @Before
     public void setUp() throws Exception {
-        testQuestion = new Question("제목 테스트", "내용 테스트 - 코드스쿼드 qna-atdd step2 진행중입니다");
-        updatedQuestion = new Question("업데이트된 제목", "업데이트된 내용입니다");
-
         testRequest = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", testQuestion.getTitle())
-                .addParameter("contents", testQuestion.getContents())
+                .addParameter("title", QUESTION.getTitle())
+                .addParameter("contents", QUESTION.getContents())
                 .build();
 
         updateRequest = HtmlFormDataBuilder.urlEncodedForm().put()
-                .addParameter("title", updatedQuestion.getTitle())
-                .addParameter("contents", updatedQuestion.getContents())
+                .addParameter("title", UPDATED_QUESTION.getTitle())
+                .addParameter("contents", UPDATED_QUESTION.getContents())
                 .build();
 
         deleteRequest = HtmlFormDataBuilder.urlEncodedForm().delete().build();
@@ -121,8 +117,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void update_succeed() {
         ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/1", updateRequest, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(response.getBody()).contains(updatedQuestion.getTitle());
-        softly.assertThat(response.getBody()).contains(updatedQuestion.getContents());
+        softly.assertThat(response.getBody()).contains(UPDATED_QUESTION.getTitle());
+        softly.assertThat(response.getBody()).contains(UPDATED_QUESTION.getContents());
     }
 
     @Test

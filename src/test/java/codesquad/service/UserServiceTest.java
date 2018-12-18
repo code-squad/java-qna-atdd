@@ -12,6 +12,7 @@ import support.test.BaseTest;
 
 import java.util.Optional;
 
+import static codesquad.domain.UserTest.BRAD;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,25 +25,23 @@ public class UserServiceTest extends BaseTest {
 
     @Test
     public void login_success() throws Exception {
-        User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
-        when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findByUserId(BRAD.getUserId())).thenReturn(Optional.of(BRAD));
 
-        User loginUser = userService.login(user.getUserId(), user.getPassword());
-        softly.assertThat(loginUser).isEqualTo(user);
+        User loginUser = userService.login(BRAD.getUserId(), BRAD.getPassword());
+        softly.assertThat(loginUser).isEqualTo(BRAD);
     }
 
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_user_not_found() throws Exception {
-        when(userRepository.findByUserId("sanjigi")).thenReturn(Optional.empty());
+        when(userRepository.findByUserId("brad")).thenReturn(Optional.empty());
 
-        userService.login("sanjigi", "password");
+        userService.login("brad", "1234");
     }
 
     @Test(expected = UnAuthenticationException.class)
     public void login_failed_when_mismatch_password() throws Exception {
-        User user = new User("sanjigi", "password", "name", "javajigi@slipp.net");
-        when(userRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+        when(userRepository.findByUserId(BRAD.getUserId())).thenReturn(Optional.of(BRAD));
 
-        userService.login(user.getUserId(), user.getPassword() + "2");
+        userService.login(BRAD.getUserId(), BRAD.getPassword() + "2");
     }
 }

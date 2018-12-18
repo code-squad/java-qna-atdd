@@ -1,7 +1,6 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
-import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
@@ -33,20 +31,28 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
-        return questionRepository.findById(id);
+    public Question findQuestionById(long id) {
+        return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public Answer findAnswerById(long id) {
+        return answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
-    public Question update(User loginUser, long id, Question updatedQuestion) {
-        Question question = findById(id).orElseThrow(EntityNotFoundException::new);
-        return question.update(loginUser, updatedQuestion);
+    public Question updateQuestion(User loginUser, long id, Question updatedQuestion) {
+        return findQuestionById(id).update(loginUser, updatedQuestion);
+    }
+
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, String updatedContents) {
+        return findAnswerById(id).update(loginUser, updatedContents);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long id) throws CannotDeleteException {
-        Question question = findById(id).orElseThrow(EntityNotFoundException::new);
-        question.delete(loginUser);
+        findQuestionById(id).delete(loginUser);
+        // todo 답변 삭제 기능 구현
     }
 
     public Iterable<Question> findAll() {
@@ -57,9 +63,11 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        findQuestionById(questionId).addAnswer(answer);
+        return answer;
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
