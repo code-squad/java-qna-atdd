@@ -8,8 +8,8 @@ import static codesquad.domain.UserTest.JAVAJIGI;
 import static codesquad.domain.UserTest.SANJIGI;
 
 public class QuestionTest extends BaseTest {
-    public static final Question qna1 = new Question("하하하", "이것은 내용입니다.");
-    public static final Question qna2 = new Question("2번", "이것은 2번째 내용입니다.");
+    public static final Question QNA1 = new Question("하하하", "이것은 내용입니다.");
+    public static final Question QNA2 = new Question("2번", "이것은 2번째 내용입니다.");
 
     public static Question newQuestion(User origin) {
         Question question = new Question("하하하", "이것은 내용입니다.");

@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,21 +32,25 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
+    public Optional<Question> findQuestionById(long id) {
         return questionRepository.findById(id);
+    }
+
+    public Optional<Answer> findAnswerById(long id) {
+        return answerRepository.findById(id);
     }
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        Question origin = findById(id).map(q -> q.update(loginUser,updatedQuestion)).get();
+        Question origin = findQuestionById(id).map(q -> q.update(loginUser, updatedQuestion)).orElseThrow(UnAuthorizedException::new);
         return origin;
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
-        Question question = findById(questionId).map(q -> q.deleted(loginUser)).get();
-
+        findQuestionById(questionId)
+                .map(q -> q.deleted(loginUser))
+                .orElseThrow(() -> new CannotDeleteException("삭제할 수 없습니다."));
     }
 
     public Iterable<Question> findAll() {
@@ -56,9 +61,18 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+        Question question = questionRepository.findById(questionId).get();
+        Answer answer = new Answer(loginUser, contents);
+        return question.addAnswer(answer);
+    }
+
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, String contents) {
+        Answer origin = answerRepository.findById(id).orElseThrow(UnAuthorizedException::new);
+        return origin.update(loginUser, contents);
+
     }
 
     public Answer deleteAnswer(User loginUser, long id) {

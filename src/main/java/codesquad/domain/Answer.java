@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -76,4 +77,13 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
+
+    public Answer update(User loginUser, String contents) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.contents = contents;
+        return this;
+    }
+
 }
