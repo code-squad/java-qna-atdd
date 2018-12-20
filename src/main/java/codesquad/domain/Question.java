@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
@@ -37,6 +38,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public Question(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public Question(String title, String contents, User writer) {
+        this(title, contents);
+        this.writer = writer;
     }
 
     public String getTitle() {
@@ -79,7 +85,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public void update(User loginUser, Question updatedQuestion) {
-        if(!isOwner(loginUser)) {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
 
@@ -87,9 +93,9 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = updatedQuestion.contents;
     }
 
-    public void delete(User loginUser) {
-        if(!isOwner(loginUser)) {
-            throw new ClassCastException();
+    public void delete(User loginUser) throws CannotDeleteException {
+        if (!isOwner(loginUser)) {
+            throw new CannotDeleteException("삭제할 수 없습니다.");
         }
 
         this.deleted = true;
