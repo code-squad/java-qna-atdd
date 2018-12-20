@@ -36,6 +36,10 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
+    public Optional<Answer> findByIdAnswer(long id) {
+        return answerRepository.findById(id);
+    }
+
     @Transactional
     public Question update(User loginUser, Long id, Question updatedQuestion) throws UnAuthenticationException {
         Question question = questionRepository.findById(id).orElse(null).updateQuestion(updatedQuestion);
@@ -47,8 +51,14 @@ public class QnaService {
         questionRepository.deleteById(questionId);
     }
 
-    public void isOneSelf(User user, Long id) throws UnAuthenticationException {
+    public void isOneSelfQuestion(User user, Long id) throws UnAuthenticationException {
         if(!findById((id)).orElse(null).isOneSelf(user)) {
+            throw new UnAuthenticationException();
+        }
+    }
+
+    public void isOneSelfAnswer(User user, Answer answer) throws UnAuthenticationException {
+        if(!answer.isOneSelf(user)) {
             throw new UnAuthenticationException();
         }
     }
@@ -61,13 +71,18 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+    @Transactional
+    public Question addAnswer(long questionId, Answer answer) {
+        log.debug("Call addAnswer Method!");
+        Question question = questionRepository.getOne(questionId);
+        question.addAnswer(answer);
+        return question;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public Question deleteAnswer(long questionId, Answer answer) {
+        Question question = questionRepository.getOne(questionId);
+        question.deleteAnswer(answer);
+        return question;
     }
 }

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -114,6 +115,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
+    public boolean isTitleAndContentsAndWriter(Question question) {
+        return this.title.equals(question.title) && this.contents.equals(question.contents)
+                && this.writer.equals(question.writer);
+    }
+
     @Override
     public String generateUrl() {
         return String.format("/questions/%d", getId());
@@ -122,5 +128,27 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Question question = (Question) o;
+        return Objects.equals(title, question.title) &&
+                Objects.equals(contents, question.contents) &&
+                Objects.equals(writer, question.writer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), title, contents, writer);
+    }
+
+    public void deleteAnswer(Answer answer) {
+        answer.toQuestion(this);
+        System.out.println("BEFORE" + answers.size());
+        this.answers.remove(answer);
+        System.out.println("AFTER" + answers.size());
     }
 }

@@ -2,6 +2,7 @@ package codesquad.web;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthenticationException;
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.security.HttpSessionUtils;
@@ -28,7 +29,7 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     public String delete(@LoginUser User loginUser, @PathVariable Long id) throws CannotDeleteException, UnAuthenticationException {
-        qnaService.isOneSelf(loginUser, id);
+        qnaService.isOneSelfQuestion(loginUser, id);
         qnaService.deleteQuestion(loginUser, id);
         return "redirect:/";
     }
@@ -42,14 +43,14 @@ public class QuestionController {
 
     @GetMapping("/{id}/form")
     public String updateForm(@LoginUser User loginUser, @PathVariable Long id, Model model) throws UnAuthenticationException {
-        qnaService.isOneSelf(loginUser, id);
+        qnaService.isOneSelfQuestion(loginUser, id);
         model.addAttribute("question", qnaService.findById(id).orElse(null));
         return "/qna/updateForm";
     }
 
     @PutMapping("")
     public String update(@LoginUser User loginUser, Long id, Question updatedQuestion) throws UnAuthenticationException {
-        qnaService.isOneSelf(loginUser, id);
+        qnaService.isOneSelfQuestion(loginUser, id);
         Question question = qnaService.update(loginUser, id, updatedQuestion);
         return "redirect:/questions/" + Long.valueOf(question.getId());
     }

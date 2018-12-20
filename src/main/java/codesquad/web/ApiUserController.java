@@ -20,6 +20,8 @@ public class ApiUserController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@Valid @RequestBody User user) {
+        /* @Valid 어노테이션은 엔티티 조건에 맞게 객체가 생성되었는지를 확인 */
+        /* @RequestBody Http 요청에 대한 Body 부분을 객체로 생성 */
         User savedUser = userService.add(user);
 
         HttpHeaders headers = new HttpHeaders();
