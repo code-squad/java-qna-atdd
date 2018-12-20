@@ -37,4 +37,10 @@ public class ApiQuestionController {
     public Question update(@LoginUser User loginUser, @PathVariable Long id, @Valid @RequestBody Question updatedQuestion) {
         return qnaService.updateQuestion(loginUser, id, updatedQuestion);
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@LoginUser User loginUser, @PathVariable Long id) {
+        qnaService.deleteQuestion(loginUser, id);
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 }

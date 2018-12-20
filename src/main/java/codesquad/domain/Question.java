@@ -3,17 +3,23 @@ package codesquad.domain;
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -83,16 +89,21 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
-        this.deleted = true;
-        // todo 답변 삭제 추가구현 필요
+        return processDeletion();
     }
 
     public boolean isDeleted() {
         return deleted;
     }
 
+    public List<DeleteHistory> processDeletion() throws CannotDeleteException {
+        List<DeleteHistory> deletions = new ArrayList(Arrays.asList(new DeleteHistory(ContentType.QUESTION, getId(), writer)));
+        deletions.addAll(Answer.delete(answers, writer));
+        deleted = true;
+        return deletions;
+    }
 
     public Question update(User loginUser, Question updatedQuestion) {
         if(!isOwner(loginUser)) throw new UnAuthorizedException();
@@ -117,4 +128,5 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
 }

@@ -20,4 +20,9 @@ public class DeleteHistoryService {
             deleteHistoryRepository.save(deleteHistory);
         }
     }
+
+    @Transactional
+    public DeleteHistory save(DeleteHistory deleteHistory) {
+        return deleteHistoryRepository.save(deleteHistory);
+    }
 }

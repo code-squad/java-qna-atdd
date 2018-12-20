@@ -41,4 +41,9 @@ public class ApiAnswerController {
     public Answer update(@LoginUser User loginUser, @PathVariable long answerId,  @RequestBody String contents) {
         return qnaService.updateAnswer(loginUser, answerId, contents);
     }
+
+    @DeleteMapping("{answerId}")
+    public Answer delete(@LoginUser User loginUser, @PathVariable long answerId) {
+        return qnaService.deleteAnswer(loginUser, answerId);
+    }
 }

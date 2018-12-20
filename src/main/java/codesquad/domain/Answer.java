@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.slf4j.Logger;
 import support.domain.AbstractEntity;
@@ -7,6 +8,10 @@ import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -42,6 +47,20 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
         this.contents = contents;
         this.deleted = false;
+    }
+
+    public static List<DeleteHistory> delete(List<Answer> answers, User writer) throws CannotDeleteException {
+        List<DeleteHistory> deletions = new ArrayList<>();
+        for (Answer answer : answers) {
+            deletions.add(answer.delete(writer));
+        }
+        return deletions;
+    }
+
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 답변을 삭제할 수 없습니다!");
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
     }
 
     public User getWriter() {
@@ -90,6 +109,8 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + ", deleted=" + deleted + "]";
     }
+
+
 }
