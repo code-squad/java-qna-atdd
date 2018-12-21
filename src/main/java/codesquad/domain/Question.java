@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -38,6 +40,23 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public Question(String title, String contents) {
         this.title = title;
         this.contents = contents;
+    }
+
+    public Question(@Size(min = 3, max = 100) String title, @Size(min = 3) String contents, User writer, List<Answer> answers, boolean deleted) {
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
+        this.answers = answers;
+        this.deleted = deleted;
+    }
+
+    public Question(long id, @Size(min = 3, max = 100) String title, @Size(min = 3) String contents, User writer, List<Answer> answers, boolean deleted) {
+        super(id);
+        this.title = title;
+        this.contents = contents;
+        this.writer = writer;
+        this.answers = answers;
+        this.deleted = deleted;
     }
 
     public String getTitle() {
@@ -75,8 +94,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public boolean isDeleted(User loginUser) {
+        if (!loginUser.equals(this.writer)) {
+            throw new CannotDeleteException("you can't delete the other's information.");
+        }
+        return true;
     }
 
     public void update(Question updateQuestion, User loginUser) throws UnAuthorizedException {
@@ -93,7 +115,30 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Question question = (Question) o;
+        return deleted == question.deleted &&
+                Objects.equals(title, question.title) &&
+                Objects.equals(contents, question.contents) &&
+                Objects.equals(writer, question.writer) &&
+                Objects.equals(answers, question.answers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), title, contents, writer, answers, deleted);
+    }
+
+    @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
+    public boolean equalsQuestion(Question question) {
+        return this.title.equals(question.title) && this.contents.equals(question.contents);
+    }
+
 }

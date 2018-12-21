@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,10 @@ public class QnaService {
         return questionRepository.findById(id);
     }
 
+    public Question findQuestionById(long id) {
+        return questionRepository.findById(id).orElseThrow(UnAuthorizedException :: new);
+    }
+
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
         Question original = questionRepository.findById(id).filter(question -> question.isOwner(loginUser))
@@ -45,11 +50,18 @@ public class QnaService {
         return questionRepository.save(original);
     }
 
+
+    public Answer updateAnswer(User loginUser, long id, String newContents) {
+        Answer original = answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        original.update(newContents, loginUser);
+        return answerRepository.save(original);
+    }
+
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question original = questionRepository.findById(questionId).filter(question -> question.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
-        questionRepository.delete(original);
+        original.isDeleted(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -60,13 +72,16 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        findQuestionById(questionId).addAnswer(answer);
+        return answer;
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
         // TODO 답변 삭제 기능 구현 
         return null;
     }
+
 }
