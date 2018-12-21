@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
@@ -29,8 +30,6 @@ public class QnaService {
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
-
-        System.out.println("question : "+ question);
         return questionRepository.save(question);
     }
 
@@ -40,8 +39,18 @@ public class QnaService {
                 .orElseThrow(UnAuthorizedException::new); //TODO
     }
 
+    public Question findById(long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(UnAuthorizedException::new);
+    }
+
+    public Answer findByAnswerId(long id) {
+        return answerRepository.findById(id)
+                .orElseThrow(UnAuthorizedException::new);
+    }
+
     @Transactional
-    public Question update(User loginUser, long id, Question updatedQuestion) {
+    public Question updateQuestion(User loginUser, long id, Question updatedQuestion) {
         Question original = questionRepository.findById(id)
                 .orElseThrow(UnAuthorizedException::new);
 
@@ -57,6 +66,15 @@ public class QnaService {
         question.delete(loginUser);
     }
 
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, Answer updateAnswer) {
+        Answer original = answerRepository.findById(id)
+                .orElseThrow(UnAuthorizedException::new);
+
+        original.update(loginUser, updateAnswer);
+        return original;
+    }
+
     public Iterable<Question> findAll() {
         return questionRepository.findByDeleted(false);
     }
@@ -67,7 +85,15 @@ public class QnaService {
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {
         // TODO 답변 추가 기능 구현
-        return null;
+        log.debug("contents : {}", contents);
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(UnAuthorizedException::new);
+        log.debug("find question : {}", question);
+        Answer answer = new Answer(loginUser, contents);
+        log.debug("find answer : {}", answer);
+
+
+        return answerRepository.save(answer);
     }
 
     public Answer deleteAnswer(User loginUser, long id) {

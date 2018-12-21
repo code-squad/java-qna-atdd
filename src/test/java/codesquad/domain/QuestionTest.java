@@ -4,23 +4,22 @@ import codesquad.UnAuthorizedException;
 import org.junit.Test;
 import support.test.BaseTest;
 
+import static codesquad.domain.UserTest.RED;
+import static codesquad.domain.UserTest.UNHEE;
+
 public class QuestionTest extends BaseTest {
-    public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
-    public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
-
-
-    private Question q1 = new Question (JAVAJIGI, "title1", "contents1");
-    private Question q2 = new Question (SANJIGI, "title2", "contents2");
+    public static final Question RED_QUESTION = new Question(RED, "title3", "contents3");
+    public static final Question UNHEE_QUESTION = new Question(UNHEE, "title", "contents");
     private Question newQuestion = new Question("newTitle", "newcontents");
 
     @Test
     public void update_owner() {
-        q1.update(JAVAJIGI, newQuestion);
-        softly.assertThat(q1.getTitle()).isEqualTo("newTitle");
+        RED_QUESTION.update(RED, newQuestion);
+        softly.assertThat(RED_QUESTION.getTitle()).isEqualTo("newTitle");
     }
 
     @Test(expected = UnAuthorizedException.class)
     public void update_not_owner() {
-        q1.update(SANJIGI, newQuestion);
+        RED_QUESTION.update(UNHEE, newQuestion);
     }
 }

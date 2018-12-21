@@ -28,8 +28,6 @@ public class UserService {
         return original;
     }
 
-
-
     public User findById(User loginUser, long id) {
         return userRepository.findById(id)
                 .filter(user -> user.equals(loginUser))

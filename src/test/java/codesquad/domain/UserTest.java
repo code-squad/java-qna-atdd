@@ -7,6 +7,8 @@ import support.test.BaseTest;
 public class UserTest extends BaseTest {
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
     public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
+    public static final User RED = new User(3L, "red", "1", "red", "red@gmail.com");
+    public static final User UNHEE = new User (4L, "unhee", "1", "unhee", "unhee@gmail.com");
 
     public static User newUser(Long id) {
         return new User(id, "userId", "pass", "name", "javajigi@slipp.net");
