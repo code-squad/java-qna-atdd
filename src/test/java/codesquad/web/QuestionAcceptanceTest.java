@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 
+import static codesquad.domain.UserTest.SANJIGI;
+
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LogManager.getLogger(QuestionAcceptanceTest.class);
@@ -123,6 +125,14 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         ResponseEntity<String> response = getStringResponseEntity(template());
         log.debug("body : {}", response.getBody());
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void deleted_no_other_answer() throws Exception {
+        ResponseEntity<String> response = getStringResponseEntity(basicAuthTemplate(SANJIGI));
+        log.debug("body : {}", response.getBody());
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
     }
 
     private ResponseEntity<String> getStringResponseEntity(TestRestTemplate template) {

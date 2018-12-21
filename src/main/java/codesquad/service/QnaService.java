@@ -42,16 +42,17 @@ public class QnaService {
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        Question origin = findQuestionById(id).map(q -> q.update(loginUser, updatedQuestion)).orElseThrow(UnAuthorizedException::new);
-        return origin;
+        return findQuestionById(id)
+                .map(q -> q.update(loginUser, updatedQuestion))
+                .orElseThrow(UnAuthorizedException::new);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        findQuestionById(questionId)
-                .map(q -> q.deleted(loginUser))
-                .orElseThrow(() -> new CannotDeleteException("삭제할 수 없습니다."));
+        Question question = questionRepository.findById(questionId).orElseThrow(UnAuthorizedException::new);
+        deleteHistoryService.saveAll(question.deleted(loginUser));
     }
+
 
     public Iterable<Question> findAll() {
         return questionRepository.findByDeleted(false);
@@ -63,7 +64,8 @@ public class QnaService {
 
     @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        Question question = questionRepository.findById(questionId).get();
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(UnAuthorizedException::new);
         Answer answer = new Answer(loginUser, contents);
         return question.addAnswer(answer);
     }
@@ -75,8 +77,10 @@ public class QnaService {
 
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public DeleteHistory deleteAnswer(User loginUser, long id) {
+        return answerRepository.findById(id)
+                .map(answer -> answer.deleted(loginUser))
+                .orElseThrow(() -> new CannotDeleteException("삭제할 수 없습니다."));
     }
 }

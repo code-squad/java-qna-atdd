@@ -37,8 +37,12 @@ public class QuestionServiceTest extends BaseTest {
     @Mock
     private AnswerRepository answerRepository;
 
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
+
     @InjectMocks
     private QnaService qnaService;
+
 
     @Before
     public void setUp() {
@@ -65,7 +69,8 @@ public class QuestionServiceTest extends BaseTest {
         softly.assertThat(question.isDeleted()).isTrue();
     }
 
-    @Test(expected = CannotDeleteException.class)
+
+    @Test(expected = UnAuthorizedException.class)
     public void delete_no() throws Exception {
         qnaService.deleteQuestion(SANJIGI, 100L);
     }
@@ -84,6 +89,18 @@ public class QuestionServiceTest extends BaseTest {
     @Test(expected = UnAuthorizedException.class)
     public void update_no_answer_other_user() throws Exception {
         qnaService.updateAnswer(SANJIGI, ANSWER.getId(), "바뀐댓글입니다.");
+
+    }
+
+    @Test
+    public void deleted_answer() throws Exception {
+        qnaService.deleteAnswer(JAVAJIGI, ANSWER.getId());
+
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void deleted_other_answer() throws Exception {
+        qnaService.deleteAnswer(SANJIGI, ANSWER.getId());
 
     }
 }

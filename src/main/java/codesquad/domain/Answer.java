@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -62,6 +63,14 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isOwner(User loginUser) {
         return writer.equals(loginUser);
+    }
+
+    public DeleteHistory deleted(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new CannotDeleteException("삭제할수없습니다.");
+        }
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
     }
 
     public boolean isDeleted() {

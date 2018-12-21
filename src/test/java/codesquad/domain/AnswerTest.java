@@ -12,8 +12,13 @@ public class AnswerTest extends BaseTest {
     private static final Answer ANSWER1 = new Answer(1L,JAVAJIGI,QNA1,"1번질문");
     private static final Answer ANSWER2 = new Answer(2L,JAVAJIGI,QNA1,"2번질문");
 
+
     public static Answer newAnswer(String contents) {
         return new Answer(JAVAJIGI, contents);
+    }
+
+    public static Answer newAnswer(User loginUser) {
+        return new Answer(loginUser, "질문수");
     }
 
 
