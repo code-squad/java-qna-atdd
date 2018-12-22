@@ -46,7 +46,7 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String read(@PathVariable long id, Model model) {
-        Question question = qnaService.findById(id).orElseThrow(NoResultException::new);
+        Question question = qnaService.findById(id);
         log.debug("qna number {}", id);
         model.addAttribute("question", question);
         return "/qna/show";
@@ -55,7 +55,7 @@ public class QuestionController {
     @GetMapping("/{id}/form")
     public String updateForm(@LoginUser User loginUser, @PathVariable long id, Model model) {
         //TODO : 최선인가?
-        Question question = qnaService.findById(id).orElseThrow(NoResultException::new);
+        Question question = qnaService.findById(id);
         if(!question.matchUserId(loginUser.getUserId())) {
             return "/user/relogin";
         }

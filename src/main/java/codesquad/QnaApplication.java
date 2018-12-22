@@ -15,3 +15,4 @@ public class QnaApplication {
         SpringApplication.run(QnaApplication.class, args);
     }
 }
+//step3 init
