@@ -19,7 +19,7 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Void> create(@Valid @RequestBody User user) {
+    public ResponseEntity<Void> create(@Valid @RequestBody User user) {     //@RequestBody  json->객체로
         User savedUser = userService.add(user);
 
         HttpHeaders headers = new HttpHeaders();
@@ -36,4 +36,5 @@ public class ApiUserController {
     public User update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody User updatedUser) {
         return userService.update(loginUser, id, updatedUser);
     }
+
 }

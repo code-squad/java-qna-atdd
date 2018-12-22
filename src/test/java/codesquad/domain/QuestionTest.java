@@ -14,7 +14,6 @@ public class QuestionTest extends BaseTest {
     public static User other = new User(2, "sanjigi", "password", "name", "sanjigi@slipp.net");
 
     @Before
-
     public void setUp() throws Exception {
         originalQuestion.setId(1);
         originalQuestion.writeBy(owner);

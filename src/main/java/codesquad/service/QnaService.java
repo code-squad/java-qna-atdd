@@ -2,6 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,13 +69,21 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
+    public Answer addAnswer(User loginUser, long questionId, Answer answer) {
         // TODO 답변 추가 기능 구현
-        return null;
+        Question originQuestion = findById(questionId)
+                .filter(question -> question.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
+        originQuestion.addAnswer(answer);
+        return answer;
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        // TODO 답변 삭제 기능 구현
+        Answer originAnswer = answerRepository.findById(id)
+                .filter(answer -> answer.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
+        originAnswer.delete(loginUser);
+        return originAnswer;
     }
 }

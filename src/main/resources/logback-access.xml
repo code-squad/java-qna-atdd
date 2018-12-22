@@ -7,3 +7,5 @@
     </appender>
     <appender-ref ref="CONSOLE"/>
 </configuration>
+
+<!--request & response의 정보를 로그로 보여주는 역할-->

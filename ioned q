@@ -1,0 +1,292 @@
+[33mcommit 069ce4298816df4643b1ea6bc4eef66a1dd69cac[m[33m ([m[1;36mHEAD -> [m[1;32mstep3[m[33m)[m
+Author: tskim <lollolzkk@gmail.com>
+Date:   Fri Dec 21 15:25:43 2018 +0900
+
+    step3 ver_03 complete (AnswerTest)
+
+[33mcommit 4cb27fac3f4f87f04010b2f8cc516594760dc1e3[m
+Author: tskim <lollolzkk@gmail.com>
+Date:   Fri Dec 21 15:08:22 2018 +0900
+
+    step3 ver_02 complete (ApiAnswerAcceptance Test)
+
+[33mcommit eb56844200113ad94eddcec7fd91d79a924a69e9[m
+Author: tskim <lollolzkk@gmail.com>
+Date:   Thu Dec 20 23:42:29 2018 +0900
+
+    step3 ver_01 complete (ApiQuestionAcceptanceTest & ApiQuestionController)
+
+[33mcommit fa7062c45afc02469778789b0d67b78fbb3a3f4d[m[33m ([m[1;31mupstream/foreverever[m[33m, [m[1;32mforeverever[m[33m)[m
+Author: foreverever <lollolzkk@gmail.com>
+Date:   Tue Dec 18 18:14:44 2018 +0900
+
+    qna-atdd step2 complete (#198)
+    
+    * step1 feedback complete (make put method in HtmlFormDataBuilder class)
+    
+    * step2 ver_01 complete (add question_create fuction by atdd)
+    
+    * step2 ver_02 complete (apply devtools & modify login method about session name in UserController class)
+    
+    * step2 ver_03 complete (add logout function)
+    
+    * step2 ver_04 complete (question crud fuction & atdd complete)
+    
+    * step2 ver_05 complete (modify QuestionRepository interface)
+    
+    * step2 ver_06 complete (add qnaServiceTest)
+    
+    * step2 ver_07 complete (modify qnaServiceTest)
+
+[33mcommit 12dc0aa4c4a6ffbf7cb9acd7cc225bf5c871aa63[m
+Author: foreverever <lollolzkk@gmail.com>
+Date:   Mon Dec 10 18:05:28 2018 +0900
+
+    step1 ver_01 complete (applying login function based on ATDD & deduplcation code) (#182)
+
+[33mcommit 479e248d226a049f5cc40ef78e035a6f08b1b9ce[m[33m ([m[1;31morigin/foreverever[m[33m)[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Nov 6 11:46:21 2018 +0900
+
+    refactor(test): assertj, add JUnitSoftAssertions rule
+
+[33mcommit 62844257d77f8659960719a025fc257073fa9ad3[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Jul 17 22:11:40 2018 +0900
+
+    separate the exception handling to html, json requestt
+
+[33mcommit a41b63e79ccf2594ed3a6e91c94fe2d9d3a6f416[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Wed Jun 20 10:09:02 2018 +0900
+
+    refactor: add transactional annotation
+
+[33mcommit 063f9458eae4cfe96fb8587fc6ef27a9cf453f6b[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Wed Jun 20 10:01:40 2018 +0900
+
+    refactor: remove all dto
+
+[33mcommit 3dcd1f59b3f2b5c9be30c930e9ca64f906156842[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Jun 19 16:10:36 2018 +0900
+
+    refactor: reformat, remove deprecated @Email
+
+[33mcommit fc0b32d9acb88d78409aede97d57777e3936507f[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Jun 19 16:07:59 2018 +0900
+
+    refactor: upgrade spring boot 2.0.3
+
+[33mcommit c444a0c00e76d247d44193bcff48e103d29bb832[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon May 28 17:59:07 2018 +0900
+
+    refactor: session tracking-modes from 1.5 to 2.0
+
+[33mcommit c46b42b5b1dd3074675e2bf080ad5aedc1dd686c[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon May 21 18:30:32 2018 +0900
+
+    fiix(user): optional assert from user
+
+[33mcommit dd068e9073c3500a62e5ddb08808cdc6559ed218[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue May 15 17:05:07 2018 +0900
+
+    refactor(maven): upgrade spring boot 1.5 to 2.0.2
+
+[33mcommit 9b62780cb678424ea7a175c48af7ff7dc3e46ec5[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue May 15 16:56:00 2018 +0900
+
+    refactor: upgrade spring boot 1.5 to 2.0.2
+
+[33mcommit 8114cfad14fc8d3dbc4dd1be03d7c1a95de53aff[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Wed May 9 15:48:49 2018 +0900
+
+    refactor: add default constructor
+
+[33mcommit d6c570a8bb49b94c953a522eeba44f92b4e80510[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Apr 24 23:45:26 2018 +0900
+
+    add dependency hibernate-java8
+
+[33mcommit dda2fd2320362e53fd86c774e35e0739853a304d[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Fri Apr 20 09:35:00 2018 +0900
+
+    update spring boot version 1.5.9 -> 1.5.12
+
+[33mcommit 3086297bd1c4c0611663c24d813cfdd500bfa72f[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Jan 29 15:03:38 2018 +0900
+
+    add dependency hibernate-java8
+
+[33mcommit 9c712d43ad733b973b6604a1700ef73ac6c5f840[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sun Jan 28 17:40:10 2018 +0900
+
+    set session tracking mode to cookie
+
+[33mcommit 6dd911c320d7c103e45f410d7cd1870b45d0efda[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Jan 27 12:45:09 2018 +0900
+
+    upgrade 1.5.8 to 1.5.9
+
+[33mcommit 8369212d2491c25a0cf2850a91781ff65c17c4de[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sun Jan 21 15:10:22 2018 +0900
+
+    refactor dto to builder pattern, remove setter from domain
+
+[33mcommit 33cc5c1d286f4295ba06771f2aefe5bd9d057a86[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Thu Jan 11 17:49:07 2018 +0900
+
+    remove setter method
+
+[33mcommit c137a6db87fe910b63ac3e892d78758acc7da336[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Wed Jan 10 06:42:05 2018 +0900
+
+    change assertj scope to test
+
+[33mcommit 68a8607413748332ed4d126b1fcc1525940fd392[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Jan 8 15:15:58 2018 +0900
+
+    로그인 기능을 구현하지 않은 상태로 유지함.
+
+[33mcommit a463f2a13a61f6c45a89d12e92091de4afdfba48[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Jan 6 23:05:55 2018 +0900
+
+    ignore sts, idea files
+
+[33mcommit 50df3dc8b6b91a48ca06f139886f277f158426cd[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Fri Jan 5 11:09:29 2018 +0900
+
+    add dependency
+
+[33mcommit ee6f90a03ed78652e850d65ff47e594c63804e45[m
+Merge: 5b77e55 d4ff1b5
+Author: javajigi <javajigi@gmail.com>
+Date:   Fri Jan 5 11:07:42 2018 +0900
+
+    Merge branch 'master' of https://github.com/code-squad/java-qna
+
+[33mcommit 5b77e555670fbc21328e80ee960958781459a916[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Fri Jan 5 11:06:45 2018 +0900
+
+    add dependency
+
+[33mcommit d4ff1b5050f6dca3daf414ebd98392f8892bc081[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Dec 19 10:08:27 2017 +0900
+
+    refactor online code review document
+
+[33mcommit 8856602c416e715664404417eb9472a76c0836b0[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Dec 18 16:31:53 2017 +0900
+
+    실습을 위해 불필요한 코드 제거함.
+
+[33mcommit bced1a905d23f2647b48bbfd0f84c947ca08152f[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Dec 18 16:19:01 2017 +0900
+
+    실습을 위해 불필요한 코드 제거함.
+
+[33mcommit be174263688f3a6f87b6b555232718ecf7f1c649[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Dec 18 15:39:24 2017 +0900
+
+    비밀번호 일치 여부에 대한 단위 테스트 추가함.
+
+[33mcommit d4bfae7aaf981fa284ace7753a81a5f4af77aa93[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 16:45:05 2017 +0900
+
+    수정 기능 추가함.
+
+[33mcommit 3492531975ef348409e3a8c74ba5b67458fb0da9[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 16:29:06 2017 +0900
+
+    ControllerTest를 AcceptanceTest로 변경
+
+[33mcommit 9a9ac5dce2f29ecafa22d195c75b38a38b943a78[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 16:04:37 2017 +0900
+
+    HttpStatus의 UnAuthorized를 Forbidden으로 변경함.
+
+[33mcommit a31464b7b5a631d2be614e92845bb27799d3343d[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 13:52:11 2017 +0900
+
+    User에 대한 json api 기능 추가
+
+[33mcommit c930048ea5865af3e80e81d562b197d39bb1fbd8[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 10:57:03 2017 +0900
+
+    답변 테스트 추가
+
+[33mcommit 8bdf94f1afdd77ba5374705b107a05bb9d042286[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Sat Dec 16 10:39:56 2017 +0900
+
+    refactoring finish
+
+[33mcommit 2afa120da22d6d4cfa38173bfad3e93cb8a7f93e[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Nov 21 16:44:04 2017 +0900
+
+    refactor(doc): update pull request manual
+
+[33mcommit f367da641ef7a139c916e88f83ed5e72edd347de[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Fri Nov 10 12:13:52 2017 +0900
+
+    logback 설정 파일 추가
+
+[33mcommit 0967877574abd1609b9c41f738d0d5eafc055714[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Wed Nov 8 18:04:21 2017 +0900
+
+    테스트 및 사용자 기반 코드 추가함.
+
+[33mcommit 1a3032e324c3fd75fb809395156bea7c64f828b4[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Tue Nov 7 16:25:48 2017 +0900
+
+    apply spring boot
+
+[33mcommit d2f82ab95c835958d59f2b9db880d3fd05d5981e[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Nov 6 18:42:05 2017 +0900
+
+    ATDD를 위한 기반 코드 추가함.
+
+[33mcommit 871e863950fee6a2828e63a40f0a727d48ec3dc1[m
+Author: javajigi <javajigi@gmail.com>
+Date:   Mon Nov 6 18:06:34 2017 +0900
+
+    질문답변 게시판에 대한 기본 코드 추가함.
+
+[33mcommit 123eedf4edf77388cd0be1b6b678438b2aabe4ee[m
+Author: 박 재성 <javajigi@gmail.com>
+Date:   Mon Nov 6 17:49:29 2017 +0900
+
+    Initial commit
