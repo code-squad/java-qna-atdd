@@ -31,4 +31,13 @@ public class HtmlFormDataBuilder {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return new HtmlFormDataBuilder(headers);
     }
+
+    public static HtmlFormDataBuilder put() {
+        return urlEncodedForm().addParameter("_method", "put");
+    }
+
+    public static HtmlFormDataBuilder delete() {
+        return urlEncodedForm().addParameter("_method", "delete");
+    }
+
 }

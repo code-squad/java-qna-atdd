@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthenticationException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +38,17 @@ public class QnaService {
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        // TODO 수정 기능 구현
-        return null;
+        Question originQuestion = questionRepository.findById(id).get();
+        originQuestion.update(loginUser, updatedQuestion);
+        return questionRepository.save(originQuestion);
     }
 
     @Transactional
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        // TODO 삭제 기능 구현
+        log.debug("####{}", questionRepository.findById(questionId).get());
+        Question targetQuestion = questionRepository.findById(questionId).get();
+        targetQuestion.delete(loginUser);
+        questionRepository.save(targetQuestion);
     }
 
     public Iterable<Question> findAll() {

@@ -1,5 +1,8 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
+import codesquad.UnAuthenticationException;
+import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
@@ -75,6 +78,17 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public void update(User loginUser, Question otherQuestion) {
+        if(!(this.isOwner(loginUser) && otherQuestion.isOwner(loginUser))) throw new UnAuthorizedException("Invalid user");
+        this.title = otherQuestion.title;
+        this.contents = otherQuestion.contents;
+    }
+
+    public void delete(User loginUser) throws CannotDeleteException{
+        if(!this.isOwner(loginUser)) throw new CannotDeleteException("Invalid user");
+        this.deleted = true;
     }
 
     @Override
