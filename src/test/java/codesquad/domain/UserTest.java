@@ -5,6 +5,8 @@ import org.junit.Test;
 import support.test.BaseTest;
 
 public class UserTest extends BaseTest {
+    public static final User CHOI = new User(1, "CHOI", "1234", "CHOI", "chltmdals115@gmail.com");
+    public static final User SING = new User(2, "SING", "1234", "SING", "SING@gmail.com");
     public static final User JAVAJIGI = new User(1L, "javajigi", "password", "name", "javajigi@slipp.net");
     public static final User SANJIGI = new User(2L, "sanjigi", "password", "name", "sanjigi@slipp.net");
 

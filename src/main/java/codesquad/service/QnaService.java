@@ -44,11 +44,10 @@ public class QnaService {
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
-        log.debug("####{}", questionRepository.findById(questionId).get());
+    public Question deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question targetQuestion = questionRepository.findById(questionId).get();
         targetQuestion.delete(loginUser);
-        questionRepository.save(targetQuestion);
+        return questionRepository.save(targetQuestion);
     }
 
     public Iterable<Question> findAll() {
@@ -59,13 +58,17 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+        Answer answer = new Answer(loginUser, contents);
+        answer.toQuestion(questionRepository.findById(questionId).get());
+        return answerRepository.save(answer);
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public Answer deleteAnswer(User loginUser, long id) throws CannotDeleteException {
+        Answer targetAnswer = answerRepository.findById(id).get();
+        targetAnswer.delete(loginUser);
+        return answerRepository.save(targetAnswer);
     }
 }

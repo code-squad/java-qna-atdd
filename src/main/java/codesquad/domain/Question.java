@@ -81,7 +81,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public void update(User loginUser, Question otherQuestion) {
-        if(!(this.isOwner(loginUser) && otherQuestion.isOwner(loginUser))) throw new UnAuthorizedException("Invalid user");
+        if(!this.isOwner(loginUser)) throw new UnAuthorizedException("Invalid user");
         this.title = otherQuestion.title;
         this.contents = otherQuestion.contents;
     }
