@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.slf4j.Logger;
 import support.domain.AbstractEntity;
@@ -7,6 +8,8 @@ import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -76,6 +79,23 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public DeleteHistory delete(User loginUser) {
+        if (!loginUser.equals(writer)) {
+            throw new CannotDeleteException("you can't delete other's information.");
+        }
+        this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
+    }
+
+
+    public static List<DeleteHistory> deleteAnswers(List<Answer> answers, User loginUser) {
+        List<DeleteHistory> infoAnswers = new ArrayList<>();
+        for (Answer answer1 : answers) {
+            infoAnswers.add(answer1.delete(loginUser));
+        }
+        return infoAnswers;
     }
 
     @Override

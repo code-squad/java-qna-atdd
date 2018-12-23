@@ -34,6 +34,9 @@ public class ApiAnswerController {
         return qnaService.updateAnswer(loginUser, answerId, target);
     }
 
-
-
+    @DeleteMapping("/{answerId}")
+    public ResponseEntity<Void> delete(@LoginUser User loginUser, @PathVariable long answerId) {
+        qnaService.deleteAnswer(loginUser, answerId);
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 }

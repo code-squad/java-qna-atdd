@@ -86,4 +86,28 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
                 basicAuthAnotherTemplate().exchange(location, HttpMethod.PUT, createHttpEntity(updateAnswer.getContents()), Answer.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
+
+    @Test
+    public void 삭제_로그인됨() {
+        String location = createResource("/api/questions/" + question.getId() + "/answers", answer.getContents());
+        ResponseEntity<Void> response =
+                basicAuthTemplate().exchange(location, HttpMethod.DELETE, createHttpEntity(null), Void.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void 삭제_다른유저() {
+        String location = createResource("/api/questions/" + question.getId() + "/answers", answer.getContents());
+        ResponseEntity<Void> response =
+                basicAuthAnotherTemplate().exchange(location, HttpMethod.DELETE, createHttpEntity(null), Void.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void 삭제_로그인안됨() {
+        String location = createResource("/api/questions/" + question.getId() + "/answers", answer.getContents());
+        ResponseEntity<Void> response =
+                template().exchange(location, HttpMethod.DELETE, createHttpEntity(null), Void.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 }

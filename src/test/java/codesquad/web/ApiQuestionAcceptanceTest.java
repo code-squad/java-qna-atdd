@@ -1,5 +1,7 @@
 package codesquad.web;
 
+import codesquad.domain.Answer;
+import codesquad.domain.DeleteHistory;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import org.junit.Test;
@@ -8,6 +10,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
+
+import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -69,4 +73,23 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
+    @Test
+    public void 삭제_로그인됨() {
+        Question newQuestion = new Question("title", "content");
+        String location = createResource("/api/questions", newQuestion);
+
+        ResponseEntity<Void> response = basicAuthTemplate()
+                .exchange(location, HttpMethod.DELETE, createHttpEntity(null), Void.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void 삭제_사용자_다를때() {
+        Question newQuestion = new Question("title", "content");
+        String location = createResource("/api/questions", newQuestion);
+
+        ResponseEntity<Void> response = basicAuthAnotherTemplate()
+                .exchange(location, HttpMethod.DELETE, createHttpEntity(null),Void.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
 }

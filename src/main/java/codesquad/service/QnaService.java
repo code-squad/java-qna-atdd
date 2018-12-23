@@ -61,7 +61,8 @@ public class QnaService {
     public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question original = questionRepository.findById(questionId).filter(question -> question.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
-        original.isDeleted(loginUser);
+        original.delete(loginUser);
+        deleteHistoryService.saveAll(original.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -79,9 +80,11 @@ public class QnaService {
         return answer;
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) {
+        Answer answer = answerRepository.findById(id).filter(answer1 -> answer1.isOwner(loginUser))
+                .orElseThrow(UnAuthorizedException::new);
+        answer.delete(loginUser);
     }
 
 }
