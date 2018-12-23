@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Service("userService")
 public class UserService {
@@ -36,8 +37,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User login(String userId, String password) throws UnAuthenticationException {
-        // TODO 로그인 기능 구현
-        return null;
+        return userRepository.findByUserId(userId)
+                .filter(user -> user.matchPassword(password))
+                .orElseThrow(UnAuthenticationException::new);
     }
 }
