@@ -53,4 +53,10 @@ public class UserTest extends BaseTest {
         User target = new User("sanjigi", "password2", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
     }
+
+    @Test
+    public void userEqualTest() {
+        softly.assertThat(new User("userId", "password", "name", "email"))
+                .isEqualTo(new User("userId", "password", "other", "other"));
+    }
 }

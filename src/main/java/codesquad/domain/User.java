@@ -141,6 +141,6 @@ public class User extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), userId, password);
+        return Objects.hash(userId, password);
     }
 }

@@ -1,5 +1,6 @@
 package codesquad.security;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import org.slf4j.Logger;
@@ -33,6 +34,13 @@ public class RestSecurityControllerAdvice {
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ErrorMessage unAuthentication(UnAuthenticationException e) {
         log.debug("JSON API UnAuthenticationException is happened!");
+        return new ErrorMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(CannotDeleteException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorMessage cannotdelete(UnAuthenticationException e) {
+        log.debug("JSON API CannotDeleteException is happened!");
         return new ErrorMessage(e.getMessage());
     }
 }

@@ -2,6 +2,8 @@ package codesquad.domain;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class DeleteHistory {
@@ -23,11 +25,24 @@ public class DeleteHistory {
     public DeleteHistory() {
     }
 
-    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
+    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy) {
         this.contentType = contentType;
         this.contentId = contentId;
         this.deletedBy = deletedBy;
+    }
+
+    public DeleteHistory(ContentType contentType, Long contentId, User deletedBy, LocalDateTime createDate) {
+        this(contentType, contentId, deletedBy);
         this.createDate = createDate;
+    }
+
+    public static List<DeleteHistory> createDeleteHistories(Question question, Long id) {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        deleteHistories.add(question.createQuestionOfDeleteHistory(id));
+        for(DeleteHistory deleteHistory : question.createAnswersOfDeleteHistories()) {
+            deleteHistories.add(deleteHistory);
+        }
+        return deleteHistories;
     }
 
     @Override

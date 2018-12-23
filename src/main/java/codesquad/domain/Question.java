@@ -1,7 +1,9 @@
 package codesquad.domain;
 
+import codesquad.UnAuthorizedException;
 import codesquad.security.HttpSessionUtils;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -12,8 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+
+    private static final Logger logger = getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -92,10 +99,39 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public Question updateQuestion(Question updatedQuestion) {
+    public Question updateQuestion(User loginUser, Question updatedQuestion) throws UnAuthorizedException {
+        if(!updatedQuestion.writer.equals(loginUser)) {
+            throw new UnAuthorizedException();
+        }
         this.contents = updatedQuestion.contents;
         this.title = updatedQuestion.title;
         return this;
+    }
+
+    public Question deleteQuestion(User loginUser) throws UnAuthorizedException{
+        // 질문자와 로그인 유저가 동일 확인
+        if(!this.writer.equals(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+
+        answers.stream().filter(a -> !a.isDeleted()).filter(a -> a.isOwner(this.writer))
+                .forEach(a -> logger.debug("DeleteQuestion : Answer : {}", a.toString()));
+
+        // 질문자와 답변자가 동일 확인
+        if(answers.stream().filter(a -> !a.isOwner(this.writer)).count() > 0) {
+            throw new UnAuthorizedException();
+        }
+
+        this.deleted = true;
+        /* 피드백2) 질문삭제 시, 답변 삭제 처리(deleted) */
+        deleteAnswers(loginUser);
+        return this;
+    }
+
+    public void deleteAnswers(User loginUser) {
+        for(Answer answer : answers) {
+            answer.deleteAnswer(loginUser);
+        }
     }
 
     public Question applyOwner(User user) {
@@ -105,12 +141,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
-    /* 피드백1) 본인이 작성한 글인지 확인하는 로직이 서비스 영역 vs 도메인 영역
-        나의 선택) 도메인 영역
-            why? Service 영역의 역할은 데이터를 가공하는 역할이기 때문에 확인하는 메소드는 도메인이 맞지 않을까?
-                 그러나, Service 영역에서 한다면, 도메인까지 넘어가지 않고 바로 처리를 할 수 있다는 장점은 있을 것 같다.
-                 과연 답은..?
-    */
     public boolean isOneSelf(User loginUser) {
         return writer.equals(loginUser);
     }
@@ -118,6 +148,18 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public boolean isTitleAndContentsAndWriter(Question question) {
         return this.title.equals(question.title) && this.contents.equals(question.contents)
                 && this.writer.equals(question.writer);
+    }
+
+    public DeleteHistory createQuestionOfDeleteHistory(Long id) {
+        return new DeleteHistory(ContentType.QUESTION, id, writer);
+    }
+
+    public List<DeleteHistory> createAnswersOfDeleteHistories() {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        for (Answer answer : answers) {
+            deleteHistories.add(answer.createAnswerOfDeleteHistory());
+        }
+        return deleteHistories;
     }
 
     @Override
@@ -143,12 +185,5 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), title, contents, writer);
-    }
-
-    public void deleteAnswer(Answer answer) {
-        answer.toQuestion(this);
-        System.out.println("BEFORE" + answers.size());
-        this.answers.remove(answer);
-        System.out.println("AFTER" + answers.size());
     }
 }

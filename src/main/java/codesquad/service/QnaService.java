@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-    public Question create(User loginUser, Question question) {
+    public Question createQuestion(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
@@ -41,26 +42,15 @@ public class QnaService {
     }
 
     @Transactional
-    public Question update(User loginUser, Long id, Question updatedQuestion) throws UnAuthenticationException {
-        Question question = questionRepository.findById(id).orElse(null).updateQuestion(updatedQuestion);
-        return questionRepository.save(question);
+    public Question update(User loginUser, Long id, Question updatedQuestion)  {
+        Question question = questionRepository.findById(id).orElse(null).updateQuestion(loginUser, updatedQuestion);
+        return question;
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException, UnAuthenticationException {
-        questionRepository.deleteById(questionId);
-    }
-
-    public void isOneSelfQuestion(User user, Long id) throws UnAuthenticationException {
-        if(!findById((id)).orElse(null).isOneSelf(user)) {
-            throw new UnAuthenticationException();
-        }
-    }
-
-    public void isOneSelfAnswer(User user, Answer answer) throws UnAuthenticationException {
-        if(!answer.isOneSelf(user)) {
-            throw new UnAuthenticationException();
-        }
+    public Question deleteQuestion(User loginUser, long questionId) {
+        return questionRepository.findById(questionId).orElse(null)
+                .deleteQuestion(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -69,6 +59,10 @@ public class QnaService {
 
     public List<Question> findAll(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
+    }
+
+    public boolean isSaved(Long id) {
+        return answerRepository.findById(id).orElse(null) != null;
     }
 
     @Transactional
@@ -80,9 +74,14 @@ public class QnaService {
     }
 
     @Transactional
-    public Question deleteAnswer(long questionId, Answer answer) {
+    public Question deleteAnswer(User loginUser, long questionId, Answer answer) {
         Question question = questionRepository.getOne(questionId);
-        question.deleteAnswer(answer);
+        /* 피드백1) 답변삭제를 Question
+            --> Answer로 변경 (Question의 answers에서 작업하는 것이 아니라 Answer에서 deleted값만 변경하면되기
+                때문에 Answer에 적용하는 것이 맞음
+        */
+        answer.deleteAnswer(loginUser);
         return question;
     }
 }
+

@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import support.test.AcceptanceTest;
+
+import javax.xml.bind.ValidationException;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ApiAnswerAcceptanceTest extends AcceptanceTest {
@@ -30,43 +33,44 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void 답변추가_로그인X() {
+    public void 답변추가_로그인X() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = postResource(template(), location + URL, AnswerFixture.TEST_ANSWER);
         softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void 답변추가_로그인O_본인O_글자수5자리미만() {
+    public void 답변추가_로그인O_본인O_글자수5자리미만() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = postResource(testRestTemplateOneSelf, location + URL, AnswerFixture.ERROR_ANSWER);
         softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
-    public void 답변추가_로그인O_글자수5자리이상() {
+    public void 답변추가_로그인O_글자수5자리이상() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = postResource(testRestTemplateOneSelf, location + URL, AnswerFixture.TEST_ANSWER);
         softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.CREATED);
+        logger.debug("Answer : " + responseEntity.getHeaders().getLocation().getPath());
     }
 
     @Test
-    public void 답변삭제_로그인X() {
+    public void 답변삭제_로그인X() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = exchangeResource(template(), location + URL, HttpMethod.DELETE, AnswerFixture.TEST_ANSWER);
         softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void 답변삭제_로그인O_본인X() {
+    public void 답변삭제_로그인O_본인X() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = exchangeResource(basicAuthTemplate(UserFixture.SANJIGI_USER), location + URL,
                 HttpMethod.DELETE, AnswerFixture.TEST_ANSWER);
-        softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.UNAUTHORIZED);
+        softly.assertThat(getStatusCode(responseEntity)).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void 답변삭제_로그인O_본인O() {
+    public void 답변삭제_로그인O_본인O() throws ValidationException {
         String location = getLocation(postResource(basicAuthTemplate(), QUESTION_LOCATION, QuestionFixture.TEST_QUESTION));
         ResponseEntity<Void> responseEntity = exchangeResource(basicAuthTemplate(), location + URL,
                 HttpMethod.DELETE, AnswerFixture.TEST_ANSWER);

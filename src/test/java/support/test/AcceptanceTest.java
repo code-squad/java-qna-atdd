@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.xml.bind.ValidationException;
 import java.net.URI;
 
 import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
@@ -54,11 +55,15 @@ public abstract class AcceptanceTest extends BaseTest {
         return responseEntity.getStatusCode();
     }
 
-    public String getLocation(ResponseEntity<Void> responseEntity) {
+    public String getLocation(ResponseEntity<Void> responseEntity) throws ValidationException {
+        if(responseEntity.getHeaders().getLocation() == null) {
+            throw new ValidationException("Location is null");
+        }
         return responseEntity.getHeaders().getLocation().getPath();
     }
 
     public ResponseEntity exchangeResource(TestRestTemplate testRestTemplate, String location, HttpMethod httpMethod, Object obj) {
+        // T제네릭으로 변경 필요!
         return testRestTemplate.exchange(URI.create(location),httpMethod, new HttpEntity(obj, new HttpHeaders()), Void.class);
     }
 }
