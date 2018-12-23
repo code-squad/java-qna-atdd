@@ -39,7 +39,7 @@ public class ApiAnswerControllerTest extends AcceptanceTest {
     @Test
     public void update_no_login() {
         String location = createResource("/api/questions/" + QUESTION.getId() + "/answers", ANSWER.getContents());
-        ResponseEntity<String> responseEntity = template().exchange(location, HttpMethod.PUT, createHttpEntity(UPDATED_CONTENTS), String.class);
+        ResponseEntity<ErrorMessage> responseEntity = template().exchange(location, HttpMethod.PUT, createHttpEntity(UPDATED_CONTENTS), ErrorMessage.class);
 
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         log.debug("error Message : {}", responseEntity.getBody());

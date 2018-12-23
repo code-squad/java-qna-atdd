@@ -5,13 +5,17 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import support.utils.PagingUtils;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
+import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
@@ -63,8 +67,9 @@ public class QnaService {
         return questionRepository.findByDeleted(false);
     }
 
-    public List<Question> findAll(Pageable pageable) {
-        return questionRepository.findAll(pageable).getContent();
+    public Page<Question> findAll(Optional<Integer> page) {
+        Pageable pageable = PageRequest.of(page.orElse(1) - 1, PagingUtils.DEFAULT_PAGE_QUESTION_COUNT, Sort.Direction.DESC, "createdAt", "id");
+        return questionRepository.findByDeleted(false, pageable);
     }
 
     @Transactional
