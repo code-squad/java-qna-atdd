@@ -36,7 +36,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void loginFail() {
+    public void login_fail() {
         HttpEntity<MultiValueMap<String, Object>> request =
                 HtmlFormDataBuilder.urlEncodedForm()
                         .addParameter("userId", "javajigi1")

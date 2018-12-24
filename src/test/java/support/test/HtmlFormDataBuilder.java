@@ -37,4 +37,9 @@ public class HtmlFormDataBuilder {
         addParameter("_method", "put");
         return this;
     }
+
+    public HtmlFormDataBuilder delete() {
+        addParameter("_method", "delete");
+        return this;
+    }
 }
