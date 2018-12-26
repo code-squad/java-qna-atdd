@@ -74,6 +74,14 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return this;
     }
 
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
+
     public User getWriter() {
         return writer;
     }
@@ -93,6 +101,10 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public void addAnswer(Answer answer) {
         answer.toQuestion(this);
         answers.add(answer);
+    }
+
+    public int getCountOfAnswer() {
+        return answers.size();
     }
 
     public boolean isDeleted() {

@@ -5,14 +5,20 @@ import codesquad.UnAuthenticationException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service("qnaService")
 public class QnaService {
@@ -57,6 +63,14 @@ public class QnaService {
         return questionRepository.findByDeleted(false);
     }
 
+    public Page<Question> findByPaging(Paging paging) {
+        return questionRepository.findByDeleted(false, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+    }
+
+    public int obtainCountOfQuestion() {
+        return (int)questionRepository.findByDeleted(false).stream().count();
+    }
+
     public List<Question> findAll(Pageable pageable) {
         return questionRepository.findAll(pageable).getContent();
     }
@@ -82,6 +96,10 @@ public class QnaService {
         */
         answer.deleteAnswer(loginUser);
         return question;
+    }
+
+    public Paging obtainPaging(Paging paging) {
+        return paging.of(questionRepository.findByDeleted(false).size());
     }
 }
 

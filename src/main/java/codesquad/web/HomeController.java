@@ -1,11 +1,13 @@
 package codesquad.web;
 
+import codesquad.domain.Paging;
 import codesquad.service.QnaService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpSession;
 
@@ -19,11 +21,12 @@ public class HomeController {
 
     private static final Logger logger = getLogger(HomeController.class);
 
-
-    @GetMapping("/")
-    public String home(Model model, HttpSession httpSession) {
+    @GetMapping(path = {"/", "/{no}"})
+    public String home(@PathVariable(required = false) Long no,  Model model, HttpSession httpSession) {
         logger.debug("sesseion id : {} ", httpSession.getId());
-        model.addAttribute("questions", qnaService.findAll());
+        Paging paging = new Paging(no);
+        model.addAttribute("questions", qnaService.findByPaging(paging));
+        model.addAttribute("paging", qnaService.obtainPaging(paging));
         return "home";
     }
 }

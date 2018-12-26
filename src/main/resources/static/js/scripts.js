@@ -16,7 +16,7 @@ function submitQuestion(e) {
 
     var queryString = $("#question").serialize();
     var url = '/api/questions';
-
+    console.log(queryString);
     $.ajax({
         type : 'post',
         url : url,
