@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.NoResultException;
 import java.util.List;
-import java.util.Optional;
 
 @Service("qnaService")
 public class QnaService {
@@ -26,14 +25,15 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
-//    public Question add(Question question) {
-//        return questionRepository.save(question);
-//    }
+    public Question add(Question question) {
+        return questionRepository.save(question);
+    }
 
+    @Transactional
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
-        log.debug("question : {}", question);
-        return questionRepository.save(question);
+        add(question);
+        return question;
     }
 
     public Question findById(long id) {
@@ -48,7 +48,6 @@ public class QnaService {
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        //TODO : @Transactional 학습(save 라인이 없는 이유?)
         Question original = findById(id);
         original.update(loginUser, updatedQuestion);
         return original;
@@ -57,7 +56,7 @@ public class QnaService {
     @Transactional
     public Question deleteQuestion(User loginUser, long id) throws CannotDeleteException {
         Question target = findById(id);
-        target.delete(loginUser);
+        deleteHistoryService.saveAll(target.delete(loginUser));
         return target;
     }
 
@@ -70,15 +69,17 @@ public class QnaService {
     }
 
     @Transactional
-    public Answer addAnswer(User loginUser, long questionId, Answer answer) {
-        //반환타입 Answer인 이유 알아보기
-        Question target = findById(questionId);
-        target.addAnswer(answer);
-        return answer;
+    public Answer addAnswer(User loginUser, long id, String contents) {
+        Question target = findById(id);
+        return target.addAnswer(new Answer(loginUser, contents));
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현
-        return null;
+    @Transactional
+    public Question deleteAnswer(User loginUser, long id, long answerId) throws CannotDeleteException {
+        Question question = findById(id);
+        Answer target = findByAnswerId(answerId);
+
+        deleteHistoryService.saveAll(target.delete(loginUser));
+        return question;
     }
 }

@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import support.test.AcceptanceTest;
 
 import static codesquad.domain.QuestionTest.DEFAULT_QUESTION;
 import static codesquad.domain.QuestionTest.UPDATED_QUESTION;
+import static codesquad.domain.UserTest.JAVAJIGI;
 import static codesquad.domain.UserTest.SANJIGI;
 
 public class ApiQuestionAcceptanceTest extends AcceptanceTest {
@@ -87,6 +89,11 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
                 basicAuthTemplate(SANJIGI).exchange(location, HttpMethod.DELETE, createHttpEntity(DEFAULT_QUESTION), Void.class);
 
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void delete_타인답변존재() {
+        //TODO : 답변추가 어떻게...?
     }
 
     @Test

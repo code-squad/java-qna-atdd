@@ -13,7 +13,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void loginForm() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/login/form", String.class);
+        ResponseEntity<String> response = template().getForEntity("/login", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
@@ -25,19 +25,6 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         htmlbuilder.addParameter("userId", "javajigi");
         htmlbuilder.addParameter("password", "test");
         HttpEntity<MultiValueMap<String, Object>> request = htmlbuilder.build();
-
-        /*  urlEncodedForm
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-         */
-
-        /*  addParameter, builder
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", "javajigi");
-        params.add("password", "test");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        */
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
 
