@@ -1,8 +1,10 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -12,8 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = getLogger(Question.class);
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -95,12 +100,32 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         this.contents = target.contents;
     }
 
-    public void delete(User loginUser) {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
 
+        deleteAnswer(loginUser, deleteHistories);
         this.deleted = true;
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser));
+
+        return deleteHistories;
+    }
+
+    private void deleteAnswer(User loginUser, List<DeleteHistory> deleteHistories) throws CannotDeleteException {
+        log.debug("loginUser : {}", loginUser);
+        log.debug("answers.size : {}", answers.size());
+
+        for (Answer answer : answers) {
+            log.debug("answer : {}", answer);
+            answer.delete(loginUser);
+        }
+
+        for (Answer answer : answers) {
+            deleteHistories.add(new DeleteHistory(ContentType.ANSWER, answer.getId(), loginUser));
+        }
     }
 
     public boolean equalsTitleAndContents(Question target) {

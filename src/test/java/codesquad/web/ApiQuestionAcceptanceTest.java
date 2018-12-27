@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.domain.Answer;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import org.junit.Test;
@@ -9,7 +10,11 @@ import support.test.AcceptanceTest;
 
 import javax.annotation.Resource;
 
+import java.util.Arrays;
+
+import static codesquad.domain.QuestionTest.RED_QUESTION;
 import static codesquad.domain.UserTest.RED;
+import static codesquad.domain.UserTest.UNHEE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ApiQuestionAcceptanceTest extends AcceptanceTest {
@@ -86,6 +91,57 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         log.debug("responetEntity : {}", responseEntity.getBody());
 
+    }
+
+    @Test
+    public void delete_question_no_answer() {
+        Question newQuestion = new Question("title", "contents");
+        String location = createResourceLogin("/api/questions", newQuestion, RED);
+
+        Question original = template().getForObject(location, Question.class);
+
+        ResponseEntity<Question> response = basicAuthTemplate(RED).exchange(location, HttpMethod.DELETE,
+                createHttpEntity(original), Question.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        log.debug("response : {}", response);
+    }
+
+    @Test
+    public void delete_question_other_writer() {
+        Question newQuestion = new Question("title", "contents");
+        String location = createResourceLogin("/api/questions", newQuestion, RED);
+
+        Question original = template().getForObject(location, Question.class);
+
+        ResponseEntity<Question> response = basicAuthTemplate(UNHEE).exchange(location, HttpMethod.DELETE,
+                createHttpEntity(original), Question.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        log.debug("response : {}", response);
+    }
+
+    @Test
+    public void delete_question_no_login() {
+        Question newQuestion = new Question("title", "contents");
+        String location = createResourceLogin("/api/questions", newQuestion, RED);
+
+        Question original = template().getForObject(location, Question.class);
+
+        ResponseEntity<Question> response = template().exchange(location, HttpMethod.DELETE,
+                createHttpEntity(original), Question.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        log.debug("response : {}", response);
+    }
+
+    @Test
+    public void delete_owner_answer() {
+        Question newQuestion = new Question("title", "contents");
+        newQuestion.setAnswers(Arrays.asList(new Answer(RED, "answer_contents")));
+
+        String location = createResourceLogin("/api/questions", newQuestion, RED);
+
+        Question original = template().getForObject(location, Question.class);
+
+        //ResponseEntity<Question> response = basicAuthTemplate(RED).exchange()
     }
 
     private HttpEntity createHttpEntity(Object body) {

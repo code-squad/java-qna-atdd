@@ -27,6 +27,7 @@ public class QnaService {
     @Resource(name = "deleteHistoryService")
     private DeleteHistoryService deleteHistoryService;
 
+
     public Question create(User loginUser, Question question) {
         question.writeBy(loginUser);
         log.debug("question : {}", question);
@@ -59,11 +60,13 @@ public class QnaService {
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
+    public Question deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(UnAuthorizedException::new);
 
-        question.delete(loginUser);
+        List<DeleteHistory> histories = question.delete(loginUser);
+        deleteHistoryService.saveAll(histories);
+        return question;
     }
 
     @Transactional
@@ -97,7 +100,10 @@ public class QnaService {
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        // TODO 답변 삭제 기능 구현
+        Answer answer = answerRepository.findById(id)
+                .orElseThrow(UnAuthorizedException::new);
+        answer.delete(loginUser);
+        return answerRepository.save(answer);
     }
 }

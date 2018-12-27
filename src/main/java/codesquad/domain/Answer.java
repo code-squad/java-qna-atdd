@@ -69,12 +69,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     }
 
     public void update(User loginUser, Answer updateAnswer) {
-        if(!isOwner(loginUser)) {
+        if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
         this.contents = updateAnswer.contents;
     }
 
+    public void delete(User loginUser) {
+        if (!isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
+    }
 
     @Override
     public String generateUrl() {
@@ -85,4 +91,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
     }
+
+
 }

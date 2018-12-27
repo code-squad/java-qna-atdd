@@ -55,9 +55,9 @@ public class QuestionController {
         return "redirect:/";
     }
 
-    @GetMapping("/{id}/show")
-    public String show(@LoginUser User loginUser, @PathVariable Long id, Model model) {
-        model.addAttribute("question", qnaService.findById(loginUser, id));
-        return "redirect:/qna/show";
+    @GetMapping("/{id}")
+    public String show(@PathVariable Long id, Model model) {
+        model.addAttribute("question", qnaService.findById(id));
+        return "/qna/show";
     }
 }
