@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityExistsException;
 import java.util.List;
 
 @Service("userService")
@@ -15,21 +16,18 @@ public class UserService {
     @Resource(name = "userRepository")
     private UserRepository userRepository;
 
-    public User add(User user) {
-        return userRepository.save(user);
+    public User add(User newUser) {
+        return userRepository.save(newUser);
     }
 
     @Transactional
     public User update(User loginUser, long id, User updatedUser) {
-        User original = findById(loginUser, id);
-        original.update(loginUser, updatedUser);
-        return original;
+        return findById(id).update(loginUser, updatedUser);
     }
 
-    public User findById(User loginUser, long id) {
+    public User findById(long id) {
         return userRepository.findById(id)
-                .filter(user -> user.equals(loginUser))
-                .orElseThrow(UnAuthorizedException::new);
+                .orElseThrow(EntityExistsException::new);
     }
 
     public List<User> findAll() {

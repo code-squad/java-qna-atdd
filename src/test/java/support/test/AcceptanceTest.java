@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)        //SpringRunner로 실행하라.
@@ -54,11 +53,9 @@ public abstract class AcceptanceTest extends BaseTest {
         return basicAuthTemplate(loginUser).getForObject(location, responseType);
     }
 
-    protected Question createQuestion() {
-        return new Question("제목입니다.", "내용입니다.");
-    }
-
-    protected Question updateQuestion() {
-        return new Question("업데이트 제목", "업데이트 내용");
+    protected HttpEntity createHttpEntity(Object body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity(body, headers);
     }
 }

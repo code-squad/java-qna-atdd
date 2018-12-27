@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.UnAuthenticationException;
 import codesquad.UnAuthorizedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import support.domain.AbstractEntity;
@@ -79,38 +80,37 @@ public class User extends AbstractEntity {
         return this;
     }
 
-    public void update(User loginUser, User target) {
-        if (!matchUserId(loginUser.getUserId())) {
+    public User update(User loginUser, User updateUser) {
+        if (isOwn(loginUser)) {
+            this.name = updateUser.name;
+            this.email = updateUser.email;
+        }
+        return this;
+    }
+
+    public boolean isOwn(User targetUser) {
+        isLogin(targetUser);
+        if(!this.equals(targetUser)){
             throw new UnAuthorizedException();
         }
+        return true;
+    }
 
-        if (!matchPassword(target.getPassword())) {
-            throw new UnAuthorizedException();
+    public boolean isLogin(User targetUser) {
+        if (targetUser == null){
+            throw new UnAuthenticationException();
         }
-
-        this.name = target.name;
-        this.email = target.email;
+        return true;
     }
 
-    private boolean matchUserId(String userId) {
-        return this.userId.equals(userId);
-    }
-
-    public boolean matchPassword(String targetPassword) {
-        return password.equals(targetPassword);
-    }
-
-    public boolean equalsNameAndEmail(User target) {
-        if (Objects.isNull(target)) {
-            return false;
-        }
-
-        return name.equals(target.name) &&
-                email.equals(target.email);
+    public boolean matchPassword(String password) {
+        if (!this.password.equals(password))
+            throw new UnAuthenticationException();
+        return true;
     }
 
     @JsonIgnore
-    public boolean isGuestUser() {
+    public  boolean isGuestUser() {
         return false;
     }
 
@@ -126,5 +126,19 @@ public class User extends AbstractEntity {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        if (!super.equals(o)) return false;
+        User user = (User) o;
+        return Objects.equals(getUserId(), user.getUserId()) &&
+                Objects.equals(getPassword(), user.getPassword()) &&
+                Objects.equals(getId(),user.getId());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getUserId(), getPassword());
+    }
 }

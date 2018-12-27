@@ -1,8 +1,6 @@
 package codesquad.service;
 
-import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
-import codesquad.security.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service("qnaService")  //서비스에서는 비즈니스 로직을 구현하는 곳이 아니다!! , thin layer - 가볍게 구현해야 한다.
@@ -27,23 +26,28 @@ public class QnaService {
     private DeleteHistoryService deleteHistoryService;
 
     public Question create(User loginUser, Question question) {
-        question.writeBy(loginUser);
+        question.writtenBy(loginUser);
         log.debug("question : {}", question);
         return questionRepository.save(question);
     }
 
-    public Question findById(long id) {
-        return questionRepository.findById(id).orElseThrow(UnAuthorizedException::new);
+    public Question findByQuestionId(long id) {
+        return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        //존재 하지 않는 질문을 수정하고자 할때 bad request란 에러를 발생시킴
+    }
+
+    public Answer findByAnswerId(long id) {
+        return answerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
-        return findById(id).modify(updatedQuestion, loginUser);
+        return findByQuestionId(id).modify(updatedQuestion, loginUser);
     }
 
     @Transactional
-    public void delete(User loginUser, long id) {
-        findById(id).delete(loginUser);
+    public Question deleteQuestion(User loginUser, long questionId) {
+        return findByQuestionId(questionId).delete(loginUser);
     }
 
     public Iterable<Question> findAll() {
@@ -54,22 +58,16 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public void checkLogin(User loginUser) {
-        if (loginUser == null)
-            throw new UnAuthorizedException();
-    }
-
     @Transactional
     public Answer addReply(User loginUser, long questionId, String contents) {
         // TODO 답변 추가 기능 구현
-        Answer addAnswer1 = new Answer(loginUser, contents);
-        findById(questionId).addAnswer(addAnswer1);
-        return addAnswer1;
+        Answer newAnswer = new Answer(loginUser, contents);
+        return findByQuestionId(questionId).addAnswer(loginUser, newAnswer);
     }
 
     @Transactional
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    public Answer deleteAnswer(User loginUser, long answerId) {
+        // TODO 답변 삭제 기능 구현
+        return findByAnswerId(answerId).delete(loginUser);
     }
 }

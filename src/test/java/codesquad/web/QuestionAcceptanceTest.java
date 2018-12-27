@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -19,6 +20,27 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Autowired
     private QuestionRepository questionRepository;
 
+    public HttpEntity<MultiValueMap<String, Object>> makeQuestion() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("title", "제목입니다.")
+                .addParameter("contents", "내용입니다.")
+                .build();
+    }
+
+    public HttpEntity<MultiValueMap<String, Object>> modifyQuestion() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .put()
+                .addParameter("title", "제목입니다.")
+                .addParameter("contents", "내용입니다.")
+                .build();
+    }
+
+    public HttpEntity<MultiValueMap<String, Object>> deleteQuestion() {
+        return HtmlFormDataBuilder.urlEncodedForm()
+                .delete()
+                .build();
+    }
+
     @Test
     public void createForm_no_login() throws Exception {
         ResponseEntity<String> response = template()
@@ -29,21 +51,16 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void createForm_login() throws Exception {
-        User loginUser = defaultUser();
-        ResponseEntity<String> response = basicAuthTemplate(loginUser)
+        ResponseEntity<String> response = basicAuthTemplate()
                 .getForEntity("/questions", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     public void create() {
-        HttpEntity<MultiValueMap<String, Object>> request = HtmlFormDataBuilder
-                .urlEncodedForm()
-                .addParameter("title", "제목입니다.")
-                .addParameter("contents", "내용입니다.")
-                .build();
+        HttpEntity<MultiValueMap<String, Object>> request = makeQuestion();
 
-        ResponseEntity<String> response = basicAuthTemplate().postForEntity("/questions",request, String.class);
+        ResponseEntity<String> response = basicAuthTemplate().postForEntity("/questions", request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
 
@@ -83,30 +100,22 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void update_self() {
         HttpEntity<MultiValueMap<String, Object>> request = modifyQuestion();
-        ResponseEntity<String> response = basicAuthTemplate().postForEntity(String.format("/questions/%d", 1),request, String.class);
+        ResponseEntity<String> response = basicAuthTemplate().postForEntity(String.format("/questions/%d", 1), request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> modifyQuestion() {
-        return HtmlFormDataBuilder.urlEncodedForm()
-                .put()
-                .addParameter("title", "제목입니다.")
-                .addParameter("contents", "내용입니다.")
-                .build();
-    }
-
-
     @Test
     public void delete_no_login() {
+//        HttpEntity<MultiValueMap<String, Object>> request1 = makeQuestion();
         HttpEntity<MultiValueMap<String, Object>> request = deleteQuestion();
-        ResponseEntity<String> response = template().postForEntity(String.format("/questions/%d", 2), request, String.class);
+        ResponseEntity<String> response = template().postForEntity(String.format("/questions/%d", 1), request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     public void delete_other_user() {
         HttpEntity<MultiValueMap<String, Object>> request = deleteQuestion();
-        ResponseEntity<String> response = basicAuthTemplate(defaultUser())
+        ResponseEntity<String> response = basicAuthTemplate()
                 .postForEntity(String.format("/questions/%d", 2), request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
@@ -114,16 +123,11 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void delete_self() {
         HttpEntity<MultiValueMap<String, Object>> request = deleteQuestion();
-        ResponseEntity<String> response = basicAuthTemplate(defaultUser())
+        ResponseEntity<String> response = basicAuthTemplate()
                 .postForEntity(String.format("/questions/%d", 1), request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/");
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> deleteQuestion() {
-        return HtmlFormDataBuilder.urlEncodedForm()
-                .delete()
-                .build();
-    }
 
 }

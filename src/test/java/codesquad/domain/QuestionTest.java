@@ -3,14 +3,15 @@ package codesquad.domain;
 import codesquad.UnAuthorizedException;
 import org.junit.Before;
 import org.junit.Test;
+import support.test.BaseTest;
 
-public class QuestionTest {
+public class QuestionTest extends BaseTest {
     private Question question;
 
     @Before
     public void setUp() {
         question = new Question("제목입니다.", "내용 입니다.");
-        question.writeBy(UserTest.newUser(1L));
+        question.writtenBy(UserTest.newUser(1L));
     }
 
     @Test(expected = UnAuthorizedException.class)
@@ -27,7 +28,8 @@ public class QuestionTest {
 
     @Test
     public void delete_owner() {
-        question.delete(UserTest.newUser(1L));
+        Question question1 = question.delete(UserTest.newUser(1L));
+        softly.assertThat(question1.isDeleted()).isTrue();
     }
 
     @Test(expected = UnAuthorizedException.class)

@@ -29,7 +29,7 @@ public class ApiUserController {
 
     @GetMapping("{id}")
     public User show(@LoginUser User loginUser, @PathVariable long id) {
-        return userService.findById(loginUser, id);
+        return userService.findById(id);
     }
 
     @PutMapping("{id}")

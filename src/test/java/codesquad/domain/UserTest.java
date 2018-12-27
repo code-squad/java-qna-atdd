@@ -39,7 +39,7 @@ public class UserTest extends BaseTest {
     }
 
     @Test
-    public void update_match_password() {
+    public void update() {
         User origin = newUser("sanjigi");
         User target = new User("sanjigi", "password", "name2", "javajigi@slipp.net2");
         origin.update(origin, target);
@@ -47,10 +47,4 @@ public class UserTest extends BaseTest {
         softly.assertThat(origin.getEmail()).isEqualTo(target.getEmail());
     }
 
-    @Test(expected = UnAuthorizedException.class)
-    public void update_mismatch_password() {
-        User origin = newUser("sanjigi", "password");
-        User target = new User("sanjigi", "password2", "name2", "javajigi@slipp.net2");
-        origin.update(origin, target);
-    }
 }
