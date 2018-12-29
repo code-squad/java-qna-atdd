@@ -1,8 +1,6 @@
 package codesquad.web;
 
-import codesquad.domain.Question;
-import codesquad.domain.QuestionFixture;
-import codesquad.domain.UserFixture;
+import codesquad.domain.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.springframework.http.*;
@@ -58,7 +56,7 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
     public void 게시글작성자와_로그인유저가다를때_질문수정불가() {
         ResponseEntity<Question> response = basicAuthTemplate(UserFixture.USER_2)
                 .exchange(String.format("/api/questions/%d", 1), HttpMethod.PUT, createHttpEntity(QuestionFixture.QUESTION), Question.class);
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -70,8 +68,13 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void 게시글작성자와_로그인유저가같을때_질문삭제가능() {
+        // 질문 생성
+        String questionLocation = createResource("/api/questions", new Question("안녕하세요", "반갑습니다."));
+
+        // 질문 삭제
         ResponseEntity<Question> response = basicAuthTemplate()
-                .exchange(String.format("/api/questions/%d", 1), HttpMethod.DELETE, createHttpEntity(QuestionFixture.QUESTION), Question.class);
+                .exchange(questionLocation, HttpMethod.DELETE, new HttpEntity<>(new HttpHeaders()), Question.class);
+
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -80,5 +83,38 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         ResponseEntity<Question> response = basicAuthTemplate(findByUserId("master"))
                 .exchange(String.format("/api/questions/%d", 1), HttpMethod.DELETE, new HttpEntity<>(new HttpHeaders()), Question.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void 질문자와_로그인유저가같고_답변글의_모든답변자_같은경우_게시글삭제가능() {
+        // 질문생성
+        String questionLocation = createResource("/api/questions", new Question("하이요요용", "내용입니다"));
+        logger.debug("asdf : {}", questionLocation);
+
+        // 댓글생성
+        ResponseEntity<Question> answerResponse = basicAuthTemplate().postForEntity(questionLocation + "/answers", "댓글입니다.", Question.class);
+        softly.assertThat(answerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        // 질문삭제
+        ResponseEntity<Question> response = basicAuthTemplate()
+                .exchange(questionLocation, HttpMethod.DELETE, new HttpEntity<>(new HttpHeaders()), Question.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void 질문자와_로그인유저가같고_답변글의_답변자_다른경우_게시글삭제불가() {
+        // 질문생성
+        String questionLocation = createResource("/api/questions", new Question("하이요요용", "내용입니다"));
+        logger.debug("asdf : {}", questionLocation);
+
+        // 댓글생성
+        ResponseEntity<Question> answerResponse = basicAuthTemplate(UserFixture.USER_2)
+                .postForEntity(questionLocation + "/answers", "댓글입니다.", Question.class);
+        softly.assertThat(answerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        // 질문삭제
+        ResponseEntity<Question> response = basicAuthTemplate()
+                .exchange(questionLocation, HttpMethod.DELETE, new HttpEntity<>(new HttpHeaders()), Question.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 }

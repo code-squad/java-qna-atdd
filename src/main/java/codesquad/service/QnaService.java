@@ -6,11 +6,14 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,26 +36,22 @@ public class QnaService {
         return questionRepository.save(question);
     }
 
-    public Optional<Question> findById(long id) {
-        return questionRepository.findById(id);
+    public Question findById(long id) {
+        return questionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
     public Question update(User loginUser, long id, Question updatedQuestion) {
         // TODO 수정 기능 구현
         Question question = questionRepository.findById(id).orElseThrow(UnAuthorizedException::new);
-        question.update(loginUser, updatedQuestion);
-        questionRepository.save(question);
-        return null;
+        return question.update(loginUser, updatedQuestion);
     }
 
     @Transactional
-    public void deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
+    public void deleteQuestion(User loginUser, long questionId) {
         // TODO 삭제 기능 구현
-        log.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + questionId);
         Question question = questionRepository.findById(questionId).orElseThrow(UnAuthorizedException::new);
-        question.delete(loginUser);
-        questionRepository.save(question);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Iterable<Question> findAll() {
@@ -64,13 +63,14 @@ public class QnaService {
     }
 
     @Transactional
-    public Answer addAnswer(User loginUser, long questionId, Answer answer) {
+    public Answer addAnswer(User loginUser, long questionId, String contents) {
         // TODO 답변 추가 기능 구현
+        Answer answer = new Answer(loginUser, contents);
+
         Question question = questionRepository.findById(questionId)
-                .filter(q -> q.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
         question.addAnswer(answer);
-        return null;
+        return answer;
     }
 
     @Transactional
@@ -79,8 +79,8 @@ public class QnaService {
         Answer answer = answerRepository.findById(id)
                 .filter(a -> a.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
-        answer.delete(loginUser);
-        return null;
+        deleteHistoryService.save(answer.delete(loginUser));
+        return answer;
     }
 
     public void oneSelf(User loginUser, long id) {

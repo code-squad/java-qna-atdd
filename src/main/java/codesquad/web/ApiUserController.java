@@ -27,12 +27,12 @@ public class ApiUserController {
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public User show(@LoginUser User loginUser, @PathVariable long id) {
         return userService.findById(loginUser, id);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public User update(@LoginUser User loginUser, @PathVariable long id, @Valid @RequestBody User updatedUser) {
         return userService.update(loginUser, id, updatedUser);
     }

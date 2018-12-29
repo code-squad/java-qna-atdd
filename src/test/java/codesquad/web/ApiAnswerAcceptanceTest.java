@@ -20,7 +20,7 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
         ResponseEntity<Void> response = basicAuthTemplate().postForEntity("/api/questions", QuestionFixture.QUESTION, Void.class);
         String location = response.getHeaders().getLocation().getPath() + ANSWER_URL;
         ResponseEntity<Void> responseEntity = template()
-                .postForEntity(location, new Answer(UserFixture.USER, "컨텐츠작성함"), Void.class);
+                .postForEntity(location,"컨텐츠작성함", Void.class);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
@@ -29,7 +29,7 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
         ResponseEntity<Void> response = basicAuthTemplate().postForEntity("/api/questions", QuestionFixture.QUESTION, Void.class);
         String location = response.getHeaders().getLocation().getPath() + ANSWER_URL;
         ResponseEntity<Void> responseEntity = basicAuthTemplate()
-                .postForEntity(location, new Answer(UserFixture.USER, "컨텐츠작성"), Void.class);
+                .postForEntity(location,"컨텐츠작성", Void.class);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
@@ -38,7 +38,7 @@ public class ApiAnswerAcceptanceTest extends AcceptanceTest {
         ResponseEntity<Void> response = basicAuthTemplate().postForEntity("/api/questions", QuestionFixture.QUESTION, Void.class);
         String location = response.getHeaders().getLocation().getPath() + ANSWER_URL;
         ResponseEntity<Void> responseEntity = basicAuthTemplate()
-                .postForEntity(location, new Answer(UserFixture.USER, "컨텐츠작"), Void.class);
+                .postForEntity(location,"컨텐츠작", Void.class);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

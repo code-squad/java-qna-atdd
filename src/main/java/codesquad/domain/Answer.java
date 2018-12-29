@@ -1,11 +1,14 @@
 package codesquad.domain;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthenticationException;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
@@ -27,8 +30,10 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     }
 
     public Answer(User writer, String contents) {
-        this.writer = writer;
-        this.contents = contents;
+        if (isLogin(writer)) {
+            this.writer = writer;
+            this.contents = contents;
+        }
     }
 
     public Answer(Long id, User writer, Question question, String contents) {
@@ -61,18 +66,27 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
     }
 
     public boolean isOwner(User loginUser) {
+        isLogin(loginUser);
         return writer.equals(loginUser);
+    }
+
+    private boolean isLogin(User writer) {
+        if (Objects.isNull(writer)) {
+            throw new UnAuthenticationException("로그인 하세요.");
+        }
+        return true;
     }
 
     public boolean isDeleted() {
         return deleted;
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
         if(!writer.equals(loginUser)) {
             throw new CannotDeleteException("삭제할 수 없습니다.");
         }
         this.deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser, LocalDateTime.now());
     }
 
     @Override

@@ -8,8 +8,10 @@ import support.domain.UrlGeneratable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
@@ -25,10 +27,8 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    @Where(clause = "deleted = false")
-    @OrderBy("id ASC")
-    private List<Answer> answers = new ArrayList<>();
+    @Embedded
+    private Answers answers = new Answers();
 
     private boolean deleted = false;
 
@@ -84,21 +84,32 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-    public void update(User loginUser, Question updatedQuestion) {
+    public Question update(User loginUser, Question updatedQuestion) {
         if (!isOwner(loginUser)) {
             throw new UnAuthorizedException();
         }
 
         this.title = updatedQuestion.title;
         this.contents = updatedQuestion.contents;
+        return this;
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
+    public List<DeleteHistory> delete(User loginUser) {
         if (!isOwner(loginUser)) {
             throw new CannotDeleteException("삭제할 수 없습니다.");
         }
 
+        long otherAnswers = answers.otherAnswerCount(writer);
+        if (otherAnswers > 0) {
+            throw new UnAuthorizedException("다른 댓글 작성자가 있습니다.");
+        }
+
+        List<DeleteHistory> histories = answers.delete(loginUser);
+
         this.deleted = true;
+
+        histories.add(new DeleteHistory(ContentType.QUESTION, getId(), writer, LocalDateTime.now()));
+        return histories;
     }
 
     @Override
