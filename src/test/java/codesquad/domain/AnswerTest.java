@@ -6,21 +6,21 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import support.test.BaseTest;
 
+import static codesquad.domain.QuestionTest.originalQuestion;
+import static codesquad.domain.UserTest.owner;
+import static codesquad.domain.UserTest.other;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class AnswerTest extends BaseTest {
     private static final Logger logger = getLogger(AnswerTest.class);
 
-    private static Question question = new Question("title", "contents");
-    private static User owner = new User(0, "owner", "test", "owner", "owner@gmail.com");
-    private static User other = new User(1, "other", "test", "other", "other@gmail.com");
-    private static Answer answer = new Answer(0L, owner, question, "contents");
+    public static Answer answer = new Answer(1L, owner, originalQuestion, "contents");
 
     @Before
     public void setUp() throws Exception {
-        question.setId(1);
-        question.writeBy(owner);
-        question.addAnswer(answer);
+        originalQuestion.setId(1);
+        originalQuestion.writeBy(owner);
+        originalQuestion.addAnswer(answer);
     }
 
     @Test
@@ -31,8 +31,8 @@ public class AnswerTest extends BaseTest {
     @Test
     public void toQuestion() {
         Answer answer = new Answer(owner,"contents");
-        answer.toQuestion(question);
-        softly.assertThat(answer.getQuestion()).isEqualTo(question);
+        answer.toQuestion(originalQuestion);
+        softly.assertThat(answer.getQuestion()).isEqualTo(originalQuestion);
     }
 
     @Test

@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Entity
 public class Answer extends AbstractEntity implements UrlGeneratable {
     @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
     private User writer;
 
     @ManyToOne

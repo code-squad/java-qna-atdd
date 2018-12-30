@@ -48,10 +48,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/");
-//        softly.assertThat(questionRepository.findByWriter(loginUser)).isNotEmpty();
         softly.assertThat(questionRepository.findByTitle("질문있어요")).isNotEmpty();
         softly.assertThat(questionRepository.findByTitle("질문_있어요")).isEmpty();
-//        softly.assertThat(questionRepository.findByWriter(loginUser).isPresent()).isTrue(); //이 경우, IncorrectResultSizeDataAccessException 에러 뜸 optional은 유니크(1개) 결과값만 값을 받는다?
     }
 
     @Test
@@ -73,10 +71,9 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void 질문수정_버튼_클릭_다른유저() throws Exception {   //다른 로그인 유저일 시, 수정버튼 클릭
         User otherUser = defaultUser();
         ResponseEntity<String> response = basicAuthTemplate(otherUser)
-                .getForEntity(String.format("/questions/%d/form", 2), String.class);
+                .getForEntity(String.format("/questions/%d/form", 3), String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);   //redirect는 status code == 300대
-        softly.assertThat(response.getHeaders().getLocation().getPath().startsWith("/questions/%d/form", 2));    //결과 url
-        softly.assertThat(response.getHeaders().getLocation().getPath().startsWith("/questions/%d/form", 1));    //얘는 통과 안되야 하는 거 아닌가
+        softly.assertThat(response.getHeaders().getLocation().getPath().startsWith("/questions/%d/form", 3));    //결과 url
     }
 
     @Test

@@ -5,13 +5,13 @@ import codesquad.UnAuthenticationException;
 import org.junit.Before;
 import org.junit.Test;
 import support.test.BaseTest;
+import static codesquad.domain.UserTest.owner;
+import static codesquad.domain.UserTest.other;
+
 
 public class QuestionTest extends BaseTest {
     public static Question originalQuestion = new Question("title", "contents");
     public static Question updatedQuestion = new Question("updatedTitle", "updatedContents");
-
-    public static User owner = new User(1, "javajigi", "password", "name", "javajigi@slipp.net");
-    public static User other = new User(2, "sanjigi", "password", "name", "sanjigi@slipp.net");
 
     @Before
     public void setUp() throws Exception {

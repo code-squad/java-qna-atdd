@@ -55,7 +55,8 @@ public class QnaService {
             Question originQuestion = findById(questionId)
                     .filter(question -> question.isOwner(loginUser))
                     .orElseThrow(UnAuthenticationException::new);
-            originQuestion.delete(loginUser);
+            List<DeleteHistory> histories = originQuestion.delete(loginUser);
+            deleteHistoryService.saveAll(histories);
         } catch (UnAuthenticationException e) {
             throw new CannotDeleteException("삭제 안됨");
         }
@@ -72,7 +73,6 @@ public class QnaService {
     public Answer addAnswer(User loginUser, long questionId, Answer answer) {
         // TODO 답변 추가 기능 구현
         Question originQuestion = findById(questionId)
-                .filter(question -> question.isOwner(loginUser))
                 .orElseThrow(UnAuthorizedException::new);
         originQuestion.addAnswer(answer);
         return answer;

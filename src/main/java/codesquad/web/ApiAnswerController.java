@@ -34,9 +34,6 @@ public class ApiAnswerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Answer> delete(@LoginUser User loginUser, @PathVariable long questionId, @PathVariable long id) {
         qnaService.deleteAnswer(loginUser,id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/api/questions/" + questionId + "/answers/" + id));
-        log.debug("headers!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! : {}", headers.getLocation());
-        return new ResponseEntity<Answer>(headers, HttpStatus.OK);
+        return new ResponseEntity<Answer>(HttpStatus.OK);
     }
 }
