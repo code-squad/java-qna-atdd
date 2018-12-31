@@ -46,7 +46,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void list() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/questions", String.class);
+        ResponseEntity<String> response = template().getForEntity("/users", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
         softly.assertThat(response.getBody()).contains(defaultUser().getEmail());

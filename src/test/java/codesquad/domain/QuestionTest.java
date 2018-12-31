@@ -8,14 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import support.test.BaseTest;
 
+import static codesquad.domain.UserTest.other;
+import static codesquad.domain.UserTest.user;
+
 public class QuestionTest extends BaseTest {
     private static final Logger logger = LoggerFactory.getLogger(QuestionTest.class);
 
-    public static User user = new User(1, "finn", "test", "choi", "choi@naver.com");
-    public static User other = new User(2, "pobi", "test", "park", "park@naver.com");
-
     public static Question question = new Question("title", "contents");
-    public static Question updateQuestion = new Question("updatedTitle", "updatedContents");
+    public static Question updatedQuestion = new Question("updatedTitle", "updatedContents");
 
     @Before
     public void setUp() throws Exception {
@@ -25,19 +25,19 @@ public class QuestionTest extends BaseTest {
 
     @Test
     public void update_owner() {
-        question.update(user, updateQuestion);
+        question.update(user, updatedQuestion);
         softly.assertThat(question.getTitle()).isEqualTo("updatedTitle");
     }
 
     @Test(expected = UnAuthorizedException.class)
     public void update_no_login() {
-        question.update(null, updateQuestion);
+        question.update(null, updatedQuestion);
         softly.assertThat(question.getId()).isEqualTo(1L);
     }
 
     @Test(expected = UnAuthorizedException.class)
     public void update_not_owner() {
-        question.update(other, updateQuestion);
+        question.update(other, updatedQuestion);
         softly.assertThat(question.getId()).isEqualTo(1L);
     }
 

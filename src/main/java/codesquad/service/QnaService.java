@@ -41,14 +41,13 @@ public class QnaService {
         Question question = findById(loginUser, id);
         question.update(loginUser, updatedQuestion);
 
-        return questionRepository.save(question);
+        return question;
     }
 
     @Transactional
     public void delete(User loginUser, long id) throws Exception {
         Question question = findById(loginUser, id);
-        question.delete(loginUser);
-        questionRepository.save(question);
+        deleteHistoryService.saveAll(question.delete(loginUser));
     }
 
     public Question findById(User loginUser, long id) {
@@ -65,13 +64,27 @@ public class QnaService {
         return questionRepository.findAll(pageable).getContent();
     }
 
-    public Answer addAnswer(User loginUser, long questionId, String contents) {
-        // TODO 답변 추가 기능 구현
-        return null;
+    public Answer findByAnswerId(long id) {
+        return answerRepository.findById(id).get();
     }
 
-    public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+    @Transactional
+    public Answer addAnswer(User loginUser, long questionId, String contents) {
+        Question question = findById(questionId).get();
+        Answer answer = new Answer(loginUser, contents);
+        return question.addAnswer(answer);
+    }
+
+    @Transactional
+    public Answer updateAnswer(User loginUser, long id, String contents) {
+        Answer answer = findByAnswerId(id);
+        return answer.update(loginUser, contents);
+    }
+
+    @Transactional
+    public void deleteAnswer(User loginUser, long id) throws Exception {
+        Answer answer = findByAnswerId(id);
+
+        deleteHistoryService.saveAll(answer.delete(loginUser));
     }
 }
