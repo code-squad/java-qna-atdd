@@ -16,10 +16,10 @@ public class QuestionTest extends BaseTest {
     public static final Question UNHEE_QUESTION = new Question(UNHEE, "title", "contents");
     private Question newQuestion = new Question("newTitle", "newcontents");
 
-    @Before
-    public void setUp() throws Exception {
-        UNHEE_QUESTION.setAnswers(Arrays.asList(new Answer(UNHEE, "answer contents")));
-    }
+//    @Before
+//    public void setUp() throws Exception {
+//        UNHEE_QUESTION.setAnswers(Arrays.asList(new Answer(UNHEE, "answer contents")));
+//    }
 
     @Test
     public void update_owner() {

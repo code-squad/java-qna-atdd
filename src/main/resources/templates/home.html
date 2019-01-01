@@ -28,14 +28,17 @@
                 <div class="col-md-3"></div>
                 <div class="col-md-6 text-center">
                     <ul class="pagination center-block" style="display:inline-block;">
-                        <li><a href="#">«</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">»</a></li>
+                        {{#page}}
+                        <li><a href="/{{prev}}">«</a></li>
+                        {{/page}}
+                        {{#page.pages}}
+                        <li><a href="/{{.}}">{{.}}</a></li>
+                        {{/page.pages}}
+                        {{#page}}
+                        <li><a href="/{{next}}">»</a></li>
+                        {{/page}}
                     </ul>
+
                 </div>
                 {{# loginedUser }}
                 <div class="col-md-3 qna-write">

@@ -34,6 +34,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
+    @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
 
     private boolean deleted = false;
@@ -138,10 +139,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public List<Answer> getAnswers() {
         return answers;
-    }
-
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
     }
 
     @Override

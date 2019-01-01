@@ -6,6 +6,7 @@ import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,12 +79,8 @@ public class QnaService {
         return original;
     }
 
-    public Iterable<Question> findAll() {
-        return questionRepository.findByDeleted(false);
-    }
-
-    public List<Question> findAll(Pageable pageable) {
-        return questionRepository.findAll(pageable).getContent();
+    public Page<Question> findAll(Pageable pageable) {
+        return questionRepository.findByDeleted(false, pageable);
     }
 
     public Answer addAnswer(User loginUser, long questionId, String contents) {

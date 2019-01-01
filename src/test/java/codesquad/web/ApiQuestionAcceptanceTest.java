@@ -1,6 +1,7 @@
 package codesquad.web;
 
 import codesquad.domain.Answer;
+import codesquad.domain.AnswerRepository;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import org.junit.Test;
@@ -22,6 +23,9 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
 
     @Resource(name = "questionRepository")
     private QuestionRepository questionRepository;
+
+    @Resource(name = "answerRepository")
+    private AnswerRepository answerRepository;
 
     @Test
     public void create() throws Exception {
@@ -132,17 +136,17 @@ public class ApiQuestionAcceptanceTest extends AcceptanceTest {
         log.debug("response : {}", response);
     }
 
-    @Test
-    public void delete_owner_answer() {
-        Question newQuestion = new Question("title", "contents");
-        newQuestion.setAnswers(Arrays.asList(new Answer(RED, "answer_contents")));
-
-        String location = createResourceLogin("/api/questions", newQuestion, RED);
-
-        Question original = template().getForObject(location, Question.class);
-
-        //ResponseEntity<Question> response = basicAuthTemplate(RED).exchange()
-    }
+//    @Test
+//    public void delete_owner_answer() {
+//        Question newQuestion = new Question("title", "contents");
+//        newQuestion.setAnswers(Arrays.asList(new Answer(RED, "answer_contents")));
+//
+//        String location = createResourceLogin("/api/questions", newQuestion, RED);
+//
+//        Question original = template().getForObject(location, Question.class);
+//
+//        //ResponseEntity<Question> response = basicAuthTemplate(RED).exchange()
+//    }
 
     private HttpEntity createHttpEntity(Object body) {
         HttpHeaders headers = new HttpHeaders();
