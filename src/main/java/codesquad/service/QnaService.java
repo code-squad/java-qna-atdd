@@ -40,14 +40,15 @@ public class QnaService {
     public Question update(User loginUser, long id, Question updatedQuestion) {
         Question originQuestion = questionRepository.findById(id).get();
         originQuestion.update(loginUser, updatedQuestion);
-        return questionRepository.save(originQuestion);
+        return originQuestion;
     }
 
     @Transactional
     public Question deleteQuestion(User loginUser, long questionId) throws CannotDeleteException {
         Question targetQuestion = questionRepository.findById(questionId).get();
-        targetQuestion.delete(loginUser);
-        return questionRepository.save(targetQuestion);
+        log.debug("targetQuestion : {}", targetQuestion);
+        deleteHistoryService.saveAll(targetQuestion.delete(loginUser));
+        return targetQuestion;
     }
 
     public Iterable<Question> findAll() {
@@ -68,7 +69,7 @@ public class QnaService {
     @Transactional
     public Answer deleteAnswer(User loginUser, long id) throws CannotDeleteException {
         Answer targetAnswer = answerRepository.findById(id).get();
-        targetAnswer.delete(loginUser);
-        return answerRepository.save(targetAnswer);
+        deleteHistoryService.save(targetAnswer.delete(loginUser));
+        return targetAnswer;
     }
 }

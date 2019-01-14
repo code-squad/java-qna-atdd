@@ -2,8 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.QuestionRepository;
+import codesquad.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,23 +33,22 @@ public class QnaServiceTest extends AcceptanceTest {
     @Mock
     private AnswerRepository answerRepository;
 
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
+
     @InjectMocks
     private QnaService qnaService;
-
-
 
     @Before
     public void setUp() throws Exception {
         when(questionRepository.findById((long)1)).thenReturn(Optional.of(QUESTION));
         when(questionRepository.findById((long)4)).thenReturn(Optional.of(QUESTION_FOR_DELETE));
-        when(answerRepository.save(NEW_ANSWER)).thenReturn(NEW_ANSWER);
         when(answerRepository.findById(1L)).thenReturn(Optional.of(NEW_ANSWER));
-        when(answerRepository.findById(3L)).thenReturn(Optional.of(DELETE_ANSWER));
-
     }
 
     @Test
     public void update() {
+        QUESTION.writeBy(CHOI);
         qnaService.update(CHOI, 1, QUESTION_FOR_UPDATE);
         softly.assertThat(QUESTION.getTitle()).isEqualTo(QUESTION_FOR_UPDATE.getTitle());
         softly.assertThat(QUESTION.getContents()).isEqualTo(QUESTION_FOR_UPDATE.getContents());
@@ -63,25 +61,31 @@ public class QnaServiceTest extends AcceptanceTest {
 
     @Test
     public void deleteQuestion() throws CannotDeleteException {
+        QUESTION_FOR_DELETE.writeBy(CHOI);
         qnaService.deleteQuestion(CHOI, (long)4);
         softly.assertThat(QUESTION_FOR_DELETE.isDeleted()).isTrue();
     }
 
     @Test(expected = CannotDeleteException.class)
     public void deleteQuestionWithInvalidUser() throws CannotDeleteException {
+        QUESTION.writeBy(CHOI);
         qnaService.deleteQuestion(SING, (long)1);
     }
 
     @Test
     public void addAnswer(){
+        when(answerRepository.save(NEW_ANSWER)).thenReturn(NEW_ANSWER);
         softly.assertThat(qnaService.addAnswer(CHOI, 1L, NEW_ANSWER.getContents()).getContents())
                 .isEqualTo(NEW_ANSWER.getContents());
     }
 
     @Test
     public void deleteAnswer() throws CannotDeleteException{
+        Answer answer = new Answer(3L, CHOI, null, "contents");
+        when(answerRepository.findById(3L)).thenReturn(Optional.of(answer));
+        System.out.println(answerRepository.findById(3L).get());
         qnaService.deleteAnswer(CHOI, 3L);
-        softly.assertThat(DELETE_ANSWER.isDeleted()).isTrue();
+        softly.assertThat(answer.isDeleted()).isTrue();
     }
 
     @Test(expected = CannotDeleteException.class)

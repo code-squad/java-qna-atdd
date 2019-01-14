@@ -46,7 +46,7 @@ public class ApiAnswerControllerTest extends AcceptanceTest {
 
     @Test
     public void deleteWithoutLogin() {
-        String location = createResource(getCreatePath(1L), NEW_CONTENTS);
+        String location = createResource(getCreatePath(1L), "123123213");
         logger.debug("location : {}", location);
         ResponseEntity<Answer> responseEntity =
                 template().exchange(location, HttpMethod.DELETE, HttpEntity.EMPTY, Answer.class);
@@ -60,7 +60,7 @@ public class ApiAnswerControllerTest extends AcceptanceTest {
         logger.debug("location : {}", location);
         ResponseEntity<Answer> responseEntity =
                 basicAuthTemplate(sanjigiUser()).exchange(location, HttpMethod.DELETE, HttpEntity.EMPTY, Answer.class);
-
+        logger.debug("responseEntity : {}", responseEntity);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 

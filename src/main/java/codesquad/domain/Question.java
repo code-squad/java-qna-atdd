@@ -81,14 +81,20 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     }
 
     public void update(User loginUser, Question otherQuestion) {
-        if(!this.isOwner(loginUser)) throw new UnAuthorizedException("Invalid user");
+        if (!this.isOwner(loginUser)) throw new UnAuthorizedException("Invalid user");
         this.title = otherQuestion.title;
         this.contents = otherQuestion.contents;
     }
 
-    public void delete(User loginUser) throws CannotDeleteException{
-        if(!this.isOwner(loginUser)) throw new CannotDeleteException("Invalid user");
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        if (!this.isOwner(loginUser)) throw new CannotDeleteException("Invalid user");
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        for (Answer answer : answers) {
+            deleteHistories.add(answer.delete(loginUser));
+        }
         this.deleted = true;
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, getId(), loginUser));
+        return deleteHistories;
     }
 
     @Override
